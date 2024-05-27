@@ -461,9 +461,18 @@ services:
         max-file: "10"
 
 
+
 ############################################################################
 
 
+####################################
+####   PLUTIP - testcluster    #####
+####################################
+
+  plutip:
+    image: m2tec:plutip:latest
+  volumes:
+    - testcluster:/tmp
 
 #################################
 ####    optional extras     #####
@@ -587,6 +596,7 @@ volumes:
   pgadmin-data:
   unimatrix-data:
   dbless-cardano-token-registry-data:
+  testcluster:
 
 secrets:
   postgres_password:
