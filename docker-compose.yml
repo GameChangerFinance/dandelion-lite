@@ -470,8 +470,8 @@ services:
 ####################################
 
   plutip:
-    image: m2tec:plutip:latest
-  volumes:
+    image: m2tec/plutip:latest
+    volumes:
     - testcluster:/tmp
 
 #################################
