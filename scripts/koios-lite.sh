@@ -54,6 +54,9 @@ install_dependencies() {
         alpine)
           if ! sudo apk add curl awk gum; then return 1; fi
           ;;
+        nixos)
+          if ! echo "Add gum to your environment.systemPackages in configuration.nix" ;  then return 1; fi
+          ;;
         *)
           echo "Unsupported Linux distribution for automatic installation."
           return 1
@@ -66,6 +69,7 @@ install_dependencies() {
     MINGW*|MSYS*|CYGWIN*)
       if ! winget install curl awk gum; then return 1; fi
       ;;
+    
     *)
       echo "Unsupported operating system."
       return 1
