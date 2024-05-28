@@ -471,6 +471,13 @@ services:
 
   plutip:
     image: m2tec/plutip:latest
+    environment:
+      PLUTIP_NUM_WALLETS: ${PLUTIP_NUM_WALLETS:-5}
+    #   PLUTIP_ADA: ${PLUTIP_ADA:-10000}
+    #   PLUTIP_LOVELACE: ${PLUTIP_LOVELACE:-0}
+    #   PLUTIP_NUM_UTXOS: ${PLUTIP_NUM_UTXOS:-1}
+    #   PLUTIP_SLOT_LENGTH: ${PLUTIP_SLOT_LENGTH:-1.0s}
+    #   PLUTIP_EPOCH_SIZE: ${PLUTIP_EPOCH_SIZE:-10}
     volumes:
     - testcluster:/tmp
 
