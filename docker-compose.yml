@@ -1,4 +1,4 @@
-version: '3.8'
+# version: '3.8'
 
 name: "${PROJ_NAME}"
 services:
@@ -111,80 +111,85 @@ services:
 #       - node-ipc:${CARDANO_NODE_HOME}/ipc
 #       #- ./scripts/:/scripts/
 
-  # cardano-db-sync:
-  #   image:  ${CARDANO_DB_SYNC_IMAGE}
-  #   platform: linux/x86_64
-  #   hostname: cardano-db-sync
-  #   command: [
-  #     "--config", "/config/cardano-db-sync/config.json",
-  #     "--socket-path", "/node-ipc/node.socket"
-  #   ]
-  #   environment:
-  #     #DISABLE_LEDGER: ${CARDANO_DB_SYNC_DISABLE_LEDGER}
-  #     NETWORK: ${NETWORK}
-  #     POSTGRES_HOST: ${POSTGRES_HOST}
-  #     POSTGRES_PORT: 5432 # not using exposed ${POSTGRES_PORT} because using internal docker network connection 
-  #     POSTGRES_DB: ${POSTGRES_DB}
-  #     POSTGRES_USER: ${POSTGRES_USER}
-  #     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-  #     RESTORE_SNAPSHOT: ${CARDANO_DB_SYNC_RESTORE_SNAPSHOT:-}
-  #     RESTORE_RECREATE_DB: N
-  #     #EXTRA_DB_SYNC_ARGS: ${CARDANO_DB_SYNC_ARGS:-}
-  #   healthcheck:
-  #     test: ["CMD-SHELL", "/scripts/lib/dbsync_healthcheck.sh"]
-  #     interval: 60s
-  #     timeout: 10s
-  #   depends_on:
-  #     # Depend on both services to be healthy before starting.
-  #     cardano-node-ogmios:
-  #       condition: service_healthy
-  #     postgress:
-  #       condition: service_healthy
-  #   volumes:
-  #     - ./configs/cardano/config/network/${NETWORK}:/config
-  #     - db-sync-data:/var/lib/cexplorer
-  #     - node-ipc:/node-ipc
-  #     - ./scripts/:/scripts/
-  #   restart: on-failure
-  #   stop_signal: SIGINT
-  #   logging:
-  #     driver: "json-file"
-  #     options:
-  #       max-size: "200k"
-  #       max-file: "10"
+  cardano-db-sync:
+    build:
+      args:
+        - CARDANO_DB_SYNC_IMAGE=${CARDANO_DB_SYNC_IMAGE}
+      context: ./src/cardano-db-sync
+    # image:  ${CARDANO_DB_SYNC_IMAGE}
+    platform: linux/x86_64
+    hostname: cardano-db-sync
+    command: [
+      "--config", "/config/cardano-db-sync/config.json",
+      "--socket-path", "/node-ipc/node.socket"
+    ]
+    environment:
+      #DISABLE_LEDGER: ${CARDANO_DB_SYNC_DISABLE_LEDGER}
+      NETWORK: ${NETWORK}
+      POSTGRES_HOST: ${POSTGRES_HOST}
+      POSTGRES_PORT: 5432 # not using exposed ${POSTGRES_PORT} because using internal docker network connection 
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      RESTORE_SNAPSHOT: ${CARDANO_DB_SYNC_RESTORE_SNAPSHOT:-}
+      RESTORE_RECREATE_DB: N
+      #EXTRA_DB_SYNC_ARGS: ${CARDANO_DB_SYNC_ARGS:-}
+    healthcheck:
+      test: ["CMD-SHELL", "/scripts/lib/dbsync_healthcheck.sh"]
+      interval: 60s
+      timeout: 10s
+    depends_on:
+      # Depend on both services to be healthy before starting.
+      # cardano-node-ogmios:
+      #   condition: service_healthy
+      postgress:
+        condition: service_healthy
+    volumes:
+      - ./configs/cardano/config/network/${NETWORK}:/config
+      - db-sync-data:/var/lib/cexplorer
+      # - node-ipc:/node-ipc
+      - testcluster:/tmp
+      - ./scripts/:/scripts/
+    restart: on-failure
+    stop_signal: SIGINT
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
 
-  # postgress:
-  #   hostname: ${POSTGRES_HOST}    
-  #   #image: postgrest-extended:16.1-bullseye
-  #   build:
-  #     context: ./src/postgres
-  #   volumes:
-  #     - postgresdb:/var/lib/postgresql/data
-  #     - ./scripts/:/scripts/
-  #     #- ./src/postgres/init_scripts:/docker-entrypoint-initdb.d
-  #   ports:
-  #     - ${POSTGRES_PORT:-5432}:5432
-  #   environment:
-  #     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-  #     POSTGRES_USER: ${POSTGRES_USER}
-  #     POSTGRES_DB: ${POSTGRES_DB}      
-  #     # For init_postgres.sh variable placeholder system:
-  #     DANDELION_POSTGREST_SCHEMA: ${DANDELION_POSTGREST_SCHEMA}
-  #     CARDANO_SQL_SCHEMA: ${CARDANO_SQL_SCHEMA}
-  #     #RPC_SCHEMA: ${RPC_SCHEMA} #Deprecated, use the ones down below:
-  #     KOIOS_LITE_SCHEMA: ${KOIOS_LITE_SCHEMA}
-  #     KOIOS_ARTIFACTS_SCHEMA: ${KOIOS_ARTIFACTS_SCHEMA}
-  #   healthcheck:
-  #     test:  ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
-  #     interval: 60s
-  #     timeout: 5s
-  #   command: postgres -c max_connections=200 -c wal_level=minimal -c max_wal_senders=0 -c synchronous_commit=off
-  #   restart: on-failure
-  #   logging:
-  #     driver: "json-file"
-  #     options:
-  #       max-size: "200k"
-  #       max-file: "10"
+  postgress:
+    hostname: ${POSTGRES_HOST}    
+    #image: postgrest-extended:16.1-bullseye
+    build:
+      context: ./src/postgres
+    volumes:
+      - postgresdb:/var/lib/postgresql/data
+      - ./scripts/:/scripts/
+      #- ./src/postgres/init_scripts:/docker-entrypoint-initdb.d
+    ports:
+      - ${POSTGRES_PORT:-5432}:5432
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_DB: ${POSTGRES_DB}      
+      # For init_postgres.sh variable placeholder system:
+      DANDELION_POSTGREST_SCHEMA: ${DANDELION_POSTGREST_SCHEMA}
+      CARDANO_SQL_SCHEMA: ${CARDANO_SQL_SCHEMA}
+      #RPC_SCHEMA: ${RPC_SCHEMA} #Deprecated, use the ones down below:
+      KOIOS_LITE_SCHEMA: ${KOIOS_LITE_SCHEMA}
+      KOIOS_ARTIFACTS_SCHEMA: ${KOIOS_ARTIFACTS_SCHEMA}
+    healthcheck:
+      test:  ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 3s
+    command: postgres -c max_connections=200 -c wal_level=minimal -c max_wal_senders=0 -c synchronous_commit=off
+    restart: on-failure
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
 
 #################################
 ######  cardano-graphql  ########
