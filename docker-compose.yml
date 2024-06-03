@@ -125,7 +125,7 @@ services:
     ]
     environment:
       #DISABLE_LEDGER: ${CARDANO_DB_SYNC_DISABLE_LEDGER}
-      NETWORK: ${NETWORK}
+      NETWORK: mainnet
       POSTGRES_HOST: ${POSTGRES_HOST}
       POSTGRES_PORT: 5432 # not using exposed ${POSTGRES_PORT} because using internal docker network connection 
       POSTGRES_DB: ${POSTGRES_DB}
@@ -145,7 +145,7 @@ services:
       postgress:
         condition: service_healthy
     volumes:
-      - ./configs/cardano/config/network/${NETWORK}:/config
+      - ./configs/cardano/config/network/private:/config
       - db-sync-data:/var/lib/cexplorer
       # - node-ipc:/node-ipc
       - testcluster:/tmp

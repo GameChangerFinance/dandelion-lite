@@ -7,7 +7,6 @@ FROM ${CARDANO_DB_SYNC_IMAGE}
 # # GunDB peer data
 RUN mkdir -p /tmp/cluster/pool-1
 RUN ln -s /tmp/cluster/pool-1 /node-ipc
-RUN ln -s /tmp/cluster /config
 # COPY package*.json ./
 # COPY unimatrix.js ./
 # COPY www ./
