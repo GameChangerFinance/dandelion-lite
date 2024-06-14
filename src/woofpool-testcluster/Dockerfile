@@ -1,7 +1,8 @@
 FROM alpine:latest
 RUN apk add --no-cache bash coreutils jq git wget tar
 
-RUN git clone -b geniusyield --single-branch https://github.com/M2tec/cardano-private-testnet-setup.git
+#RUN git clone -b geniusyield --single-branch https://github.com/M2tec/cardano-private-testnet-setup.git
+RUN mkdir cardano-private-testnet-setup
 RUN wget https://github.com/IntersectMBO/cardano-node/releases/download/8.9.3/cardano-node-8.9.3-linux.tar.gz
 RUN tar xvfz cardano-node-8.9.3-linux.tar.gz ./bin/ --directory /bin
 RUN rm -rf cardano-node-8.9.3-linux.tar.gz

@@ -481,6 +481,8 @@ services:
     build:
       context: ./src/woofpool-testcluster
     restart: on-failure
+    volumes:
+     - testcluster:/cardano-private-testnet-setup/
   #   environment:
   #     UNIMATRIX_PORT: 8765
   #   # static http server can be exposed as well
