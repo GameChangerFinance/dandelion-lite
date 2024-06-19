@@ -150,6 +150,7 @@ services:
       test: ["CMD-SHELL", "/scripts/lib/dbsync_healthcheck.sh"]
       interval: 60s
       timeout: 10s
+      retries: 5
     depends_on:
       # Depend on both services to be healthy before starting.
       # cardano-node-ogmios:
@@ -200,6 +201,7 @@ services:
       test:  ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 10s
       timeout: 3s
+      retries: 5
     command: postgres -c config_file=/etc/postgresql/postgresql.conf
     restart: on-failure
     logging:
