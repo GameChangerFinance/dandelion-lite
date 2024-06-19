@@ -8,3 +8,4 @@ scripts/sql/rpc/Skipped.txt
 *.log
 configs/haproxy/manifest.json
 configs/ssl/
+.vscode
