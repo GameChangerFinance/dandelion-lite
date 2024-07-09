@@ -214,12 +214,8 @@ services:
 ######  cardano-graphql  ########
 #################################
 
-
-  hasura:
+  cardano-graphql-hasura:
     image: ${CARDANO_GRAPHQL_HASURA_IMAGE}
-    # external_links:
-    #   - ${POSTGRES_HOST:-postgress}:postgres
-    #image: cardanofoundation/cardano-graphql-hasura:${CARDANO_GRAPHQL_VERSION:-8.0.1}
     ports:
       - ${CARDANO_GRAPHQL_HASURA_PORT:-8090}:8080
     depends_on:
@@ -242,16 +238,12 @@ services:
 
   cardano-graphql-background:
     image: ${CARDANO_GRAPHQL_BACKGROUND_IMAGE}
-    # external_links:
-    #   - ${POSTGRES_HOST:-postgress}:postgres
-    #   - ${CARDANO_GRAPHQL_HASURA_HOST:-cardano-graphql-hasura}:hasura
-    #image: cardanofoundation/cardano-graphql-background:${CARDANO_GRAPHQL_VERSION:-8.0.1}-${NETWORK:-mainnet}
     depends_on:
-      - "hasura"
+      - "cardano-graphql-hasura"
       - "postgress"
     environment:
       POSTGRES_HOST: postgress
-      #CARDANO_GRAPHQL_HASURA_HOST: cardano-graphql-hasura
+      HASURA_URI: http://cardano-graphql-hasura:${CARDANO_GRAPHQL_HASURA_PORT:-8090}
       LOGGER_MIN_SEVERITY: ${CARDANO_GRAPHQL_BACKGROUND_LOGGER_MIN_SEVERITY:-info}
       METADATA_SERVER_URI: ${CARDANO_GRAPHQL_BACKGROUND_METADATA_SERVER_URI:-https://tokens.cardano.org}
     restart: on-failure
@@ -268,11 +260,8 @@ services:
   cardano-graphql-server:
     platform: linux/x86_64
     image: ${CARDANO_GRAPHQL_SERVER_IMAGE}
-    # external_links:
-    #   - ${CARDANO_GRAPHQL_HASURA_HOST:-cardano-graphql-hasura}:hasura
-    #image: cardanofoundation/cardano-graphql-server:${CARDANO_GRAPHQL_VERSION:-8.0.1}-${NETWORK:-mainnet}
     environment:
-      #CARDANO_GRAPHQL_HASURA_HOST: cardano-graphql-hasura
+      HASURA_URI: http://cardano-graphql-hasura:${CARDANO_GRAPHQL_HASURA_PORT:-8090}
       ALLOW_INTROSPECTION: ${CARDANO_GRAPHQL_SERVER_ALLOW_INTROSPECTION:-true}
       CACHE_ENABLED: ${CARDANO_GRAPHQL_SERVER_CACHE_ENABLED:-true}
       LOGGER_MIN_SEVERITY: ${CARDANO_GRAPHQL_SERVER_LOGGER_MIN_SEVERITY:-info}
