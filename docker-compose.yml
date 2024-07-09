@@ -5,70 +5,72 @@ services:
 #### guild node + ogmios ########
 #################################
 
-#  cardano-node:
-#    image: ${CARDANO_NODE_IMAGE}
-#    init: true
-#    hostname: cardano-node
-#    environment:
-#      NETWORK: ${NETWORK}
-#      SOCKET: "${CARDANO_NODE_HOME}/sockets/node.socket" 
-#      UPDATE_CHECK: "N"
-#      EXPORTED_CONFIG: "${CARDANO_NODE_HOME}/sockets/exportedConfig"
-#    volumes:
-#      - node-db:${CARDANO_NODE_HOME}/db
-#      - node-ipc:${CARDANO_NODE_HOME}/sockets
-#      - ./scripts/:/scripts/
-#    entrypoint: >
-#      /bin/sh -c "
-#      echo \"Preparing setup for network '${NETWORK}'\" ;
-#      mkdir -p $${EXPORTED_CONFIG};
-#      chown -Rv guild $${EXPORTED_CONFIG};
-#      rm -rf $${EXPORTED_CONFIG}/*.json;
-#      echo \"Exporting config files from '${CARDANO_NODE_HOME}/files' into '$${EXPORTED_CONFIG}'...\" ;
-#      cp ${CARDANO_NODE_HOME}/files/*.json $${EXPORTED_CONFIG} ;
-#      echo 'Identifying lines with potencial issues with protocol magic number and file paths...' ;
-#      grep -Rnw $${EXPORTED_CONFIG} -e '764824073' ;
-#      grep -Rnw $${EXPORTED_CONFIG} -e '${CARDANO_NODE_HOME}/files' ;
-#      echo \"Patching exported files...\" ;
-#      [ \"${NETWORK}\" = \"preprod\" ] && find $${EXPORTED_CONFIG} -name '*.json' -print0 | xargs -0 sed -i 's/764824073/1/g' ;
-#      [ \"${NETWORK}\" = \"preview\" ] && find $${EXPORTED_CONFIG} -name '*.json' -print0 | xargs -0 sed -i 's/764824073/2/g' ;
-#      find $${EXPORTED_CONFIG} -name '*.json' -print0 | xargs -0 sed -i \"s#${CARDANO_NODE_HOME}/files#$${EXPORTED_CONFIG}#g\" ;
-#      echo 'Config files exported:' ;
-#      ls -ls $${EXPORTED_CONFIG} ;
-#      ./entrypoint.sh ;
-#      "
-#    restart: always
-#    healthcheck:
-#      test: ["CMD-SHELL", "netstat -ntlp | grep 12798"]
-#      interval: 30s
-#      timeout: 10s
-#      retries: 3
-#    logging:
-#      driver: "json-file"
-#      options:
-#        max-size: "200k"
-#        max-file: "10"
+  cardano-node:
+    image: ${CARDANO_NODE_IMAGE}
+    init: true
+    hostname: cardano-node
+    environment:
+      NETWORK: ${NETWORK}
+      SOCKET: "${CARDANO_NODE_HOME}/sockets/node.socket" 
+      UPDATE_CHECK: "N"
+      EXPORTED_CONFIG: "${CARDANO_NODE_HOME}/sockets/exportedConfig"
+    volumes:
+      - node-db:${CARDANO_NODE_HOME}/db
+      - node-ipc:${CARDANO_NODE_HOME}/sockets
+      - ./scripts/:/scripts/
+    entrypoint: >
+      /bin/sh -c "
+      echo \"Preparing setup for network '${NETWORK}'\" ;
+      mkdir -p $${EXPORTED_CONFIG};
+      chown -Rv guild $${EXPORTED_CONFIG};
+      rm -rf $${EXPORTED_CONFIG}/*.json;
+      echo \"Exporting config files from '${CARDANO_NODE_HOME}/files' into '$${EXPORTED_CONFIG}'...\" ;
+      cp ${CARDANO_NODE_HOME}/files/*.json $${EXPORTED_CONFIG} ;
+      echo 'Identifying lines with potencial issues with protocol magic number and file paths...' ;
+      grep -Rnw $${EXPORTED_CONFIG} -e '764824073' ;
+      grep -Rnw $${EXPORTED_CONFIG} -e '${CARDANO_NODE_HOME}/files' ;
+      echo \"Patching exported files...\" ;
+      [ \"${NETWORK}\" = \"preprod\" ] && find $${EXPORTED_CONFIG} -name '*.json' -print0 | xargs -0 sed -i 's/764824073/1/g' ;
+      [ \"${NETWORK}\" = \"preview\" ] && find $${EXPORTED_CONFIG} -name '*.json' -print0 | xargs -0 sed -i 's/764824073/2/g' ;
+      find $${EXPORTED_CONFIG} -name '*.json' -print0 | xargs -0 sed -i \"s#${CARDANO_NODE_HOME}/files#$${EXPORTED_CONFIG}#g\" ;
+      echo 'Config files exported:' ;
+      ls -ls $${EXPORTED_CONFIG} ;
+      ./entrypoint.sh ;
+      "
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "netstat -ntlp | grep 12798"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
+    profiles: [cardano-node]
 
   # TODO: add http backend ogmios and it's entry on /configs/haproxy/haproxy.cfg
   # Important: https://github.com/cardano-community/guild-operators/pull/1261/files
-#  ogmios:
-#    image:  ${OGMIOS_IMAGE}
-#    restart: always
-#    environment:
-#      NETWORK: ${NETWORK}
-#    command: [
-#      "--host", "0.0.0.0",
-#      "--node-socket", "${CARDANO_NODE_HOME}/sockets/node.socket",
-#      "--node-config", "${CARDANO_NODE_HOME}/sockets/exportedConfig/config.json"
-#    ]
-#    volumes:
-#      # exported automagically from cardano-node for plug-n-play ogmios
-#      - node-ipc:${CARDANO_NODE_HOME}/sockets
-#    ports:
-#      - ${OGMIOS_PORT:-1337}:1337
-#    depends_on:
-#      cardano-node:
-#        condition: service_healthy
+  ogmios:
+    image:  ${OGMIOS_IMAGE}
+    restart: always
+    environment:
+      NETWORK: ${NETWORK}
+    command: [
+      "--host", "0.0.0.0",
+      "--node-socket", "${CARDANO_NODE_HOME}/sockets/node.socket",
+      "--node-config", "${CARDANO_NODE_HOME}/sockets/exportedConfig/config.json"
+    ]
+    volumes:
+      # exported automagically from cardano-node for plug-n-play ogmios
+      - node-ipc:${CARDANO_NODE_HOME}/sockets
+    ports:
+      - ${OGMIOS_PORT:-1337}:1337
+    depends_on:
+      cardano-node:
+        condition: service_healthy
+    profiles: [ogmios]
 
 #################################
 ### node + ogmios + indexer #####
@@ -106,6 +108,7 @@ services:
       - node-db:${CARDANO_NODE_HOME}/db
       - node-ipc:${CARDANO_NODE_HOME}/ipc
       - ./scripts/cardano-node-ogmios/:/scripts/
+    profiles: [cardano-node-ogmios]      
 
   cardano-db-sync:
     image:  ${CARDANO_DB_SYNC_IMAGE}
@@ -150,6 +153,7 @@ services:
       options:
         max-size: "200k"
         max-file: "10"
+    profiles: [cardano-db-sync] 
 
   postgress:
     hostname: ${POSTGRES_HOST}    
@@ -185,6 +189,7 @@ services:
       options:
         max-size: "200k"
         max-file: "10"
+    profiles: [postgress]           
 
 #################################
 ######  cardano-graphql  ########
@@ -217,6 +222,7 @@ services:
       options:
         max-size: "200k"
         max-file: "10"
+    profiles: [cardano-graphql-hasura]            
 
   cardano-graphql-background:
     image: ${CARDANO_GRAPHQL_BACKGROUND_IMAGE}
@@ -242,6 +248,7 @@ services:
       options:
         max-size: "200k"
         max-file: "10"
+    profiles: [cardano-graphql-background]           
 
   cardano-graphql-server:
     platform: linux/x86_64
@@ -265,6 +272,7 @@ services:
       options:
         max-size: "200k"
         max-file: "10"
+    profiles: [cardano-graphql-server]         
 
 #################################
 ####     token registry  ########
@@ -289,6 +297,7 @@ services:
       postgress:
         condition: service_healthy      
     restart: always
+    profiles: [cardano-token-registry]
 
 #
 #  dbless-cardano-token-registry:
@@ -338,6 +347,7 @@ services:
       options:
         max-size: "200k"
         max-file: "10"
+    profiles: [postgrest]       
 
   cron:
     build: .
@@ -362,7 +372,7 @@ services:
     # Uncomment for persistent logs
     # - ./logs:/var/log
     restart: always
-
+    profiles: [cron]
 
 #################################
 #### Dandelion PostGREST API#####
@@ -394,6 +404,7 @@ services:
       options:
         max-size: "200k"
         max-file: "10"
+    profiles: [dandelion-postgrest]        
 
 
 #################################
@@ -426,6 +437,7 @@ services:
       options:
         max-size: "200k"
         max-file: "10"
+    profiles: [cardano-sql-postgrest]
 
 
 #################################
@@ -445,7 +457,7 @@ services:
     # TODO: link to persistent volume
     volumes:
       - unimatrix-data:/work/data
-
+    profiles: [unimatrix]
 
 #################################
 ####   HAPROXY - Ingress    #####
@@ -489,7 +501,7 @@ services:
       options:
         max-size: "200k"
         max-file: "10"
-
+    profiles: [haproxy]
 
 ############################################################################
 
@@ -499,42 +511,42 @@ services:
 ####    optional extras     #####
 #################################
 
-#  cardano-sql-companion:
-#    #image: cardano-sql-companion:latest
-#    build:
-#      context: ./src/cardano-sql/companion
-#      target: production-build-stage
-#    restart: always
-#    environment:
-#      NETWORK: ${NETWORK}
-#      DLT: ${DLT}
-#      NODE_NAME: ${NODE_NAME}
-#      NODE_GROUPS: ${NODE_GROUPS}
-#      NODE_EXTENSIONS: ${NODE_EXTENSIONS}
-#      
-#      CARDANO_NODE_VERSION: ${CARDANO_NODE_VERSION}
-#      CARDANO_NODE_IMAGE: ${CARDANO_NODE_IMAGE}
-#      
-#      CARDANO_DB_SYNC_VERSION: ${CARDANO_DB_SYNC_VERSION}
-#      CARDANO_DB_SYNC_IMAGE: ${CARDANO_DB_SYNC_IMAGE}
-#      
-#      OGMIOS_VERSION: ${OGMIOS_VERSION}
-#      OGMIOS_IMAGE: ${OGMIOS_IMAGE}
-#      OGMIOS_PORT: ${OGMIOS_PORT}
-#      # used for service connection, others are for public manifest
-#      USE_OGMIOS_HOST: ${OGMIOS_HOST:-ogmios}
-#      USE_OGMIOS_PORT: 1337
-#
-#      CARDANO_SQL_EXTENSIONS: ${CARDANO_SQL_EXTENSIONS}
-#      CARDANO_SQL_COMPANION_PORT: ${CARDANO_SQL_COMPANION_PORT}
-#
-#      POSTGREST_PORT: ${POSTGREST_PORT}
-#      UNIMATRIX_PORT: ${UNIMATRIX_PORT:-8765}
-#      PGADMIN_PORT: ${PGADMIN_PORT}
-#      SWAGGER_PORT: ${SWAGGER_PORT}
-#    ports:
-#      - ${CARDANO_SQL_COMPANION_PORT:-4000}:4000
-#
+  cardano-sql-companion:
+    #image: cardano-sql-companion:latest
+    build:
+      context: ./src/cardano-sql/companion
+      target: production-build-stage
+    restart: always
+    environment:
+      NETWORK: ${NETWORK}
+      DLT: ${DLT}
+      NODE_NAME: ${NODE_NAME}
+      NODE_GROUPS: ${NODE_GROUPS}
+      NODE_EXTENSIONS: ${NODE_EXTENSIONS}
+      
+      CARDANO_NODE_VERSION: ${CARDANO_NODE_VERSION}
+      CARDANO_NODE_IMAGE: ${CARDANO_NODE_IMAGE}
+      
+      CARDANO_DB_SYNC_VERSION: ${CARDANO_DB_SYNC_VERSION}
+      CARDANO_DB_SYNC_IMAGE: ${CARDANO_DB_SYNC_IMAGE}
+      
+      OGMIOS_VERSION: ${OGMIOS_VERSION}
+      OGMIOS_IMAGE: ${OGMIOS_IMAGE}
+      OGMIOS_PORT: ${OGMIOS_PORT}
+      # used for service connection, others are for public manifest
+      USE_OGMIOS_HOST: ${OGMIOS_HOST:-ogmios}
+      USE_OGMIOS_PORT: 1337
+
+      CARDANO_SQL_EXTENSIONS: ${CARDANO_SQL_EXTENSIONS}
+      CARDANO_SQL_COMPANION_PORT: ${CARDANO_SQL_COMPANION_PORT}
+
+      POSTGREST_PORT: ${POSTGREST_PORT}
+      UNIMATRIX_PORT: ${UNIMATRIX_PORT:-8765}
+      PGADMIN_PORT: ${PGADMIN_PORT}
+      SWAGGER_PORT: ${SWAGGER_PORT}
+    ports:
+      - ${CARDANO_SQL_COMPANION_PORT:-4000}:4000
+    profiles: [cardano-sql-companion]   
 
   # portainer-agent:
   #   image: portainer/agent:latest
@@ -561,45 +573,46 @@ services:
   #   depends_on:
   #     - portainer-agent
 
-  # Develpoment and Testing
-  # swagger:
-  #   image: swaggerapi/swagger-ui
-  #   restart: always
-  #   depends_on:
-  #     postgress:
-  #       condition: service_healthy
-  #   ports:
-  #     - "${SWAGGER_PORT:-8080}:8080"
-  #   expose:
-  #     - "8080"
-  #   environment:
-  #     API_URL: http://127.0.0.1:${POSTGREST_PORT}/
+  #Develpoment and Testing
+  swagger:
+    image: swaggerapi/swagger-ui
+    restart: always
+    depends_on:
+      postgress:
+        condition: service_healthy
+    ports:
+      - "${SWAGGER_PORT:-8080}:8080"
+    expose:
+      - "8080"
+    environment:
+      API_URL: http://127.0.0.1:${POSTGREST_PORT}/
+    profiles: [swagger]      
 
-  # pgadmin:
-  #   build:
-  #     context: ./src/pgadmin
-  #     args:
-  #       NETWORK: ${NETWORK}
-  #       PROJ_NAME: ${PROJ_NAME}
-  #       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
-  #       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
-  #       POSTGRES_DB: ${POSTGRES_DB}
-  #       POSTGRES_PORT: ${POSTGRES_PORT}
-  #       POSTGRES_USER: ${POSTGRES_USER}
-  #       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-  #   restart: always
-  #   environment:
-  #       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
-  #       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
-  #       PGADMIN_LISTEN_PORT: 80
-  #   ports:
-  #       - "${PGADMIN_PORT:-5050}:80"
-  #   volumes:
-  #       - pgadmin-data:/var/lib/pgadmin
-  #   depends_on:
-  #     postgress:
-  #       condition: service_healthy
-
+  pgadmin:
+    build:
+      context: ./src/pgadmin
+      args:
+        NETWORK: ${NETWORK}
+        PROJ_NAME: ${PROJ_NAME}
+        PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+        PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+        POSTGRES_DB: ${POSTGRES_DB}
+        POSTGRES_PORT: ${POSTGRES_PORT}
+        POSTGRES_USER: ${POSTGRES_USER}
+        POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    restart: always
+    environment:
+        PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+        PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+        PGADMIN_LISTEN_PORT: 80
+    ports:
+        - "${PGADMIN_PORT:-5050}:80"
+    volumes:
+        - pgadmin-data:/var/lib/pgadmin
+    depends_on:
+      postgress:
+        condition: service_healthy
+    profiles: [pgadmin]   
 
 
 #################################
