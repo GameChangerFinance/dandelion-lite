@@ -50,25 +50,25 @@ services:
         max-file: "10"
     profiles: [cardano-node]
 
-  # TODO: add http backend ogmios and it's entry on /configs/haproxy/haproxy.cfg
-  # Important: https://github.com/cardano-community/guild-operators/pull/1261/files
-  ogmios:
+  #TODO: add http backend ogmios and it's entry on /configs/haproxy/haproxy.cfg
+  #Important: https://github.com/cardano-community/guild-operators/pull/1261/files
+  cardano-node-ogmios:
     image:  ${OGMIOS_IMAGE}
     restart: always
     environment:
       NETWORK: ${NETWORK}
     command: [
       "--host", "0.0.0.0",
-      "--node-socket", "${CARDANO_NODE_HOME}/sockets/node.socket",
-      "--node-config", "${CARDANO_NODE_HOME}/sockets/exportedConfig/config.json"
+      "--node-socket", "${CARDANO_NODE_HOME}/node-ipc/node.socket",
+      "--node-config", "${CARDANO_NODE_HOME}/node-ipc/testcluster/private-testnet/configuration.yaml"
     ]
     volumes:
       # exported automagically from cardano-node for plug-n-play ogmios
-      - node-ipc:${CARDANO_NODE_HOME}/sockets
+      - node-ipc:${CARDANO_NODE_HOME}/node-ipc
     ports:
       - ${OGMIOS_PORT:-1337}:1337
     depends_on:
-      cardano-node:
+      testcluster:
         condition: service_healthy
     profiles: [ogmios]
 
@@ -76,51 +76,72 @@ services:
 ### node + ogmios + indexer #####
 #################################
 
-  cardano-node-ogmios:
-    image: ${CARDANO_NODE_OGMIOS_IMAGE}
-    hostname: cardano-node
-    #init: true
-    platform: linux/x86_64
-    restart: always
-    healthcheck:
-      test: ["CMD-SHELL", "/scripts/healthcheck.sh"]
-      interval: 30s
-      timeout: 10s
-      retries: 1000000
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "400k"
-        max-file: "10"
-    ports:
-      - ${OGMIOS_PORT:-1337}:1337
+  # cardano-node-ogmios:
+  #   image: ${CARDANO_NODE_OGMIOS_IMAGE}
+  #   hostname: cardano-node
+  #   #init: true
+  #   platform: linux/x86_64
+  #   restart: always
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "/scripts/healthcheck.sh"]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 1000000
+  #   logging:
+  #     driver: "json-file"
+  #     options:
+  #       max-size: "400k"
+  #       max-file: "10"
+  #   ports:
+  #     - ${OGMIOS_PORT:-1337}:1337
+  #   environment:
+  #     NETWORK: ${NETWORK}
+  #     #SOCKET: "${CARDANO_NODE_HOME}/ipc/node.socket" 
+  #     #UPDATE_CHECK: "N"
+  #     #EXPORTED_CONFIG: "${CARDANO_NODE_HOME}/config"
+  #   volumes:
+  #     #- node-db:/db
+  #     #- node-ipc:/ipc 
+  #     # Uncomment if you want to use your own config files or the provided ones.
+  #     # Current configs are also available at: https://book.world.dev.cardano.org/
+  #     #- ./configs/cardano/config/network/${NETWORK}:/config
+  #     - node-db:${CARDANO_NODE_HOME}/db
+  #     - node-ipc:${CARDANO_NODE_HOME}/ipc
+  #     - ./scripts/cardano-node-ogmios/:/scripts/
+  #   profiles: [cardano-node-ogmios]      
+
+  testcluster:
+    build:
+      context: ./src/woofpool-testcluster
+    restart: on-failure
     environment:
-      NETWORK: ${NETWORK}
-      #SOCKET: "${CARDANO_NODE_HOME}/ipc/node.socket" 
-      #UPDATE_CHECK: "N"
-      #EXPORTED_CONFIG: "${CARDANO_NODE_HOME}/config"
+      NETWORK_MAGIC: 5    
     volumes:
-      #- node-db:/db
-      #- node-ipc:/ipc 
-      # Uncomment if you want to use your own config files or the provided ones.
-      # Current configs are also available at: https://book.world.dev.cardano.org/
-      #- ./configs/cardano/config/network/${NETWORK}:/config
-      - node-db:${CARDANO_NODE_HOME}/db
-      - node-ipc:${CARDANO_NODE_HOME}/ipc
-      - ./scripts/cardano-node-ogmios/:/scripts/
-    profiles: [cardano-node-ogmios]      
+     - node-ipc:${CARDANO_NODE_HOME}/node-ipc     
+    healthcheck:
+      test:  ["CMD-SHELL", "/healthcheck.sh"]
+      interval: 10s
+      retries: 30
+      timeout: 3s 
+    profiles: [testcluster]         
 
   cardano-db-sync:
-    image:  ${CARDANO_DB_SYNC_IMAGE}
+    build:
+      args:
+        - CARDANO_DB_SYNC_IMAGE=${CARDANO_DB_SYNC_IMAGE}
+      context: ./src/cardano-db-sync
+    # image:  ${CARDANO_DB_SYNC_IMAGE}
     platform: linux/x86_64
     hostname: cardano-db-sync
     command: [
-      "--config", "/config/cardano-db-sync/config.json",
-      "--socket-path", "/node-ipc/node.socket"
+      "--config", "/node-ipc/testcluster/private-testnet/db-sync-config.yaml",
+      "--socket-path", "/node-ipc/node.socket",
+      "--disable-metadata",
+      "--disable-offchain-pool-data"      
     ]
     environment:
       #DISABLE_LEDGER: ${CARDANO_DB_SYNC_DISABLE_LEDGER}
-      NETWORK: ${NETWORK}
+      # NETWORK: ${NETWORK}
       POSTGRES_HOST: ${POSTGRES_HOST}
       POSTGRES_PORT: 5432 # not using exposed ${POSTGRES_PORT} because using internal docker network connection 
       POSTGRES_DB: ${POSTGRES_DB}
@@ -137,8 +158,8 @@ services:
       retries: 5000000
     depends_on:
       # Depend on both services to be healthy before starting.
-      cardano-node-ogmios:
-        condition: service_healthy
+      # cardano-node-ogmios:
+      #   condition: service_healthy
       postgress:
         condition: service_healthy
     volumes:
@@ -203,8 +224,8 @@ services:
     ports:
       - ${CARDANO_GRAPHQL_HASURA_PORT:-8090}:8080
     depends_on:
-      cardano-node-ogmios:
-        condition: service_healthy
+      # cardano-node-ogmios:
+      #   condition: service_healthy
       postgress:
         condition: service_healthy
     restart: always
@@ -349,7 +370,7 @@ services:
         max-file: "10"
     profiles: [postgrest]       
 
-  cron:
+  koios:
     build: .
     environment:
       NETWORK: ${NETWORK}
@@ -629,6 +650,7 @@ volumes:
   pgadmin-data:
   unimatrix-data:
   dbless-cardano-token-registry-data:
+  testcluster:
 
 secrets:
   postgres_password:

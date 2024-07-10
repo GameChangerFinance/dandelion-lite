@@ -1,0 +1,64 @@
+ARG CARDANO_DB_SYNC_IMAGE
+FROM ${CARDANO_DB_SYNC_IMAGE}
+
+RUN rm -rf /nix/store/n7qvj8847bpsvzv018bi36c2wci1cgb0-schema/migration-4-0001-20200702.sql
+RUN rm -rf /nix/store/n7qvj8847bpsvzv018bi36c2wci1cgb0-schema/migration-4-0002-20200810.sql
+RUN rm -rf /nix/store/n7qvj8847bpsvzv018bi36c2wci1cgb0-schema/migration-4-0003-20210116.sql
+RUN rm -rf /nix/store/n7qvj8847bpsvzv018bi36c2wci1cgb0-schema/migration-4-0007-20220528.sql
+RUN rm -rf /nix/store/n7qvj8847bpsvzv018bi36c2wci1cgb0-schema/migration-4-0005-20211022.sql
+RUN rm -rf /nix/store/n7qvj8847bpsvzv018bi36c2wci1cgb0-schema/migration-4-0006-20220118.sql
+RUN rm -rf /nix/store/n7qvj8847bpsvzv018bi36c2wci1cgb0-schema/migration-4-0004-20210116.sql
+
+# RUN rm -rf /nix/store/n7qvj8847bpsvzv018bi36c2wci1cgb0-schema/migration-3-0001-20190816.sql
+# RUN rm -rf /nix/store/n7qvj8847bpsvzv018bi36c2wci1cgb0-schema/migration-3-0002-20200521.sql
+# RUN rm -rf /nix/store/n7qvj8847bpsvzv018bi36c2wci1cgb0-schema/migration-3-0003-20240121.sql
+# RUN rm -rf /nix/store/n7qvj8847bpsvzv018bi36c2wci1cgb0-schema/migration-3-9999-20200728.sql
+
+# RUN rm -rf /nix/store/n7qvj8847bpsvzv018bi36c2wci1cgb0-schema/migration-2-0001-20211003.sql
+# RUN rm -rf /nix/store/n7qvj8847bpsvzv018bi36c2wci1cgb0-schema/migration-2-0002-20211007.sql
+# RUN rm -rf /nix/store/n7qvj8847bpsvzv018bi36c2wci1cgb0-schema/migration-2-0003-20211013.sql
+# RUN rm -rf /nix/store/n7qvj8847bpsvzv018bi36c2wci1cgb0-schema/migration-2-0004-20211014.sql
+# RUN rm -rf /nix/store/n7qvj8847bpsvzv018bi36c2wci1cgb0-schema/migration-2-0005-20211018.sql
+# RUN rm -rf /nix/store/n7qvj8847bpsvzv018bi36c2wci1cgb0-schema/migration-2-0006-20220105.sql
+# RUN rm -rf /nix/store/n7qvj8847bpsvzv018bi36c2wci1cgb0-schema/migration-2-0007-20220118.sql
+# RUN rm -rf /nix/store/n7qvj8847bpsvzv018bi36c2wci1cgb0-schema/migration-2-0008-20220126.sql
+# RUN rm -rf /nix/store/n7qvj8847bpsvzv018bi36c2wci1cgb0-schema/migration-2-0009-20220207.sql
+# RUN rm -rf /nix/store/n7qvj8847bpsvzv018bi36c2wci1cgb0-schema/migration-2-0010-20220225.sql
+# RUN rm -rf /nix/store/n7qvj8847bpsvzv018bi36c2wci1cgb0-schema/migration-2-0011-20220318.sql
+# RUN rm -rf /nix/store/n7qvj8847bpsvzv018bi36c2wci1cgb0-schema/migration-2-0012-20220502.sql
+# RUN rm -rf /nix/store/n7qvj8847bpsvzv018bi36c2wci1cgb0-schema/migration-2-0013-20220505.sql
+# RUN rm -rf /nix/store/n7qvj8847bpsvzv018bi36c2wci1cgb0-schema/migration-2-0014-20220505.sql
+# RUN rm -rf /nix/store/n7qvj8847bpsvzv018bi36c2wci1cgb0-schema/migration-2-0015-20220505.sql
+# RUN rm -rf /nix/store/n7qvj8847bpsvzv018bi36c2wci1cgb0-schema/migration-2-0016-20220524.sql
+# RUN rm -rf /nix/store/n7qvj8847bpsvzv018bi36c2wci1cgb0-schema/migration-2-0017-20220526.sql
+# RUN rm -rf /nix/store/n7qvj8847bpsvzv018bi36c2wci1cgb0-schema/migration-2-0018-20220604.sql
+# RUN rm -rf /nix/store/n7qvj8847bpsvzv018bi36c2wci1cgb0-schema/migration-2-0019-20220615.sql
+# RUN rm -rf /nix/store/n7qvj8847bpsvzv018bi36c2wci1cgb0-schema/migration-2-0020-20220919.sql
+# RUN rm -rf /nix/store/n7qvj8847bpsvzv018bi36c2wci1cgb0-schema/migration-2-0021-20221019.sql
+# RUN rm -rf /nix/store/n7qvj8847bpsvzv018bi36c2wci1cgb0-schema/migration-2-0022-20221020.sql
+# RUN rm -rf /nix/store/n7qvj8847bpsvzv018bi36c2wci1cgb0-schema/migration-2-0023-20221019.sql
+# RUN rm -rf /nix/store/n7qvj8847bpsvzv018bi36c2wci1cgb0-schema/migration-2-0024-20221020.sql
+# RUN rm -rf /nix/store/n7qvj8847bpsvzv018bi36c2wci1cgb0-schema/migration-2-0025-20221020.sql
+# RUN rm -rf /nix/store/n7qvj8847bpsvzv018bi36c2wci1cgb0-schema/migration-2-0026-20231017.sql
+# RUN rm -rf /nix/store/n7qvj8847bpsvzv018bi36c2wci1cgb0-schema/migration-2-0027-20230713.sql
+# RUN rm -rf /nix/store/n7qvj8847bpsvzv018bi36c2wci1cgb0-schema/migration-2-0028-20240117.sql
+# RUN rm -rf /nix/store/n7qvj8847bpsvzv018bi36c2wci1cgb0-schema/migration-2-0029-20240117.sql
+# RUN rm -rf /nix/store/n7qvj8847bpsvzv018bi36c2wci1cgb0-schema/migration-2-0030-20240108.sql
+# RUN rm -rf /nix/store/n7qvj8847bpsvzv018bi36c2wci1cgb0-schema/migration-2-0031-20240117.sql
+# RUN rm -rf /nix/store/n7qvj8847bpsvzv018bi36c2wci1cgb0-schema/migration-2-0032-20230815.sql
+# RUN rm -rf /nix/store/n7qvj8847bpsvzv018bi36c2wci1cgb0-schema/migration-2-0033-20231009.sql
+
+# RUN rm -rf /nix/store/n7qvj8847bpsvzv018bi36c2wci1cgb0-schema/migration-1-0000-20190730.sql
+# RUN rm -rf /nix/store/n7qvj8847bpsvzv018bi36c2wci1cgb0-schema/migration-1-0001-20190730.sql
+# RUN rm -rf /nix/store/n7qvj8847bpsvzv018bi36c2wci1cgb0-schema/migration-1-0002-20190912.sql
+# RUN rm -rf /nix/store/n7qvj8847bpsvzv018bi36c2wci1cgb0-schema/migration-1-0003-20200211.sql
+# RUN rm -rf /nix/store/n7qvj8847bpsvzv018bi36c2wci1cgb0-schema/migration-1-0004-20201026.sql
+# RUN rm -rf /nix/store/n7qvj8847bpsvzv018bi36c2wci1cgb0-schema/migration-1-0005-20210311.sql
+# RUN rm -rf /nix/store/n7qvj8847bpsvzv018bi36c2wci1cgb0-schema/migration-1-0006-20210531.sql
+# RUN rm -rf /nix/store/n7qvj8847bpsvzv018bi36c2wci1cgb0-schema/migration-1-0007-20210611.sql
+# RUN rm -rf /nix/store/n7qvj8847bpsvzv018bi36c2wci1cgb0-schema/migration-1-0008-20210727.sql
+# RUN rm -rf /nix/store/n7qvj8847bpsvzv018bi36c2wci1cgb0-schema/migration-1-0009-20210727.sql
+# RUN rm -rf /nix/store/n7qvj8847bpsvzv018bi36c2wci1cgb0-schema/migration-1-0010-20230612.sql
+# RUN rm -rf /nix/store/n7qvj8847bpsvzv018bi36c2wci1cgb0-schema/migration-1-0011-20230814.sql
+
+
