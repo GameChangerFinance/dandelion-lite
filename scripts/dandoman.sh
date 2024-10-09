@@ -2,6 +2,11 @@
 # Global configuration
 # shellcheck disable=SC1091,SC2015
 
+docker() {
+    podman "$@"
+}
+export -f docker
+
 VERSION=0.0.2
 NAME="dandoman"
 # Get the full path of the current script's directory
