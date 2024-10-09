@@ -65,19 +65,30 @@ Suggested setup for concurrent **Cardano Mainnet** and **Preproduction Testnet**
 
 ## Deployment
 
-To deploy or run Dandelion Lite:
+Base system install:
+As a base system we use ubuntu-server version 24.04. We use the normal install not the minimal one. Also install OpenSSH server to allow for system administration. 
+1. When install do `ip -br a` to get the ip address of your newly installed server 
+2. From you local system. So not on your server do `ssh-copy-id username@server-ip` This will copy your ssh keys to the server to allow easy login
+3. Do `ssh username@server-ip`
 
+To deploy or run Dandelion Lite:
 1. Clone the repository to your local machine.
-2. Run Admin Tool `scripts/dandoman.sh` for setting up an initial `.env` file and installing dependencies such as Docker Compose and Podman
-3. Edit/configure the environment variables the `.env` file. You can base it on the provided `env.example.<NETWORK>`.
-4. Run `scripts/dandoman.sh` > `Docker->Docker Up/Reload` on Admin Tool or `docker compose up -d` to start the services.
-5. Monitor that node has reached tip and `scripts/dandoman.sh` > `Docker->Docker Status` to ensure none of the containers are `DOWN` or `UP (unhealthy)` state.
-4. Once on tip, execute `scripts/dandoman.sh` > `Setup->Initialise Postgres` to deploy custom RPCs and test via PostgREST/HAProxy endpoints using curl:
+2. Run `./scripts/dandoman.sh --podman-install` to install podman. Exit the terminal and log back in.
+3. Run Admin Tool `scripts/dandoman.sh` for setting up an initial `.env` file and installing dependencies such as Docker Compose and Podman. Exit the gui and restart your terminal
+4. Edit/configure the environment variables the `.env` file. You can base it on the provided `env.example.<NETWORK>`.
+5. Run `scripts/dandoman.sh` > `Docker->Docker Up/Reload` on Admin Tool or `docker compose up -d` to start the services.
+6. Monitor that node has reached tip and `scripts/dandoman.sh` > `Docker->Docker Status` to ensure none of the containers are `DOWN` or `UP (unhealthy)` state.
+7. Once on tip, execute `scripts/dandoman.sh` > `Setup->Initialise Postgres` to deploy custom RPCs and test via PostgREST/HAProxy endpoints using curl:
+
 ```bash
+# Check if the node is synced using docker
+docker inspect --format "{{json .State.Health }}" dandolite-preprod-cardano-node-ogmios-1 | jq
+
+# Check if db-sync is ready 
+docker inspect --format "{{json .State.Health }}" dandolite-preprod-cardano-db-sync-1 | jq
 
 # Koios tip check
 curl http://127.0.0.1:8050/koios/v1/tip
-
 ```
 
 Remember to secure your deployment according to best practices, including securing your database and API endpoints.
