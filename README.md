@@ -67,9 +67,9 @@ Suggested setup for concurrent **Cardano Mainnet** and **Preproduction Testnet**
 
 Base system install:
 As a base system we use ubuntu-server version 24.04. We use the normal install not the minimal one. Also install OpenSSH server to allow for system administration. 
-1. When install do `ip -br a` to get the ip address of your newly installed server 
-2. From you local system. So not on your server do `ssh-copy-id username@server-ip` This will copy your ssh keys to the server to allow easy login
-3. Do `ssh username@server-ip`
+1. When install is completed do `ip -br a` to get the ip address of your newly installed server 
+2. From you local system. So not on your server do `ssh-copy-id USER_NAME@SERVER_IP` This will copy your ssh keys to the server to allow easy login
+3. Do `ssh USER_NAME@SERVER_IP`
 
 To deploy or run Dandelion Lite:
 1. Clone the repository to your local machine.
