@@ -69,6 +69,24 @@ extract_sync_progress() {
 }
 
 
+extract_epoch() {
+  local json_data=$1
+  local sync_progress
+
+  epoch=$(echo "$json_data" | while read -r line; do
+    case $line in
+      *"\"epoch\": "*)
+        # Extract the value
+        value=${line#*\"epoch\": \"}
+        value=${value%%\"*}
+        echo "$value"
+        ;;
+    esac
+  done)
+
+  echo "$epoch"
+}
+
 if [[ "$NETWORK" == "mainnet" ]]
 then
     STATUS=`cardano-cli query tip --mainnet --socket-path /ipc/node.socket`
@@ -103,11 +121,12 @@ fi
 # echo $STATUS
 SYNC_PROGRESS=$(extract_sync_progress "$STATUS")
 # echo "SYNC: $SYNC_PROGRESS"
+EPOCH=$(extract_epoch "$STATUS")
 
 STATUS_INTEGER=${SYNC_PROGRESS%.*}
 
 if [ "$STATUS_INTEGER" -ge "1" ] ; then
-    echo "OK - Node sync progress: $SYNC_PROGRESS %";
+    echo "OK - Epoch: $EPOCH, Node sync progress: $SYNC_PROGRESS %";
     exit 0;
 else 
     echo "Initializing - Sync progress: $SYNC_PROGRESS % < 1%";
