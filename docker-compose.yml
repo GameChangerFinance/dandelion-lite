@@ -94,7 +94,7 @@ services:
       - ${OGMIOS_PORT:-1337}:1337
     environment:
       NETWORK: ${NETWORK}
-      #SOCKET: "${CARDANO_NODE_HOME}/ipc/node.socket" 
+      SOCKET: "/node-ipc/node.socket" 
       #UPDATE_CHECK: "N"
       #EXPORTED_CONFIG: "${CARDANO_NODE_HOME}/config"
     volumes:
@@ -104,7 +104,7 @@ services:
       # Current configs are also available at: https://book.world.dev.cardano.org/
       #- ./configs/cardano/config/network/${NETWORK}:/config
       - node-db:${CARDANO_NODE_HOME}/db
-      - node-ipc:${CARDANO_NODE_HOME}/ipc
+      - ./volumes/ipc/:/ipc/
       - ./scripts/cardano-node-ogmios/:/scripts/
 
   cardano-db-sync:
@@ -113,7 +113,7 @@ services:
     hostname: cardano-db-sync
     command: [
       "--config", "/config/cardano-db-sync/config.json",
-      "--socket-path", "/node-ipc/node.socket"
+      "--node-socket", "/node-ipc/node.socket",
     ]
     environment:
       #DISABLE_LEDGER: ${CARDANO_DB_SYNC_DISABLE_LEDGER}
@@ -141,7 +141,7 @@ services:
     volumes:
       - ./configs/cardano/config/network/${NETWORK}:/config
       - db-sync-data:/var/lib/cexplorer
-      - node-ipc:/node-ipc
+      - ./node-ipc:/node-ipc/
       - ./scripts/:/scripts/
     restart: always
     stop_signal: SIGINT
@@ -629,7 +629,6 @@ services:
 
 volumes:
   node-db:
-  node-ipc:
   db-sync-data:
   postgresdb:
   portainer-data:
