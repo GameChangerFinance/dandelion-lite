@@ -560,7 +560,7 @@ menu() {
                     ;;
                 "Expose with NGROK")
                     # Logic for Enter Postgres
-                    container_id=$(docker ps -qf "name=haproxy")
+                    container_id=$(podman ps -qf "name=haproxy")
                     if [ -z "$container_id" ]; then
                         echo "No running Haproxy found."
                         read -r -p "Press enter to continue"

@@ -16,7 +16,7 @@ services:
       EXPORTED_CONFIG: "${CARDANO_NODE_HOME}/sockets/exportedConfig"
     volumes:
       - node-db:${CARDANO_NODE_HOME}/db
-      - node-ipc:${CARDANO_NODE_HOME}/sockets
+      - ./node-ipc:/node-ipc/
       - ./scripts/:/scripts/
     entrypoint: >
       /bin/sh -c "
@@ -59,12 +59,12 @@ services:
       NETWORK: ${NETWORK}
     command: [
       "--host", "0.0.0.0",
-      "--node-socket", "${CARDANO_NODE_HOME}/node-ipc/node.socket",
-      "--node-config", "${CARDANO_NODE_HOME}/node-ipc/testcluster/private-testnet/configuration.yaml"
+      "--node-socket", "/node-ipc/node.socket",
+      "--node-config", "/node-ipc/testcluster/private-testnet/configuration.yaml"
     ]
     volumes:
       # exported automagically from cardano-node for plug-n-play ogmios
-      - node-ipc:${CARDANO_NODE_HOME}/node-ipc
+      - ./node-ipc:/node-ipc/
     ports:
       - ${OGMIOS_PORT:-1337}:1337
     depends_on:
@@ -117,7 +117,7 @@ services:
     environment:
       NETWORK_MAGIC: 5    
     volumes:
-     - node-ipc:${CARDANO_NODE_HOME}/node-ipc     
+     - ./node-ipc:/node-ipc/
     healthcheck:
       test:  ["CMD-SHELL", "/healthcheck.sh"]
       interval: 10s
@@ -165,7 +165,7 @@ services:
     volumes:
       - ./configs/cardano/config/network/${NETWORK}:/config
       - db-sync-data:/var/lib/cexplorer
-      - node-ipc:/node-ipc
+      - ./node-ipc:/node-ipc/
       - ./scripts/:/scripts/
     restart: always
     stop_signal: SIGINT
@@ -370,7 +370,7 @@ services:
         max-file: "10"
     profiles: [postgrest]       
 
-  koios:
+  cron:
     build: .
     environment:
       NETWORK: ${NETWORK}
@@ -643,7 +643,7 @@ services:
 
 volumes:
   node-db:
-  node-ipc:
+  #node-ipc:
   db-sync-data:
   postgresdb:
   portainer-data:

@@ -15,7 +15,7 @@ then
   # echo 'good'
   if [ ! -e /node-ipc/node.socket ]; then
     echo "Linking to /node-ipc/node.socket"
-    ln -s /node-ipc/testcluster/private-testnet/node-spo1/node.sock /node-ipc/node.socket
+    ln /node-ipc/testcluster/private-testnet/node-spo1/node.sock /node-ipc/node.socket
   fi
 
   exit 0;
