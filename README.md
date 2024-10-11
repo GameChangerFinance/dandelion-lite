@@ -49,18 +49,18 @@ Suggested setup for concurrent **Cardano Mainnet** and **Preproduction Testnet**
 
     25G     /home/$USER/.local/share/containers/storage/volumes/gc-node-mainnet_db-sync-data
     445M    /home/$USER/.local/share/containers/storage/volumes/gc-node-mainnet_dbless-cardano-token-registry-data
-    185G    /home/$USER/.local/share/containers/storage/volumes/gc-node-mainnet_node-db
+    187G    /home/$USER/.local/share/containers/storage/volumes/gc-node-mainnet_node-db
     8.0K    /home/$USER/.local/share/containers/storage/volumes/gc-node-mainnet_node-ipc
-    518G    /home/$USER/.local/share/containers/storage/volumes/gc-node-mainnet_postgresdb
+    512G    /home/$USER/.local/share/containers/storage/volumes/gc-node-mainnet_postgresdb
     8.0K    /home/$USER/.local/share/containers/storage/volumes/gc-node-mainnet_unimatrix-data
 
 ### Cardano Pre-Production Testnet volume sizes
 
     3.7G    /home/$USER/.local/share/containers/storage/volumes/gc-node-preprod_db-sync-data
     41M     /home/$USER/.local/share/containers/storage/volumes/gc-node-preprod_dbless-cardano-token-registry-data
-    8.4G    /home/$USER/.local/share/containers/storage/volumes/gc-node-preprod_node-db
+    8.8G    /home/$USER/.local/share/containers/storage/volumes/gc-node-preprod_node-db
     8.0K    /home/$USER/.local/share/containers/storage/volumes/gc-node-preprod_node-ipc
-    15G     /home/$USER/.local/share/containers/storage/volumes/gc-node-preprod_postgresdb
+    16G     /home/$USER/.local/share/containers/storage/volumes/gc-node-preprod_postgresdb
     8.0K    /home/$USER/.local/share/containers/storage/volumes/gc-node-preprod_unimatrix-data
 
 ## Deployment
