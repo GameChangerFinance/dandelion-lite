@@ -1,87 +1,13 @@
 name: "${PROJ_NAME}"
 services:
 
-#################################
-#### guild node + ogmios ########
-#################################
-
-#  cardano-node:
-#    image: ${CARDANO_NODE_IMAGE}
-#    init: true
-#    hostname: cardano-node
-#    environment:
-#      NETWORK: ${NETWORK}
-#      SOCKET: "${CARDANO_NODE_HOME}/sockets/node.socket" 
-#      UPDATE_CHECK: "N"
-#      EXPORTED_CONFIG: "${CARDANO_NODE_HOME}/sockets/exportedConfig"
-#    volumes:
-#      - node-db:${CARDANO_NODE_HOME}/db
-#      - node-ipc:${CARDANO_NODE_HOME}/sockets
-#      - ./scripts/:/scripts/
-#    entrypoint: >
-#      /bin/sh -c "
-#      echo \"Preparing setup for network '${NETWORK}'\" ;
-#      mkdir -p $${EXPORTED_CONFIG};
-#      chown -Rv guild $${EXPORTED_CONFIG};
-#      rm -rf $${EXPORTED_CONFIG}/*.json;
-#      echo \"Exporting config files from '${CARDANO_NODE_HOME}/files' into '$${EXPORTED_CONFIG}'...\" ;
-#      cp ${CARDANO_NODE_HOME}/files/*.json $${EXPORTED_CONFIG} ;
-#      echo 'Identifying lines with potencial issues with protocol magic number and file paths...' ;
-#      grep -Rnw $${EXPORTED_CONFIG} -e '764824073' ;
-#      grep -Rnw $${EXPORTED_CONFIG} -e '${CARDANO_NODE_HOME}/files' ;
-#      echo \"Patching exported files...\" ;
-#      [ \"${NETWORK}\" = \"preprod\" ] && find $${EXPORTED_CONFIG} -name '*.json' -print0 | xargs -0 sed -i 's/764824073/1/g' ;
-#      [ \"${NETWORK}\" = \"preview\" ] && find $${EXPORTED_CONFIG} -name '*.json' -print0 | xargs -0 sed -i 's/764824073/2/g' ;
-#      find $${EXPORTED_CONFIG} -name '*.json' -print0 | xargs -0 sed -i \"s#${CARDANO_NODE_HOME}/files#$${EXPORTED_CONFIG}#g\" ;
-#      echo 'Config files exported:' ;
-#      ls -ls $${EXPORTED_CONFIG} ;
-#      ./entrypoint.sh ;
-#      "
-#    restart: always
-#    healthcheck:
-#      test: ["CMD-SHELL", "netstat -ntlp | grep 12798"]
-#      interval: 30s
-#      timeout: 10s
-#      retries: 3
-#    logging:
-#      driver: "json-file"
-#      options:
-#        max-size: "200k"
-#        max-file: "10"
-
-  # TODO: add http backend ogmios and it's entry on /configs/haproxy/haproxy.cfg
-  # Important: https://github.com/cardano-community/guild-operators/pull/1261/files
-#  ogmios:
-#    image:  ${OGMIOS_IMAGE}
-#    restart: always
-#    environment:
-#      NETWORK: ${NETWORK}
-#    command: [
-#      "--host", "0.0.0.0",
-#      "--node-socket", "${CARDANO_NODE_HOME}/sockets/node.socket",
-#      "--node-config", "${CARDANO_NODE_HOME}/sockets/exportedConfig/config.json"
-#    ]
-#    volumes:
-#      # exported automagically from cardano-node for plug-n-play ogmios
-#      - node-ipc:${CARDANO_NODE_HOME}/sockets
-#    ports:
-#      - ${OGMIOS_PORT:-1337}:1337
-#    depends_on:
-#      cardano-node:
-#        condition: service_healthy
-
-#################################
-### node + ogmios + indexer #####
-#################################
-
-  cardano-node-ogmios:
-    image: ${CARDANO_NODE_OGMIOS_IMAGE}
-    hostname: cardano-node
-    #init: true
-    platform: linux/x86_64
-    restart: always
+  cardano-node:
+    build:
+      context: ./src/cardano-node-alpine
+    environment:
+      NETWORK: ${NETWORK}
     healthcheck:
-      test: ["CMD-SHELL", "/scripts/healthcheck.sh"]
+      test: ["CMD-SHELL", "/healthcheck.sh"]
       interval: 30s
       timeout: 10s
       retries: 1000000
@@ -91,21 +17,30 @@ services:
         max-size: "400k"
         max-file: "10"
     ports:
-      - ${OGMIOS_PORT:-1337}:1337
+      - 12798:12798
+    volumes:
+      - node-db:/db
+      - ./configs/cardano/config/network/${NETWORK}:/config
+      - node-ipc:/ipc
+
+  ogmios:
+    image:  ${OGMIOS_IMAGE}
+    restart: always
     environment:
       NETWORK: ${NETWORK}
-      SOCKET: "/node-ipc/node.socket" 
-      #UPDATE_CHECK: "N"
-      #EXPORTED_CONFIG: "${CARDANO_NODE_HOME}/config"
+    command: [
+      "--host", "0.0.0.0",
+      "--node-socket", "/ipc/node.socket",
+      "--node-config", "/config/cardano-node/config.json"
+    ]
     volumes:
-      #- node-db:/db
-      #- node-ipc:/ipc 
-      # Uncomment if you want to use your own config files or the provided ones.
-      # Current configs are also available at: https://book.world.dev.cardano.org/
-      #- ./configs/cardano/config/network/${NETWORK}:/config
-      - node-db:${CARDANO_NODE_HOME}/db
-      - ./volumes/ipc/:/ipc/
-      - ./scripts/cardano-node-ogmios/:/scripts/
+      - ./configs/cardano/config/network/${NETWORK}:/config
+      - node-ipc:/ipc
+    ports:
+      - ${OGMIOS_PORT:-1337}:1337
+    depends_on:
+      cardano-node:
+        condition: service_healthy
 
   cardano-db-sync:
     image:  ${CARDANO_DB_SYNC_IMAGE}
@@ -134,14 +69,14 @@ services:
       retries: 5000000
     depends_on:
       # Depend on both services to be started before starting.
-      cardano-node-ogmios:
+      cardano-node:
         condition: service_started
       postgress:
         condition: service_started
     volumes:
       - ./configs/cardano/config/network/${NETWORK}:/config
       - db-sync-data:/var/lib/cexplorer
-      - ./node-ipc:/node-ipc/
+      - node-ipc:/node-ipc/
       - ./scripts/:/scripts/
     restart: always
     stop_signal: SIGINT
@@ -150,6 +85,22 @@ services:
       options:
         max-size: "200k"
         max-file: "10"
+
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - 9090:9090
+    volumes:
+      - ./configs/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+
+  graphana:
+    image: grafana/grafana
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: 11112222
+      GF_SECURITY_ADMIN_USER: graphana
+    ports:
+      - 3000:3000
+
 
   postgress:
     hostname: ${POSTGRES_HOST}    
@@ -198,7 +149,7 @@ services:
     ports:
       - ${CARDANO_GRAPHQL_HASURA_PORT:-8090}:8080
     depends_on:
-      cardano-node-ogmios:
+      cardano-node:
         condition: service_healthy
       postgress:
         condition: service_healthy
@@ -291,7 +242,7 @@ services:
 #################################
 
   cardano-token-registry:
-    #image: cardanofoundation/cf-token-metadata-registry-api:latest            
+    #image: cardanofoundation/cf-token-metadata-registry-api:latest
     image: ${CARDANO_TOKEN_REGISTRY_IMAGE}
     hostname: ${CARDANO_TOKEN_REGISTRY_HOSTNAME}
     ports:
@@ -620,6 +571,14 @@ services:
   #     postgress:
   #       condition: service_healthy
 
+  # test-image-ubuntu:
+  #   # Usefull commands
+  #   # nmap 10.89.1.0/24 -e eth0 --unprivileged
+  #   build:
+  #     context: ./src/test-image-ubuntu
+  #   cap_add:
+  #     - NET_RAW
+
 
 
 #################################
@@ -635,6 +594,12 @@ volumes:
   pgadmin-data:
   unimatrix-data:
   dbless-cardano-token-registry-data:
+  node-ipc:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./volumes/ipc
+      o: bind
 
 secrets:
   postgres_password:
