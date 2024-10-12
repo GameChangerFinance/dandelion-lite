@@ -1,6 +1,6 @@
 FROM alpine:3.14
 
-RUN apk add --no-cache wget tar bash coreutils ncurses jq nano nmap curl
+RUN apk add --no-cache wget tar bash coreutils ncurses jq nano nmap curl bc procps grep
 
 # RUN wget https://github.com/IntersectMBO/cardano-node/releases/download/9.2.1/cardano-node-9.2.1-linux.tar.gz
 
