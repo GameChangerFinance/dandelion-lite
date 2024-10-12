@@ -526,18 +526,18 @@ menu() {
                     fi
                     show_splash_screen           
                     ;;
-                "cntools")
-                    # Find the Docker container ID with 'postgres' in the name
-                    container_id=$(docker ps -qf "name=cardano-node")
-                    if [ -z "$container_id" ]; then
-                        echo "No running Node container found."
-                        read -r -p "Press enter to continue"
-                    else
-                        # Executing commands in the found container
-                        docker exec -it "$container_id" bash -c "/opt/cardano/cnode/scripts/cntools.sh"
-                    fi
-                    show_splash_screen           
-                    ;;
+                # "cntools")
+                #     # Find the Docker container ID with 'postgres' in the name
+                #     container_id=$(docker ps -qf "name=cardano-node")
+                #     if [ -z "$container_id" ]; then
+                #         echo "No running Node container found."
+                #         read -r -p "Press enter to continue"
+                #     else
+                #         # Executing commands in the found container
+                #         docker exec -it "$container_id" bash -c "/opt/cardano/cnode/scripts/cntools.sh"
+                #     fi
+                #     show_splash_screen           
+                #     ;;
                 "Enter PSQL")
                     # Logic for Enter Postgres
                     container_id=$(docker ps -qf "name=postgress")
