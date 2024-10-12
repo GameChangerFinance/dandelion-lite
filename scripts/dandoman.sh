@@ -522,7 +522,7 @@ menu() {
                         read -r -p "Press enter to continue"
                     else
                         # Executing commands in the found container
-                        docker exec -it "$container_id" bash -c "/opt/cardano/cnode/scripts/gLiveView.sh"
+                        docker exec -it "$container_id" bash -c "/gLiveView.sh"
                     fi
                     show_splash_screen           
                     ;;
