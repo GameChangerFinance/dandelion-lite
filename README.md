@@ -21,8 +21,8 @@ Each service is containerized and managed via Docker, ensuring easy deployment a
 
 For local testing:
 
-1. Clone the repository to your local machine.
-2. Make sure Docker and Docker Compose are installed.
+1. Clone the repository to your local machine: `git clone https://github.com/GameChangerFinance/dandelion-lite.git`
+2. Make sure Docker and Docker Compose are installed (https://docs.docker.com/engine/install/ubuntu/)
 3. Configure the environment variables in a `.env` file based on the provided `env.example`.
 4. Run `docker compose up -d` to start the services.
 5. Access the local endpoints as needed for testing.
