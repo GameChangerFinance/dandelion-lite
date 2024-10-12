@@ -27,6 +27,24 @@ For local testing:
 4. Run `docker compose up -d` to start the services.
 5. Access the local endpoints as needed for testing.
 
+## System
+1. Hardware Suggested setup for concurrent Cardano Mainnet and Preproduction Testnet consists on
+    128GB RAM (DDR4 ECC RAM)
+    2TB M2 NVME for storage
+    Dual Intel Xeon E5 2680 v4 (LGA 2011-3 motherboard)
+
+2. Preferably do a clean install of ubuntu-server version 24.04 (https://ubuntu.com/download/server).
+3. Make sure swapsize is big enough for your RAM. db-sync uses a lot of RAM to sync. For example with 128GB of RAM you can set you swapspace to 20GB
+
+```bash
+    swapon --show
+    sudo swapoff -a
+    sudo fallocate -l 20G /swap.img
+    sudo chmod 600 /swap.img
+    sudo mkswap /swap.img
+    sudo swapon /swap.img
+```
+
 ## Deployment
 
 To deploy Koios Lite:
