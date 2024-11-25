@@ -174,6 +174,11 @@ Remember to secure your deployment according to best practices, including securi
 
 To auto run on system start:
 1. Execute `scripts/dandoman.sh` > `Setup->Run on system start` and follow steps.
+Dandelion uses systemd to make the services persisten. 
+Stop services with:
+`systemctl stop dandelion-lite-preprod`
+Start services with:
+`systemctl start dandelion-lite-preprod`
 
 ### Run a Full Deploy Backup
 
