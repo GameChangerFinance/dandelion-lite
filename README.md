@@ -129,7 +129,7 @@ Reported to be working on:
 
 ### Base system install
 
-As a base system we use **ubuntu-server version 24.04**. We use the normal install not the minimal one. Also install **OpenSSH** server to allow for system administration. 
+As a base system we use **ubuntu-server version 24.04**. We use the normal install not the minimal one. Also install **OpenSSH** server to allow for system administration with `sudo apt install openssh-server -y` 
 
 1. When install is completed do `ip -br a` to get the ip address of your newly installed server 
 2. From you local system. So not on your server do `ssh-copy-id USER_NAME@SERVER_IP` This will copy your ssh keys to the server to allow easy login
