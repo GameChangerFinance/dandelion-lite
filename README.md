@@ -136,6 +136,7 @@ As a base system we use **ubuntu-server version 24.04**. We use the normal insta
 3. Do `ssh USER_NAME@SERVER_IP`
 
 To deploy or run Dandelion Lite:
+We make use of podman running in a user session. You should be aware that if you close the terminal all services will shut down. So during these steps keep your terminal open. Or incase you need to restart, you will also have to start your services again. In a later section we detail how to make the install permanent. 
 1. Install git: `sudo apt install git -y`
 2. Clone the repository to your local machine.`$ git clone https://github.com/GameChangerFinance/dandelion-lite.git`
 Dandelion-lite is currently a private repo. In case you are asked to login to git. You can generate keys for authentication with this command:
