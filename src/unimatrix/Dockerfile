@@ -29,6 +29,7 @@ WORKDIR /work
 RUN mkdir /radata
 COPY package*.json ./
 COPY unimatrix.js ./
+COPY www ./
 #COPY --from=builder /work/node_modules ./node_modules
 RUN npm install
 ADD . .

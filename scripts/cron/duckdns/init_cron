@@ -1,0 +1,2 @@
+# duckdns
+*/3 * * * * /scripts/cron/duckdns/update.sh >> /var/log/duckdns_update.log 2>&1

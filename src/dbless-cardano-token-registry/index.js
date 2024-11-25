@@ -1,6 +1,6 @@
 const jsonServer = require('json-server')
 const bodyParser = require("body-parser");
-const middlewares = jsonServer.defaults();
+const middlewares = jsonServer.defaults({readOnly:true});
 const server = jsonServer.create()
 const fs = require( 'fs' );
 const path = require( 'path' );
@@ -31,8 +31,6 @@ db['query'] = {};
 
 const router = jsonServer.router(db);
 
-server.use(middlewares);
-
 // Handle POST queries to /metadata/query
 server.use(bodyParser.json())
 server.use(bodyParser.urlencoded({
@@ -43,7 +41,6 @@ server.use((req, res, next) => {
     responseBody = { message: 'ok' }
     res.jsonp(responseBody)
   } else if (req.method === 'POST' && req.originalUrl === '/metadata/query') {
-
     responseBody = { subjects: [] }
     if ( req.body.subjects ) {
       req.body.subjects.forEach(function (subject) {
@@ -59,6 +56,8 @@ server.use((req, res, next) => {
   }
 
 })
+
+server.use(middlewares);
 
 // mount resources directly to /metadata instead of rewriting every req
 server.use('/metadata', router);

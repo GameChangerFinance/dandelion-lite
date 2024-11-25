@@ -1,0 +1,3 @@
+/scripts/sql/migration/reset-db/20_koios-artifacts/01_reset.sql
+/scripts/sql/migration/reset-db/30_cardano-sql/01_reset.sql
+/scripts/sql/migration/reset-db/40_dandelion-postgrest/01_reset.sql

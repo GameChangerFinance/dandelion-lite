@@ -64,7 +64,7 @@ SELECT sql_private_extensions.expose_some_tables('public','cardano_db_sync',ARRA
 'treasury_withdrawal',
 'tx',
 'tx_in',
-'tx_metadata',
+-- 'tx_metadata', CHANG-UPDATE: commented out as cardano-db-sync 13.4.0.1 breaks on boot sequence because of this
 'tx_out',
 'voting_anchor',
 'voting_procedure',

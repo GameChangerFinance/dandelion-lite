@@ -1,7 +1,0 @@
-{
-"dltTag": "cardano",
-"networkTag": "preprod",
-"name": "sunflower01",
-"groups": "",
-"extensions":[{"name":"cardano_node_ogmios","path":"ogmios/","version":"v6.2.0","image":"cardanosolutions/ogmios:v6.2.0"},{"name":"cardano_db_sync","version":"13.2.0.2-docker","image":"ghcr.io/intersectmbo/cardano-db-sync:13.2.0.2-docker"},{"name":"cardano_graphql","path":"cardano-graphql/","version":"8.0.3","image":"cardanofoundation/cardano-graphql-server:8.0.3-preprod"},{"name":"dbless_cardano_token_registry","path":"token-registry/","version":"1.1","image":""},{"name":"koios","path":"koios/","version":"1.1.1","image":""},{"name":"dandelion_postgrest","path":"postgrest/","version":"f814f568b389f13e75230f1d3175210abfddb7e9","image":""},{"name":"cardano_sql","path":"cardano-sql/","version":"1.0","image":"","plugins":"cardano_sql,cardano_db_sync,cf_ledger_sync,ogmios,unimatrix,gcfs,koios_lite,koios,dandelion_postgrest"},{"name":"unimatrix","path":"unimatrix/","version":"1.0","image":""}]
-}

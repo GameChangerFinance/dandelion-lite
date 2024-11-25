@@ -34,7 +34,7 @@ for volumeName in $volumeNames; do
     if [[ $volumeName == "$projectName"* ]]; then   # True if $volumeName starts with $projectName.
 	fileName=$(echo $volumeName | sed "s/^${projectName}//")
 	echo $fileName
-    	./scripts/docker/restore-volume.sh "${volumeName}" "${fileName}" "${backupDir}"> full-restore.log 2>&1
+    	./scripts/docker/restore-volume.sh "${volumeName}" "${fileName}" "${backupDir}">> full-restore.log 2>&1
 	ls -alh "${backupDir}${fileName}.tar.gz" | awk '{print $5, $9}'
 	#read -p "Press key to continue.. (Ctrl + C to abort)" -n1 -s
 	echo

@@ -31,7 +31,7 @@ for volumeName in $volumeNames; do
     if [[ $volumeName == "$projectName"* ]]; then   # True if $volumeName starts with a projectName.
 	fileName=$(echo $volumeName | sed "s/^${projectName}//")
 	echo "Creating '${fileName}.tar.gz'..."
-    	./scripts/docker/backup-volume.sh "${volumeName}" "${fileName}" "${backupDir}" > full-backup.log 2>&1
+    	./scripts/docker/backup-volume.sh "${volumeName}" "${fileName}" "${backupDir}" >> full-backup.log 2>&1
 	ls -alh "${backupDir}${fileName}.tar.gz" | awk '{print $5, $9}'
 	#read -p "Press key to continue.. (Ctrl + C to abort)" -n1 -s
 	echo

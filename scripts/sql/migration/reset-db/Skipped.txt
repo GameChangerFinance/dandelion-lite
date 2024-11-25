@@ -1,0 +1,1 @@
+/scripts/sql/migration/reset-db/10_koios-lite_[SKIP]/01_reset.sql

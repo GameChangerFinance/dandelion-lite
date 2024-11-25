@@ -7,4 +7,5 @@ scripts/sql/rpc/NotOk.txt
 scripts/sql/rpc/Skipped.txt
 *.log
 configs/haproxy/manifest.json
-
+configs/haproxy/index.html
+configs/ssl/

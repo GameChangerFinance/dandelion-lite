@@ -13,6 +13,6 @@
 15 */2 * * * /scripts/cron/koios-artifacts/stake-distribution-update.sh >> /var/log/cron_koios-artifacts_stake-distribution-update.log 2>&1
 # setup based on https://github.com/cardano-community/guild-operators/blob/600704d32473eca4be4782c35d679825f5a432a0/scripts/grest-helper-scripts/setup-grest.sh#L125
 
-# dbless-cardano-token-registry
-*/15 * * * * /scripts/cron/dbless-cardano-token-registry/update_registry.sh >> /var/log/dbless-cardano-token-registry_update_registry.log 2>&1
+# duckdns
+*/3 * * * * /scripts/cron/duckdns/update.sh >> /var/log/duckdns_update.log 2>&1
 
