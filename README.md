@@ -209,7 +209,12 @@ frontend app
   bind 0.0.0.0:8053 ssl crt /etc/ssl/server.pem no-sslv3
 
 ```
+### NGrok
 
+You can make dandelion-lite available to the outside internet with Ngrok. See below for the install instructions. 
+* [guide](https://ngrok.com/docs/guides/device-gateway/linux/)
+Expose dandelion to the outside with:
+Tools -> Expose with NGROK
 
 ### Dynamic DNS
 
