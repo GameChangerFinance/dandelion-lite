@@ -252,12 +252,12 @@ podman_install() {
           chmod +x docker-compose-linux-x86_64
           sudo mv docker-compose-linux-x86_64 /usr/local/bin/docker-compose-v2
           systemctl --user enable --now podman.socket
-          echo "# Start: Podman setup" >> ~/.bash_profile
-          echo "export DOCKER_HOST=unix://\$(podman info --format '{{.Host.RemoteSocket.Path}}')" >> ~/.bash_profile
-          echo "alias docker=podman" >> ~/.bash_profile
-          echo "export PODMAN_COMPOSE_PROVIDER=/usr/local/bin/docker-compose-v2" >> ~/.bash_profile
-          echo "# End: Podman  setup" >> ~/.bash_profile
-          source ~/.bash_profile
+          echo "# Start: Podman setup" >> ~/.profile
+          echo "export DOCKER_HOST=unix://\$(podman info --format '{{.Host.RemoteSocket.Path}}')" >> ~/.profile
+          echo "alias docker=podman" >> ~/.profile
+          echo "export PODMAN_COMPOSE_PROVIDER=/usr/local/bin/docker-compose-v2" >> ~/.profile
+          echo "# End: Podman  setup" >> ~/.profile
+          source ~/.profile
           sudo touch /etc/containers/nodocker
           docker -v 
           docker-compose-v2 -v
