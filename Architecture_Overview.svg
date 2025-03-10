@@ -1,0 +1,963 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="420mm"
+   height="297mm"
+   viewBox="0 0 420 297"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
+   sodipodi:docname="Architecture_Overview.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="0.72248176"
+     inkscape:cx="941.20023"
+     inkscape:cy="427.0004"
+     inkscape:window-width="2560"
+     inkscape:window-height="1403"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs2">
+    <rect
+       x="1119.5554"
+       y="68.747375"
+       width="1876.1456"
+       height="690.33142"
+       id="rect10026" />
+    <marker
+       style="overflow:visible"
+       id="marker9442"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="TriangleStart"
+       markerWidth="5.3244081"
+       markerHeight="6.155385"
+       viewBox="0 0 5.3244081 6.1553851"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         transform="scale(0.5)"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
+         d="M 5.77,0 -2.88,5 V -5 Z"
+         id="path9440" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="TriangleStart"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="TriangleStart"
+       markerWidth="5.3244081"
+       markerHeight="6.155385"
+       viewBox="0 0 5.3244081 6.1553851"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         transform="scale(0.5)"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
+         d="M 5.77,0 -2.88,5 V -5 Z"
+         id="path135" />
+    </marker>
+    <rect
+       x="480.96402"
+       y="30.030622"
+       width="238.91837"
+       height="259.34912"
+       id="rect2737" />
+    <marker
+       style="overflow:visible"
+       id="TriangleStart-0"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="TriangleStart"
+       markerWidth="5.3244081"
+       markerHeight="6.155385"
+       viewBox="0 0 5.3244081 6.1553851"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         transform="scale(0.5)"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
+         d="M 5.77,0 -2.88,5 V -5 Z"
+         id="path135-9" />
+    </marker>
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-6.2727439,-5.0488398)">
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.222919;stroke-opacity:1"
+       id="rect1203"
+       width="78.426994"
+       height="45.559883"
+       x="11.815845"
+       y="99.559013"
+       ry="1.8880414" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:4.30524px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.107631"
+       x="13.964851"
+       y="105.31116"
+       id="text1622"><tspan
+         sodipodi:role="line"
+         id="tspan1620"
+         style="font-weight:bold;stroke-width:0.107631"
+         x="13.964851"
+         y="105.31116">Gamechanger</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:5.05777px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.126444"
+       x="55.119888"
+       y="117.78329"
+       id="text1676"><tspan
+         sodipodi:role="line"
+         id="tspan1674"
+         style="stroke-width:0.126444"
+         x="55.119888"
+         y="117.78329">graphQL</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:5.05777px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.126444"
+       x="55.156281"
+       y="130.30214"
+       id="text1676-9"><tspan
+         sodipodi:role="line"
+         id="tspan1674-3"
+         style="stroke-width:0.126444"
+         x="55.156281"
+         y="130.30214">Koios</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:3.2814px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0820351"
+       x="15.146297"
+       y="110.76917"
+       id="text1680"><tspan
+         sodipodi:role="line"
+         id="tspan1678"
+         style="stroke-width:0.0820351"
+         x="15.146297"
+         y="110.76917">Walletcontent</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.0820351"
+         x="15.146297"
+         y="114.87092"
+         id="tspan2408"> - NFT's</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.0820351"
+         x="15.146297"
+         y="118.97266"
+         id="tspan2412"> - Assets</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:3.2814px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0820351"
+       x="14.785394"
+       y="123.49483"
+       id="text1680-3"><tspan
+         sodipodi:role="line"
+         id="tspan1678-6"
+         style="stroke-width:0.0820351"
+         x="14.785394"
+         y="123.49483">GC Filesystem</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.0820351"
+         x="14.785394"
+         y="127.59659"
+         id="tspan2412-5" /></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:3.2814px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0820351"
+       x="15.198939"
+       y="130.61284"
+       id="text1680-3-2"><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.0820351"
+         x="15.198939"
+         y="130.61284"
+         id="tspan2412-5-0">Pooldata</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:3.2814px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0820351"
+       x="15.265816"
+       y="139.14157"
+       id="text1680-3-2-20"><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.0820351"
+         x="15.265816"
+         y="139.14157"
+         id="tspan2412-5-0-6">Transaction submission </tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:3.89469px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0973675"
+       x="8.9537144"
+       y="45.992516"
+       id="text1680-3-3"><tspan
+         sodipodi:role="line"
+         id="tspan1678-6-5"
+         style="stroke-width:0.0973675"
+         x="8.9537144"
+         y="45.992516" /><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.0973675"
+         x="8.9537144"
+         y="50.860878"
+         id="tspan2412-5-6" /></text>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.222919px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 38.788251,111.65919 11.893556,4.35797"
+       id="path2517" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.222919px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 129.54219,83.591961 -4.01641,16.726219"
+       id="path2517-6"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.222919px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 142.0008,82.888528 7.50125,19.082672"
+       id="path2517-6-8"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.222919px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 136.25017,121.17426 12.34131,3.60648"
+       id="path2517-6-84"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.222919px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 39.686521,122.48827 c 1.513594,-0.43677 10.993583,-5.24132 10.993583,-5.24132"
+       id="path2519" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.222919px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 39.326719,130.00169 c 1.513594,-0.43678 10.993583,-0.50581 10.993583,-0.50581"
+       id="path2519-6"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.222919px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#TriangleStart)"
+       d="m 52.939694,138.47316 c 5.671506,3.46775 49.688916,32.45888 49.688916,32.45888"
+       id="path2519-6-1"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.222919px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#TriangleStart-0)"
+       d="m 115.02321,170.77648 c 0.8746,-2.67957 2.09272,-6.50946 2.09272,-6.50946"
+       id="path2519-6-1-25"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.222919px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-start:url(#TriangleStart);marker-end:url(#TriangleStart)"
+       d="m 67.73499,131.68276 c -14.534036,66.40383 55.52186,59.53237 55.52186,59.53237"
+       id="path2519-6-1-0"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.222919px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-start:url(#TriangleStart);marker-end:url(#marker9442)"
+       d="m 75.803232,120.51727 c 0.36168,9.2971 0.442983,96.85066 96.539648,94.94177"
+       id="path2519-6-1-2"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.222919px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-start:url(#TriangleStart);marker-end:url(#TriangleStart)"
+       d="M 73.552086,120.45781 C 72.721989,228.29582 177.95116,261.93475 305.57826,214.20795"
+       id="path2519-6-1-2-7"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.222919px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 129.3453,156.86659 c 4.02472,2.12291 16.1306,9.53781 16.1306,9.53781"
+       id="path2519-6-1-8"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.222919px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 158.15874,169.95765 c 4.02472,2.12291 16.1306,9.53781 16.1306,9.53781"
+       id="path2519-6-1-8-9"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.222919px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 163.6002,183.00616 c -11.66243,5.01973 -25.4462,8.01502 -25.4462,8.01502"
+       id="path2519-6-1-8-9-3"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.222919px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 182.16066,177.36294 c -5.96464,-10.45642 0.96488,-22.58607 0.96488,-22.58607"
+       id="path2519-6-1-8-9-2"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.222919px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 197.51755,187.78797 c 4.02472,2.12291 10.03105,17.63464 10.03105,17.63464"
+       id="path2519-6-1-8-9-4"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.222919px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 170.27783,201.6696 c -7.70301,4.18593 -8.8983,5.39153 -8.8983,5.39153"
+       id="path2519-6-1-8-9-4-8"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.222919px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 181.57034,201.30194 c 1.61929,3.15872 2.44505,4.25558 2.44505,4.25558"
+       id="path2519-6-1-8-9-4-8-7"
+       sodipodi:nodetypes="cc" />
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.222919;stroke-opacity:1"
+       id="rect1203-0"
+       width="135.31808"
+       height="80.899239"
+       x="99.014145"
+       y="142.5975"
+       ry="1.8880414" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:4.30524px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.107631"
+       x="101.16314"
+       y="148.34966"
+       id="text1622-6"><tspan
+         sodipodi:role="line"
+         id="tspan1620-2"
+         style="font-weight:bold;stroke-width:0.107631"
+         x="101.16314"
+         y="148.34966">Dandelion-lite</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:3.2814px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0820351"
+       x="102.34461"
+       y="153.80765"
+       id="text1680-9"><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.0820351"
+         x="102.34461"
+         y="153.80765"
+         id="tspan2408-0">Services</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.0820351"
+         x="102.34461"
+         y="157.90939"
+         id="tspan2878"> - Cardano-node</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.0820351"
+         x="102.34461"
+         y="162.01115"
+         id="tspan6626">      - Haskell (code)</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.0820351"
+         x="102.34461"
+         y="166.1129"
+         id="tspan8226"> </tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.0820351"
+         x="102.34461"
+         y="170.21465"
+         id="tspan6624" /><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.0820351"
+         x="102.34461"
+         y="174.31639"
+         id="tspan2412-2"> - Ogmios</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:3.2814px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0820351"
+       x="167.27844"
+       y="182.70491"
+       id="text1680-9-1"><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.0820351"
+         x="167.27844"
+         y="182.70491"
+         id="tspan2412-2-2">-PostgresQL</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.0820351"
+         x="167.27844"
+         y="186.80666"
+         id="tspan10022" /></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:3.2814px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0820351"
+       x="168.87195"
+       y="199.80087"
+       id="text1680-9-1-2"><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.0820351"
+         x="168.87195"
+         y="199.80087"
+         id="tspan2412-2-2-66">-Cardano-GraphQL</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:3.2814px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0820351"
+       x="124.77073"
+       y="192.25854"
+       id="text1680-9-1-2-76"><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.0820351"
+         x="124.77073"
+         y="192.25854"
+         id="tspan2412-2-2-66-4">-Koios</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:3.2814px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0820351"
+       x="185.61542"
+       y="154.85481"
+       id="text1680-9-1-2-7"><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.0820351"
+         x="185.61542"
+         y="154.85481"
+         id="tspan2412-2-2-66-2">-Mongo</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:3.2814px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0820351"
+       x="154.86803"
+       y="210.24017"
+       id="text1680-9-1-2-4"><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.0820351"
+         x="154.86803"
+         y="210.24017"
+         id="tspan2412-2-2-66-9">-Hasura</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:3.2814px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0820351"
+       x="175.30472"
+       y="209.78239"
+       id="text1680-9-1-2-4-5"><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.0820351"
+         x="175.30472"
+         y="209.78239"
+         id="tspan2412-2-2-66-9-0">-CGQL - background service</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:3.2814px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0820351"
+       x="175.43747"
+       y="215.21439"
+       id="text1680-9-1-2-4-5-1"><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.0820351"
+         x="175.43747"
+         y="215.21439"
+         id="tspan2412-2-2-66-9-0-7">-CGQL - server</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:3.2814px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0820351"
+       x="143.33945"
+       y="170.64304"
+       id="text1680-9-1-0"><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.0820351"
+         x="143.33945"
+         y="170.64304"
+         id="tspan2412-2-2-6">-DBSync</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.0820351"
+         x="143.33945"
+         y="174.74478"
+         id="tspan5598">  java</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.0820351"
+         x="143.33945"
+         y="178.84654"
+         id="tspan5596" /></text>
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.222919;stroke-opacity:1"
+       id="rect1203-0-6"
+       width="37.136543"
+       height="26.516748"
+       x="104.70191"
+       y="98.296753"
+       ry="1.8880414" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:4.30524px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.107631"
+       x="106.85093"
+       y="104.0489"
+       id="text1622-6-1"><tspan
+         sodipodi:role="line"
+         id="tspan1620-2-2"
+         style="font-weight:bold;stroke-width:0.107631"
+         x="106.85093"
+         y="104.0489">SPO's </tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:3.2814px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0820351"
+       x="108.03242"
+       y="109.50694"
+       id="text1680-9-4"><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.0820351"
+         x="108.03242"
+         y="109.50694"
+         id="tspan2408-0-7">Services</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.0820351"
+         x="108.03242"
+         y="113.60869"
+         id="tspan2412-2-4"> - Block producting</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.0820351"
+         x="108.03242"
+         y="117.71043"
+         id="tspan3077"> - P2P network</tspan></text>
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.222919;stroke-opacity:1"
+       id="rect1203-0-6-5"
+       width="37.136543"
+       height="26.516748"
+       x="146.14018"
+       y="100.56131"
+       ry="1.8880414" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:4.30524px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.107631"
+       x="148.2892"
+       y="106.31343"
+       id="text1622-6-1-5"><tspan
+         sodipodi:role="line"
+         id="tspan1620-2-2-4"
+         style="font-weight:bold;stroke-width:0.107631"
+         x="148.2892"
+         y="106.31343">SPO's </tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:3.2814px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0820351"
+       x="149.47064"
+       y="111.77148"
+       id="text1680-9-4-7"><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.0820351"
+         x="149.47064"
+         y="111.77148"
+         id="tspan2408-0-7-6">Services</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.0820351"
+         x="149.47064"
+         y="115.87324"
+         id="tspan2412-2-4-5"> - Block producting</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.0820351"
+         x="149.47064"
+         y="119.97498"
+         id="tspan3077-6"> - P2P network</tspan></text>
+    <text
+       xml:space="preserve"
+       transform="scale(0.26458333)"
+       id="text2735"
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect2737);display:inline;fill:#000000;fill-opacity:1;stroke:none" />
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.222919;stroke-opacity:1"
+       id="rect1203-0-6-4"
+       width="37.136543"
+       height="26.516748"
+       x="108.46183"
+       y="60.414551"
+       ry="1.8880414" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:4.30524px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.107631"
+       x="110.61086"
+       y="66.166702"
+       id="text1622-6-1-7"><tspan
+         sodipodi:role="line"
+         id="tspan1620-2-2-44"
+         style="font-weight:bold;stroke-width:0.107631"
+         x="110.61086"
+         y="66.166702">SPO's </tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:3.2814px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0820351"
+       x="111.7923"
+       y="71.624718"
+       id="text1680-9-4-3"><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.0820351"
+         x="111.7923"
+         y="71.624718"
+         id="tspan2408-0-7-0">Services</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.0820351"
+         x="111.7923"
+         y="75.726471"
+         id="tspan2412-2-4-7"> - Block producting</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.0820351"
+         x="111.7923"
+         y="79.828217"
+         id="tspan3077-8"> - P2P network</tspan></text>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.222919px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 132.38067,121.87451 3.79661,24.41833"
+       id="path2517-6-3"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.222919px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 178.78888,123.28207 89.06086,29.74609"
+       id="path2517-6-3-3"
+       sodipodi:nodetypes="cc" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:3.63958px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0909899"
+       x="150.48012"
+       y="87.385742"
+       id="text3328"><tspan
+         sodipodi:role="line"
+         id="tspan3326"
+         style="stroke-width:0.0909899"
+         x="150.48012"
+         y="87.385742">orobouros mini </tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.0909899"
+         x="150.48012"
+         y="91.935219"
+         id="tspan3330">protocols</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:4.09992px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.102498"
+       x="135.97755"
+       y="136.31903"
+       id="text3334"><tspan
+         sodipodi:role="line"
+         id="tspan3332"
+         style="stroke-width:0.102498"
+         x="135.97755"
+         y="136.31903">chainsync protocol</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:3.182px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0795495"
+       x="117.04805"
+       y="169.71355"
+       id="text3334-4"><tspan
+         sodipodi:role="line"
+         id="tspan3332-0"
+         style="stroke-width:0.0795495"
+         x="117.04805"
+         y="169.71355">Submit</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:3.28829px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0822073"
+       x="184.11818"
+       y="186.77316"
+       id="text5755"><tspan
+         sodipodi:role="line"
+         id="tspan5753"
+         style="stroke-width:0.0822073"
+         x="184.11818"
+         y="186.77316">Asset</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.0822073"
+         x="184.11818"
+         y="190.88353"
+         id="tspan12699">DB Table</tspan></text>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.222919px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 284.61117,161.43562 c 4.02472,2.12291 38.54193,17.25693 38.54193,17.25693"
+       id="path2519-6-1-8-6"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.222919px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 332.40441,185.33818 c -2.462,7.74774 -9.97578,25.47816 -9.97578,25.47816"
+       id="path2519-6-1-8-6-8"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.222919px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 341.85619,183.94029 c -2.462,7.74774 7.94656,27.59677 7.94656,27.59677"
+       id="path2519-6-1-8-6-8-9"
+       sodipodi:nodetypes="cc" />
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.222919;stroke-opacity:1"
+       id="rect1203-0-9"
+       width="91.597649"
+       height="45.482292"
+       x="266.70416"
+       y="144.63167"
+       ry="1.8880414" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:4.30524px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.107631"
+       x="268.85318"
+       y="150.38377"
+       id="text1622-6-4"><tspan
+         sodipodi:role="line"
+         id="tspan1620-2-9"
+         style="font-weight:bold;stroke-width:0.107631"
+         x="268.85318"
+         y="150.38377">Dandelion-lite 2.0 Future vision</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:3.2814px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0820351"
+       x="270.03461"
+       y="155.84183"
+       id="text1680-9-0"><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.0820351"
+         x="270.03461"
+         y="155.84183"
+         id="tspan2408-0-9">Services</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.0820351"
+         x="270.03461"
+         y="159.94357"
+         id="tspan2878-1"> - Dingo</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.0820351"
+         x="270.03461"
+         y="164.04533"
+         id="tspan6626-7">     - Go </tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.0820351"
+         x="270.03461"
+         y="168.14708"
+         id="tspan6624-7" /><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.0820351"
+         x="270.03461"
+         y="172.24883"
+         id="tspan2412-2-1"> - Ogmios</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:3.2814px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0820351"
+       x="147.87798"
+       y="161.48062"
+       id="text1680-9-1-2-7-7-0"><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.0820351"
+         x="147.87798"
+         y="161.48062"
+         id="tspan2412-2-2-66-2-6-8">Synctime 2 days</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:3.2814px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0820351"
+       x="204.16336"
+       y="190.99988"
+       id="text1680-9-1-2-7-7-0-8"><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.0820351"
+         x="204.16336"
+         y="190.99988"
+         id="tspan2412-2-2-66-2-6-8-5">Synctime 1 day</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:3.2814px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0820351"
+       x="326.32877"
+       y="175.71648"
+       id="text1680-9-1-2-7-7-3"><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.0820351"
+         x="326.32877"
+         y="175.71648"
+         id="tspan2412-2-2-66-2-6-9">-DGraph</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.0820351"
+         x="326.32877"
+         y="179.81822"
+         id="tspan7018">  - Zero node</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.0820351"
+         x="326.32877"
+         y="183.91998"
+         id="tspan7020">  - Alpha node</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.0820351"
+         x="326.32877"
+         y="188.02173"
+         id="tspan7016" /></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:3.2814px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0820351"
+       x="305.48892"
+       y="210.64772"
+       id="text1680-9-1-2-7-7-3-1"><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.0820351"
+         x="305.48892"
+         y="210.64772"
+         id="tspan2412-2-2-66-2-6-9-89">-DGraph</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.0820351"
+         x="305.48892"
+         y="214.74947"
+         id="tspan7020-4">   - Alpha node</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.0820351"
+         x="305.48892"
+         y="218.85123"
+         id="tspan7016-33" /></text>
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.222919;stroke-opacity:1"
+       id="rect1203-0-9-9"
+       width="87.969833"
+       height="19.021137"
+       x="245.55298"
+       y="200.54941"
+       ry="1.8880414" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:4.30524px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.107631"
+       x="247.70193"
+       y="206.30156"
+       id="text1622-6-4-6"><tspan
+         sodipodi:role="line"
+         id="tspan1620-2-9-3"
+         style="font-weight:bold;stroke-width:0.107631"
+         x="247.70193"
+         y="206.30156">Dandelion-lite 2.0 Future vision</tspan></text>
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.222919;stroke-opacity:1"
+       id="rect1203-0-9-7"
+       width="72.549484"
+       height="26.348289"
+       x="341.72415"
+       y="201.21176"
+       ry="1.8880414" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:4.30524px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.107631"
+       x="343.87317"
+       y="206.96391"
+       id="text1622-6-4-8"><tspan
+         sodipodi:role="line"
+         id="tspan1620-2-9-5"
+         style="font-weight:bold;stroke-width:0.107631"
+         x="343.87317"
+         y="206.96391">Dandelion-lite 2.0 Future vision</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:3.2814px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0820351"
+       x="346.02786"
+       y="215.5201"
+       id="text1680-9-1-2-7-7-3-3"><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.0820351"
+         x="346.02786"
+         y="215.5201"
+         id="tspan2412-2-2-66-2-6-9-86">-DGraph</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.0820351"
+         x="346.02786"
+         y="219.62184"
+         id="tspan7018-0">  - Zero node</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.0820351"
+         x="346.02786"
+         y="223.7236"
+         id="tspan7020-48">  - Alpha node</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:0.0820351"
+         x="346.02786"
+         y="227.82535"
+         id="tspan7016-8" /></text>
+    <text
+       xml:space="preserve"
+       transform="matrix(0.14321628,0,0,0.14321628,54.965814,16.329928)"
+       id="text10024"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:26.6667px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;white-space:pre;shape-inside:url(#rect10026);display:inline;fill:#000000;fill-opacity:1;stroke:none"><tspan
+         x="1119.5547"
+         y="100.12555"
+         id="tspan14019"><tspan
+   style="font-weight:bold;font-size:34.4855px;-inkscape-font-specification:'sans-serif, Bold'"
+   id="tspan14017">Defenition list</tspan>
+</tspan><tspan
+         x="1119.5547"
+         y="136.11829"
+         id="tspan14021">Dandelion-lite - Collection of services to do all blockchain interaction for Cardano making services easy to run
+</tspan><tspan
+         x="1119.5547"
+         y="169.45166"
+         id="tspan14023">Gamechanger - Cardano scripting wallet
+</tspan><tspan
+         x="1119.5547"
+         y="202.78504"
+         id="tspan14025">SPO - Stake pool operator - Produce blocks and keep a ledger copy
+</tspan><tspan
+         x="1119.5547"
+         y="236.11841"
+         id="tspan14027">Haskell - Functional programming language
+</tspan><tspan
+         x="1119.5547"
+         y="269.45178"
+         id="tspan14029">Go - C like programming language
+</tspan><tspan
+         x="1119.5547"
+         y="302.78516"
+         id="tspan14031">
+</tspan><tspan
+         x="1119.5547"
+         y="336.11853"
+         id="tspan14035"><tspan
+   style="font-weight:bold"
+   id="tspan14033">Services</tspan>
+</tspan><tspan
+         x="1119.5547"
+         y="369.45191"
+         id="tspan14037">PostgresQL - Relational Database
+</tspan><tspan
+         x="1119.5547"
+         y="402.78528"
+         id="tspan14039">GraphQL - Data query and manipulation language  - Get information from the chain
+</tspan><tspan
+         x="1119.5547"
+         y="436.11865"
+         id="tspan14041">Hasura - Build, run, govern, API layer for GraphQl
+</tspan><tspan
+         x="1119.5547"
+         y="469.45203"
+         id="tspan14043">Assets - PostgresQL table of NFT's and native assets is built by the GraphQL background service
+</tspan><tspan
+         x="1119.5547"
+         y="502.7854"
+         id="tspan14045">Koios - Elastic RESTful query layer for exploring data on Cardano blockchain
+</tspan><tspan
+         x="1119.5547"
+         y="536.11878"
+         id="tspan14047">Ogmios - Is a lightweight bridge interface for cardano-node - Transaction submission
+</tspan><tspan
+         x="1119.5547"
+         y="569.45215"
+         id="tspan14049">DGraph - A fault-tolerant, distributed graph database, rapid scaling.
+</tspan><tspan
+         x="1119.5547"
+         y="602.78552"
+         id="tspan14051">Zero node - Dgraph Zero controls the Dgraph cluster, and stores information about it. 
+</tspan><tspan
+         x="1119.5547"
+         y="636.1189"
+         id="tspan14053">Alpha node - Replicated from a Zero node.</tspan></text>
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.264583;stroke-opacity:1"
+       id="rect12701"
+       width="35.64798"
+       height="17.11624"
+       x="165.11703"
+       y="177.05934"
+       ry="7.2227235" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:10.5833px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       x="17.485929"
+       y="23.368385"
+       id="text13639"><tspan
+         sodipodi:role="line"
+         id="tspan13637"
+         style="font-weight:bold;stroke-width:0.264583"
+         x="17.485929"
+         y="23.368385">Cardano information </tspan><tspan
+         sodipodi:role="line"
+         style="font-weight:bold;stroke-width:0.264583"
+         x="17.485929"
+         y="36.597511"
+         id="tspan13641">services</tspan></text>
+  </g>
+</svg>
