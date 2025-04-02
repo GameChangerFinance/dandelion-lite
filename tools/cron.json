@@ -1,0 +1,334 @@
+[
+     {
+          "Id": "83ffe33f614a5cf00c925fd43b06f5f108beacefe3fa4f4fac9b39f9f74ae8d8",
+          "Created": "2025-03-29T13:54:27.304672585+01:00",
+          "Path": "/scripts/cron/entrypoint.sh",
+          "Args": [
+               "/scripts/cron/entrypoint.sh"
+          ],
+          "State": {
+               "OciVersion": "1.1.0",
+               "Status": "running",
+               "Running": true,
+               "Paused": false,
+               "Restarting": false,
+               "OOMKilled": false,
+               "Dead": false,
+               "Pid": 474146,
+               "ConmonPid": 474141,
+               "ExitCode": 0,
+               "Error": "",
+               "StartedAt": "2025-03-29T13:54:28.074570051+01:00",
+               "FinishedAt": "0001-01-01T00:00:00Z",
+               "Health": {
+                    "Status": "",
+                    "FailingStreak": 0,
+                    "Log": null
+               },
+               "CgroupPath": "/user.slice/user-1000.slice/user@1000.service/user.slice/libpod-83ffe33f614a5cf00c925fd43b06f5f108beacefe3fa4f4fac9b39f9f74ae8d8.scope",
+               "CheckpointedAt": "0001-01-01T00:00:00Z",
+               "RestoredAt": "0001-01-01T00:00:00Z"
+          },
+          "Image": "f61b45a0115e1cb6e23a5ebf9a9d2d072af144aca8ca8f2b121880816fab206f",
+          "ImageDigest": "sha256:2dd84f03df15c45b4140ebb067dfed68965269d00ff731a1ed959d671f4bee48",
+          "ImageName": "docker.io/library/dandolite-preprod-cron:latest",
+          "Rootfs": "",
+          "Pod": "",
+          "ResolvConfPath": "/run/user/1000/containers/overlay-containers/83ffe33f614a5cf00c925fd43b06f5f108beacefe3fa4f4fac9b39f9f74ae8d8/userdata/resolv.conf",
+          "HostnamePath": "/run/user/1000/containers/overlay-containers/83ffe33f614a5cf00c925fd43b06f5f108beacefe3fa4f4fac9b39f9f74ae8d8/userdata/hostname",
+          "HostsPath": "/run/user/1000/containers/overlay-containers/83ffe33f614a5cf00c925fd43b06f5f108beacefe3fa4f4fac9b39f9f74ae8d8/userdata/hosts",
+          "StaticDir": "/home/maarten/.local/share/containers/storage/overlay-containers/83ffe33f614a5cf00c925fd43b06f5f108beacefe3fa4f4fac9b39f9f74ae8d8/userdata",
+          "OCIConfigPath": "/home/maarten/.local/share/containers/storage/overlay-containers/83ffe33f614a5cf00c925fd43b06f5f108beacefe3fa4f4fac9b39f9f74ae8d8/userdata/config.json",
+          "OCIRuntime": "crun",
+          "ConmonPidFile": "/run/user/1000/containers/overlay-containers/83ffe33f614a5cf00c925fd43b06f5f108beacefe3fa4f4fac9b39f9f74ae8d8/userdata/conmon.pid",
+          "PidFile": "/run/user/1000/containers/overlay-containers/83ffe33f614a5cf00c925fd43b06f5f108beacefe3fa4f4fac9b39f9f74ae8d8/userdata/pidfile",
+          "Name": "dandolite-preprod-cron-1",
+          "RestartCount": 0,
+          "Driver": "overlay",
+          "MountLabel": "",
+          "ProcessLabel": "",
+          "AppArmorProfile": "",
+          "EffectiveCaps": [
+               "CAP_CHOWN",
+               "CAP_DAC_OVERRIDE",
+               "CAP_FOWNER",
+               "CAP_FSETID",
+               "CAP_KILL",
+               "CAP_NET_BIND_SERVICE",
+               "CAP_SETFCAP",
+               "CAP_SETGID",
+               "CAP_SETPCAP",
+               "CAP_SETUID",
+               "CAP_SYS_CHROOT"
+          ],
+          "BoundingCaps": [
+               "CAP_CHOWN",
+               "CAP_DAC_OVERRIDE",
+               "CAP_FOWNER",
+               "CAP_FSETID",
+               "CAP_KILL",
+               "CAP_NET_BIND_SERVICE",
+               "CAP_SETFCAP",
+               "CAP_SETGID",
+               "CAP_SETPCAP",
+               "CAP_SETUID",
+               "CAP_SYS_CHROOT"
+          ],
+          "ExecIDs": [],
+          "GraphDriver": {
+               "Name": "overlay",
+               "Data": {
+                    "LowerDir": "/home/maarten/.local/share/containers/storage/overlay/96f092e753b557cce6ad36091f781ddaac716a4bde1043a3d1bd918ab0589ac0/diff:/home/maarten/.local/share/containers/storage/overlay/e19904bfb52ee865313f5ea91a8251305183de508afd7aab5098a03449c8afd8/diff:/home/maarten/.local/share/containers/storage/overlay/6b8f7731564096dea6372d1d8f8a888a4deeef749fb9410b601013f0372815dd/diff:/home/maarten/.local/share/containers/storage/overlay/e7911a69eb7223df39a07d8bf8e33f011ed2989b276d59d77cc0045f4acf4e9f/diff:/home/maarten/.local/share/containers/storage/overlay/08000c18d16dadf9553d747a58cf44023423a9ab010aab96cf263d2216b8b350/diff",
+                    "MergedDir": "/home/maarten/.local/share/containers/storage/overlay/5065f909343f17bfe1f086c8bb29233338c4b08ba33f58a5a9cd08b88e9c20af/merged",
+                    "UpperDir": "/home/maarten/.local/share/containers/storage/overlay/5065f909343f17bfe1f086c8bb29233338c4b08ba33f58a5a9cd08b88e9c20af/diff",
+                    "WorkDir": "/home/maarten/.local/share/containers/storage/overlay/5065f909343f17bfe1f086c8bb29233338c4b08ba33f58a5a9cd08b88e9c20af/work"
+               }
+          },
+          "Mounts": [
+               {
+                    "Type": "volume",
+                    "Name": "dandolite-preprod_dbless-cardano-token-registry-data",
+                    "Source": "/home/maarten/.local/share/containers/storage/volumes/dandolite-preprod_dbless-cardano-token-registry-data/_data",
+                    "Destination": "/root/token-registry",
+                    "Driver": "local",
+                    "Mode": "",
+                    "Options": [
+                         "nosuid",
+                         "nodev",
+                         "rbind"
+                    ],
+                    "RW": true,
+                    "Propagation": "rprivate"
+               },
+               {
+                    "Type": "bind",
+                    "Source": "/home/maarten/src/dandelion-lite/scripts",
+                    "Destination": "/scripts",
+                    "Driver": "",
+                    "Mode": "",
+                    "Options": [
+                         "rbind"
+                    ],
+                    "RW": true,
+                    "Propagation": "rprivate"
+               },
+               {
+                    "Type": "bind",
+                    "Source": "/home/maarten/src/dandelion-lite/scripts/cron",
+                    "Destination": "/etc/cron.d",
+                    "Driver": "",
+                    "Mode": "",
+                    "Options": [
+                         "rbind"
+                    ],
+                    "RW": true,
+                    "Propagation": "rprivate"
+               }
+          ],
+          "Dependencies": [],
+          "NetworkSettings": {
+               "EndpointID": "",
+               "Gateway": "",
+               "IPAddress": "",
+               "IPPrefixLen": 0,
+               "IPv6Gateway": "",
+               "GlobalIPv6Address": "",
+               "GlobalIPv6PrefixLen": 0,
+               "MacAddress": "",
+               "Bridge": "",
+               "SandboxID": "",
+               "HairpinMode": false,
+               "LinkLocalIPv6Address": "",
+               "LinkLocalIPv6PrefixLen": 0,
+               "Ports": {},
+               "SandboxKey": "/run/user/1000/netns/netns-77851fa7-0cb3-de28-d3b1-e7d58aa2fed7",
+               "Networks": {
+                    "dandolite-preprod_default": {
+                         "EndpointID": "",
+                         "Gateway": "10.89.0.1",
+                         "IPAddress": "10.89.0.22",
+                         "IPPrefixLen": 24,
+                         "IPv6Gateway": "",
+                         "GlobalIPv6Address": "",
+                         "GlobalIPv6PrefixLen": 0,
+                         "MacAddress": "56:41:e1:11:8b:92",
+                         "NetworkID": "dandolite-preprod_default",
+                         "DriverOpts": null,
+                         "IPAMConfig": null,
+                         "Links": null,
+                         "Aliases": [
+                              "dandolite-preprod-cron-1",
+                              "cron",
+                              "83ffe33f614a"
+                         ]
+                    }
+               }
+          },
+          "Namespace": "",
+          "IsInfra": false,
+          "IsService": false,
+          "KubeExitCodePropagation": "invalid",
+          "lockNumber": 3,
+          "Config": {
+               "Hostname": "83ffe33f614a",
+               "Domainname": "",
+               "User": "",
+               "AttachStdin": false,
+               "AttachStdout": false,
+               "AttachStderr": false,
+               "Tty": false,
+               "OpenStdin": false,
+               "StdinOnce": false,
+               "Env": [
+                    "DUCKDNS_DOMAINS=",
+                    "POSTGRES_HOST=postgres",
+                    "DBLESS_CARDANO_TOKEN_REGISTRY_DATA=/root/token-registry",
+                    "KOIOS_LITE_SCHEMA=koios_lite",
+                    "POSTGRES_PORT=15432",
+                    "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+                    "container=podman",
+                    "DUCKDNS_TOKEN=",
+                    "KOIOS_ARTIFACTS_SCHEMA=koios",
+                    "PGUSER=dandelion_user",
+                    "PGDATABASE=dandelion_lite",
+                    "NETWORK=preprod",
+                    "DUCKDNS_IP=",
+                    "PGPASSWORD=dandelion1234",
+                    "HOME=/root",
+                    "HOSTNAME=83ffe33f614a"
+               ],
+               "Cmd": [
+                    "/scripts/cron/entrypoint.sh"
+               ],
+               "Image": "docker.io/library/dandolite-preprod-cron:latest",
+               "Volumes": null,
+               "WorkingDir": "/",
+               "Entrypoint": "",
+               "OnBuild": null,
+               "Labels": {
+                    "com.docker.compose.config-hash": "464dc6fa74c401187307fc51b6a45311a6d7bace6f9a4d681fcaf1b8d7bc63a0",
+                    "com.docker.compose.container-number": "1",
+                    "com.docker.compose.depends_on": "",
+                    "com.docker.compose.image": "sha256:f61b45a0115e1cb6e23a5ebf9a9d2d072af144aca8ca8f2b121880816fab206f",
+                    "com.docker.compose.image.builder": "classic",
+                    "com.docker.compose.oneoff": "False",
+                    "com.docker.compose.project": "dandolite-preprod",
+                    "com.docker.compose.project.config_files": "/home/maarten/src/dandelion-lite/docker-compose.yml",
+                    "com.docker.compose.project.working_dir": "/home/maarten/src/dandelion-lite",
+                    "com.docker.compose.service": "cron",
+                    "com.docker.compose.version": "2.28.1",
+                    "io.buildah.version": "1.33.7"
+               },
+               "Annotations": {
+                    "io.container.manager": "libpod",
+                    "org.opencontainers.image.stopSignal": "15"
+               },
+               "StopSignal": 15,
+               "HealthcheckOnFailureAction": "none",
+               "CreateCommand": [
+                    "/usr/bin/podman",
+                    "--log-level=info",
+                    "system",
+                    "service"
+               ],
+               "Umask": "0000",
+               "Timeout": 0,
+               "StopTimeout": 10,
+               "Passwd": true
+          },
+          "HostConfig": {
+               "Binds": [
+                    "dandolite-preprod_dbless-cardano-token-registry-data:/root/token-registry:rw,rprivate,nosuid,nodev,rbind",
+                    "/home/maarten/src/dandelion-lite/scripts:/scripts:rw,rprivate,rbind",
+                    "/home/maarten/src/dandelion-lite/scripts/cron:/etc/cron.d:rw,rprivate,rbind"
+               ],
+               "CgroupManager": "systemd",
+               "CgroupMode": "private",
+               "ContainerIDFile": "",
+               "LogConfig": {
+                    "Type": "journald",
+                    "Config": null,
+                    "Path": "",
+                    "Tag": "",
+                    "Size": "0B"
+               },
+               "NetworkMode": "bridge",
+               "PortBindings": {},
+               "RestartPolicy": {
+                    "Name": "always",
+                    "MaximumRetryCount": 0
+               },
+               "AutoRemove": false,
+               "VolumeDriver": "",
+               "VolumesFrom": null,
+               "CapAdd": [],
+               "CapDrop": [],
+               "Dns": [],
+               "DnsOptions": [],
+               "DnsSearch": [],
+               "ExtraHosts": [],
+               "GroupAdd": [],
+               "IpcMode": "shareable",
+               "Cgroup": "",
+               "Cgroups": "default",
+               "Links": null,
+               "OomScoreAdj": 200,
+               "PidMode": "private",
+               "Privileged": false,
+               "PublishAllPorts": false,
+               "ReadonlyRootfs": false,
+               "SecurityOpt": [],
+               "Tmpfs": {},
+               "UTSMode": "private",
+               "UsernsMode": "",
+               "ShmSize": 65536000,
+               "Runtime": "oci",
+               "ConsoleSize": [
+                    0,
+                    0
+               ],
+               "Isolation": "",
+               "CpuShares": 0,
+               "Memory": 0,
+               "NanoCpus": 0,
+               "CgroupParent": "user.slice",
+               "BlkioWeight": 0,
+               "BlkioWeightDevice": null,
+               "BlkioDeviceReadBps": null,
+               "BlkioDeviceWriteBps": null,
+               "BlkioDeviceReadIOps": null,
+               "BlkioDeviceWriteIOps": null,
+               "CpuPeriod": 0,
+               "CpuQuota": 0,
+               "CpuRealtimePeriod": 0,
+               "CpuRealtimeRuntime": 0,
+               "CpusetCpus": "",
+               "CpusetMems": "",
+               "Devices": [],
+               "DiskQuota": 0,
+               "KernelMemory": 0,
+               "MemoryReservation": 0,
+               "MemorySwap": 0,
+               "MemorySwappiness": 0,
+               "OomKillDisable": false,
+               "PidsLimit": 2048,
+               "Ulimits": [
+                    {
+                         "Name": "RLIMIT_NOFILE",
+                         "Soft": 1048576,
+                         "Hard": 1048576
+                    },
+                    {
+                         "Name": "RLIMIT_NPROC",
+                         "Soft": 127927,
+                         "Hard": 127927
+                    }
+               ],
+               "CpuCount": 0,
+               "CpuPercent": 0,
+               "IOMaximumIOps": 0,
+               "IOMaximumBandwidth": 0,
+               "CgroupConf": null
+          }
+     }
+]
