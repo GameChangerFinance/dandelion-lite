@@ -1,0 +1,22 @@
+diff --git a/scripts/babbage/mkfiles.sh b/scripts/babbage/mkfiles.sh
+index 6ed8d78fb..dcb969759 100755
+--- a/scripts/babbage/mkfiles.sh
++++ b/scripts/babbage/mkfiles.sh
+@@ -37,7 +37,7 @@ SECURITY_PARAM=10
+ NUM_SPO_NODES=3
+ INIT_SUPPLY=12000000
+ START_TIME="$(${DATE} -d "now + 30 seconds" +%s)"
+-ROOT=example
++ROOT=/cluster
+ mkdir -p "${ROOT}"
+ 
+ cat > "${ROOT}/byron.genesis.spec.json" <<EOF
+@@ -241,7 +241,7 @@ CARDANO_NODE="\${CARDANO_NODE:-cardano-node}"
+   --config                          '${ROOT}/configuration.yaml' \\
+   --topology                        '${ROOT}/${NODE}/topology.json' \\
+   --database-path                   '${ROOT}/${NODE}/db' \\
+-  --socket-path                     '$(sprocket "${ROOT}/${NODE}/node.sock")' \\
++  --socket-path                     '$(sprocket "/node-ipc/${NODE}/node.socket")' \\
+   --shelley-kes-key                 '${ROOT}/${NODE}/kes.skey' \\
+   --shelley-vrf-key                 '${ROOT}/${NODE}/vrf.skey' \\
+   --byron-delegation-certificate    '${ROOT}/${NODE}/byron-delegation.cert' \\

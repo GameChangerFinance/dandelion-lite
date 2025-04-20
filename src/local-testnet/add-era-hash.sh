@@ -1,0 +1,13 @@
+#!/bin/bash
+
+BYRON=`cardano-cli byron genesis print-genesis-hash --genesis-json /cluster/genesis/byron/genesis.json`
+SHELLEY=`cardano-cli shelley genesis hash --genesis /cluster/genesis/shelley/genesis.json`
+ALONZO=`cardano-cli alonzo genesis hash --genesis /cluster/genesis/shelley/genesis.alonzo.json`
+CONWAY=`cardano-cli conway genesis hash --genesis /cluster/genesis/shelley/genesis.conway.json`
+
+CONFIG_PATH="/cluster/configuration.yaml"
+
+grep -q "^ByronGenesisHash:" $CONFIG_PATH || echo "ByronGenesisHash: \"$BYRON\"" >> $CONFIG_PATH
+grep -q "^ShelleyGenesisHash:" $CONFIG_PATH || echo "ShelleyGenesisHash: \"$SHELLEY\"" >> $CONFIG_PATH
+grep -q "^AlonzoGenesisHash:" $CONFIG_PATH || echo "AlonzoGenesisHash: \"$ALONZO\"" >> $CONFIG_PATH
+grep -q "^ConwayGenesisHash:" $CONFIG_PATH || echo "ConwayGenesisHash: \"$CONWAY\"" >> $CONFIG_PATH
