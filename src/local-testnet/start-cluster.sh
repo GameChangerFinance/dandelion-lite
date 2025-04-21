@@ -1,16 +1,20 @@
 #!/bin/bash
 
-cd /cluster 
-rm -rf *
+echo "GENERATE_GENESIS: $GENERATE_GENESIS"
 
-cd /cardano-node
-./scripts/babbage/mkfiles.sh 
+if [ "$GENERATE_GENESIS" = "true" ]; then
 
-cd /
+    cd /cluster 
+    rm -rf *
 
-./sync-time.sh
+    cd /cardano-node
+    ./scripts/babbage/mkfiles.sh 
 
-./add-era-hash.sh 
+    cd /
+    ./sync-time.sh
+    ./add-era-hash.sh 
+
+fi
 
 ./set-pgpass.sh 
 

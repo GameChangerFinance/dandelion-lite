@@ -5,9 +5,9 @@ FROM alpine:latest as base
 
 RUN apk add --no-cache bash coreutils jq git wget tar nano
 
-RUN wget https://github.com/IntersectMBO/cardano-node/releases/download/9.2.1/cardano-node-9.2.1-linux.tar.gz
-RUN tar xvfz cardano-node-9.2.1-linux.tar.gz ./bin/ --directory /bin
-RUN rm -rf cardano-node-9.2.1-linux.tar.gz
+RUN wget https://github.com/IntersectMBO/cardano-node/releases/download/8.12.2/cardano-node-8.12.2-linux.tar.gz
+RUN tar xvfz cardano-node-8.12.2-linux.tar.gz ./bin/ --directory /bin
+RUN rm -rf cardano-node-8.12.2-linux.tar.gz
 
 RUN git clone https://github.com/input-output-hk/cardano-node.git
 
