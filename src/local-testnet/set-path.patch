@@ -1,8 +1,14 @@
 diff --git a/scripts/babbage/mkfiles.sh b/scripts/babbage/mkfiles.sh
-index 6ed8d78fb..dcb969759 100755
+index 6ed8d78fb..6c72cf2da 100755
 --- a/scripts/babbage/mkfiles.sh
 +++ b/scripts/babbage/mkfiles.sh
-@@ -37,7 +37,7 @@ SECURITY_PARAM=10
+@@ -32,12 +32,12 @@ case $UNAME in
+ esac
+ 
+ CARDANO_CLI="${CARDANO_CLI:-cardano-cli}"
+-NETWORK_MAGIC=42
++NETWORK_MAGIC=1
+ SECURITY_PARAM=10
  NUM_SPO_NODES=3
  INIT_SUPPLY=12000000
  START_TIME="$(${DATE} -d "now + 30 seconds" +%s)"
@@ -16,7 +22,8 @@ index 6ed8d78fb..dcb969759 100755
    --topology                        '${ROOT}/${NODE}/topology.json' \\
    --database-path                   '${ROOT}/${NODE}/db' \\
 -  --socket-path                     '$(sprocket "${ROOT}/${NODE}/node.sock")' \\
-+  --socket-path                     '$(sprocket "/node-ipc/${NODE}/node.socket")' \\
++  --socket-path                     '$(sprocket "/node-ipc/${NODE}/node.sock")' \\
    --shelley-kes-key                 '${ROOT}/${NODE}/kes.skey' \\
    --shelley-vrf-key                 '${ROOT}/${NODE}/vrf.skey' \\
    --byron-delegation-certificate    '${ROOT}/${NODE}/byron-delegation.cert' \\
+   
