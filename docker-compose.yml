@@ -10,7 +10,7 @@ services:
     build:
       context: ./src/local-testnet
     environment:
-      GENERATE_GENESIS: false
+      GENERATE_GENESIS: true
       POSTGRES_HOST: ${POSTGRES_HOST}
       POSTGRES_PORT: 5432 # not using exposed ${POSTGRES_PORT} because using internal docker network connection 
       POSTGRES_DB: ${POSTGRES_DB}

@@ -1,5 +1,5 @@
 diff --git a/scripts/babbage/mkfiles.sh b/scripts/babbage/mkfiles.sh
-index 6ed8d78fb..6c72cf2da 100755
+index 6ed8d78fb..117e5f020 100755
 --- a/scripts/babbage/mkfiles.sh
 +++ b/scripts/babbage/mkfiles.sh
 @@ -32,12 +32,12 @@ case $UNAME in
@@ -17,13 +17,21 @@ index 6ed8d78fb..6c72cf2da 100755
  mkdir -p "${ROOT}"
  
  cat > "${ROOT}/byron.genesis.spec.json" <<EOF
+@@ -135,7 +135,7 @@ mv "${ROOT}/genesis.alonzo.json" "${ROOT}/genesis/shelley/genesis.alonzo.json"
+ mv "${ROOT}/genesis.conway.json" "${ROOT}/genesis/shelley/genesis.conway.json"
+ mv "${ROOT}/genesis.json" "${ROOT}/genesis/shelley/genesis.json"
+ 
+-jq --raw-output '.protocolConsts.protocolMagic = 42' "${ROOT}/genesis/byron/genesis-wrong.json" > "${ROOT}/genesis/byron/genesis.json"
++jq --raw-output ".protocolConsts.protocolMagic = ${NETWORK_MAGIC}" "${ROOT}/genesis/byron/genesis-wrong.json" > "${ROOT}/genesis/byron/genesis.json"
+ 
+ rm "${ROOT}/genesis/byron/genesis-wrong.json"
+ 
 @@ -241,7 +241,7 @@ CARDANO_NODE="\${CARDANO_NODE:-cardano-node}"
    --config                          '${ROOT}/configuration.yaml' \\
    --topology                        '${ROOT}/${NODE}/topology.json' \\
    --database-path                   '${ROOT}/${NODE}/db' \\
 -  --socket-path                     '$(sprocket "${ROOT}/${NODE}/node.sock")' \\
-+  --socket-path                     '$(sprocket "/node-ipc/${NODE}/node.sock")' \\
++  --socket-path                     '$(sprocket "/node-ipc/${NODE}/node.socket")' \\
    --shelley-kes-key                 '${ROOT}/${NODE}/kes.skey' \\
    --shelley-vrf-key                 '${ROOT}/${NODE}/vrf.skey' \\
    --byron-delegation-certificate    '${ROOT}/${NODE}/byron-delegation.cert' \\
-   
