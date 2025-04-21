@@ -44,7 +44,8 @@ services:
     image:  ${CARDANO_DB_SYNC_IMAGE}
     platform: linux/x86_64
     hostname: cardano-db-sync
-    entrypoint: cardano-db-sync --config /config/cardano-db-sync/config.yaml --socket-path /node-ipc/node.socket --state-dir /state --schema-dir /nix/store/npsidz34y67jp7sc07b2iw7s2n3fp9lj-schema
+    #entrypoint: cardano-db-sync --config /config/cardano-db-sync/config.yaml --socket-path /node-ipc/node.socket --state-dir /state --schema-dir /nix/store/npsidz34y67jp7sc07b2iw7s2n3fp9lj-schema
+    entrypoint: cardano-db-sync --config /config/cardano-db-sync/config.yaml --socket-path /node-ipc/node.socket --state-dir /state --schema-dir /schema
     # entrypoint: tail -f /dev/null
     environment:
       #DISABLE_LEDGER: ${CARDANO_DB_SYNC_DISABLE_LEDGER}
@@ -65,6 +66,7 @@ services:
       - ./node-ipc:/node-ipc/
       - ./scripts/:/scripts/
       - ./cluster/:/cluster
+      - ./schema/:/schema/
     restart: always
     stop_signal: SIGINT
     logging:
