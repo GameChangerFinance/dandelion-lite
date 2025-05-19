@@ -615,7 +615,13 @@ services:
   #     postgress:
   #       condition: service_healthy
 
-
+  pingapi:
+    build: .
+    ports:
+      - "5000:5000"
+    restart: unless-stopped
+    cap_add:
+      - NET_RAW  # Needed to allow ping from inside container
 
 #################################
 # volumes, secrets and configs  #

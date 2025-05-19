@@ -14,7 +14,7 @@ server {
     listen 80;
     listen [::]:80;
 
-    server_name preprod.${DOMAIN}.duckdns.org;
+    server_name preprod.${DOMAIN};
 
     location / {
         proxy_pass http://localhost:3081/;
@@ -31,7 +31,7 @@ server {
     listen 80;
     listen [::]:80;
 
-    server_name mainnet.${DOMAIN}.duckdns.org;
+    server_name mainnet.${DOMAIN};
 
     location / {
         proxy_pass http://localhost:3080/;
