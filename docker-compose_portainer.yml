@@ -1,0 +1,27 @@
+services:
+  portainer-agent:
+    image: portainer/agent:latest
+    environment:
+      AGENT_CLUSTER_ADDR: portainer-agent
+      AGENT_PORT: 9001
+      LOG_LEVEL: DEBUG
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/lib/docker/volumes:/var/lib/docker/volumes
+    restart: always
+
+  portainer:
+    image: portainer/portainer-ce:latest
+    command: -H tcp://portainer-agent:9001 --tlsskipverify
+    ports:
+      - 9443:9443
+      - 8000:8000
+    volumes:
+      - portainer-data:/data
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: always
+    depends_on:
+      - portainer-agent    
+
+volumes:
+  portainer-data:      

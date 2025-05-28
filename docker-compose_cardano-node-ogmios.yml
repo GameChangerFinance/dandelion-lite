@@ -1,0 +1,37 @@
+services:
+  cardano-node-ogmios:
+    image: ${CARDANO_NODE_OGMIOS_IMAGE}
+    hostname: cardano-node
+    #init: true
+    platform: linux/x86_64
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "/scripts/healthcheck.sh"]
+      interval: 30s
+      timeout: 10s
+      retries: 1000000
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "400k"
+        max-file: "10"
+    ports:
+      - ${OGMIOS_PORT:-1337}:1337
+    environment:
+      NETWORK: ${CORE_NETWORK}
+      #SOCKET: "${CARDANO_NODE_HOME}/ipc/node.socket" 
+      #UPDATE_CHECK: "N"
+      #EXPORTED_CONFIG: "${CARDANO_NODE_HOME}/config"
+    volumes:
+      #- node-db:/db
+      #- node-ipc:/ipc 
+      # Uncomment if you want to use your own config files or the provided ones.
+      # Current configs are also available at: https://book.world.dev.cardano.org/
+      #- ./configs/cardano/config/network/${NETWORK}:/config
+      - node-db:${CARDANO_NODE_HOME}/db
+      - node-ipc:${CARDANO_NODE_HOME}/ipc
+      - ./scripts/cardano-node-ogmios/:/scripts/
+
+volumes:
+  node-db:
+  node-ipc:

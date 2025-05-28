@@ -1,0 +1,41 @@
+services:
+  cardano-token-registry:
+    #image: cardanofoundation/cf-token-metadata-registry-api:latest            
+    image: ${CARDANO_TOKEN_REGISTRY_IMAGE}
+    hostname: ${CARDANO_TOKEN_REGISTRY_HOSTNAME}
+    ports:
+      - ${CARDANO_TOKEN_REGISTRY_PORT:-8080}:8080
+    environment:
+      TOKEN_METADATA_SYNC_JOB: ${CARDANO_TOKEN_REGISTRY_SYNC_JOB}
+      GITHUB_ORGANIZATION: ${CARDANO_TOKEN_REGISTRY_GITHUB_ORGANIZATION}
+      GITHUB_PROJECT_NAME: ${CARDANO_TOKEN_REGISTRY_GITHUB_PROJECT_NAME}
+      GITHUB_MAPPINGS_FOLDER: ${CARDANO_TOKEN_REGISTRY_GITHUB_MAPPINGS_FOLDER}
+      DB_USERNAME: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      DB_NAME: ${POSTGRES_DB}
+      DB_URL: jdbc:postgresql://${POSTGRES_HOST}:5432/${POSTGRES_DB}?currentSchema=${CARDANO_TOKEN_REGISTRY_SCHEMA}
+    depends_on:
+      postgress:
+        condition: service_healthy      
+    restart: always
+
+#
+#  dbless-cardano-token-registry:
+#    #image: dbless-cardano-token-registry:latest
+#    build:
+#      context: ./src/dbless-cardano-token-registry
+#    restart: always
+#    environment:
+#      NETWORK: ${NETWORK}
+#      #TOKEN_REGISTRY_MAPPINGS_DIR: ${DBLESS_CARDANO_TOKEN_REGISTRY_MAPPINGS_DIR:-/app/token-registry}
+#      TOKEN_REGISTRY_MAPPINGS_DIR: /root/token-registry/data
+#      #PORT: ${DBLESS_CARDANO_TOKEN_REGISTRY_PORT:-3042}
+#      PORT: 3042
+#    ports:
+#      - ${DBLESS_CARDANO_TOKEN_REGISTRY_PORT:-3042}:3042
+#    # TODO: link to persistent volume
+#    volumes:
+#      - dbless-cardano-token-registry-data:/root/token-registry
+
+# volumes:
+#   dbless-cardano-token-registry-data:

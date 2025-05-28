@@ -1,0 +1,26 @@
+  cardano-sql-postgrest:
+    image: postgrest/postgrest:v12.0.2
+    hostname: ${CARDANO_SQL_POSTGREST_HOST}
+    depends_on:
+      postgress:
+        condition: service_healthy
+    ports:
+      - ${CARDANO_SQL_POSTGREST_PORT:-8050}:8050
+    volumes:
+      - ./scripts/:/scripts/
+    environment:
+      # not using exposed ${POSTGRES_PORT} because using internal docker network connection
+      PGRST_DB_URI: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:5432/${POSTGRES_DB}
+      PGRST_DB_ANON_ROLE: ${CARDANO_SQL_POSTGREST_DB_ANON_ROLE}
+      PGRST_DB_SCHEMAS: "${CARDANO_SQL_POSTGREST_DB_SCHEMAS}" # first one is default
+      PGRST_SERVER_PORT: 8070
+      PGRST_OPENAPI_SERVER_PROXY_URI: http://0.0.0.0:8070
+      PGRST_DB_MAX_ROWS: 1000
+      PGRST_DB_AGGREGATES_ENABLED: true
+      PGRST_DB_EXTRA_SEARCH_PATH: "${CARDANO_SQL_POSTGREST_DB_EXTRA_SEARCH_PATH}"
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"

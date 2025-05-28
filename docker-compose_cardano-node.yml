@@ -1,0 +1,49 @@
+
+services:
+ cardano-node:
+   image: ${CARDANO_NODE_IMAGE}
+   init: true
+   hostname: cardano-node
+   environment:
+     NETWORK: ${NETWORK}
+     SOCKET: "${CARDANO_NODE_HOME}/sockets/node.socket" 
+     UPDATE_CHECK: "N"
+     EXPORTED_CONFIG: "${CARDANO_NODE_HOME}/sockets/exportedConfig"
+   volumes:
+     - node-db:${CARDANO_NODE_HOME}/db
+     - node-ipc:${CARDANO_NODE_HOME}/sockets
+     - ./scripts/:/scripts/
+   entrypoint: >
+     /bin/sh -c "
+     echo \"Preparing setup for network '${NETWORK}'\" ;
+     mkdir -p $${EXPORTED_CONFIG};
+     chown -Rv guild $${EXPORTED_CONFIG};
+     rm -rf $${EXPORTED_CONFIG}/*.json;
+     echo \"Exporting config files from '${CARDANO_NODE_HOME}/files' into '$${EXPORTED_CONFIG}'...\" ;
+     cp ${CARDANO_NODE_HOME}/files/*.json $${EXPORTED_CONFIG} ;
+     echo 'Identifying lines with potencial issues with protocol magic number and file paths...' ;
+     grep -Rnw $${EXPORTED_CONFIG} -e '764824073' ;
+     grep -Rnw $${EXPORTED_CONFIG} -e '${CARDANO_NODE_HOME}/files' ;
+     echo \"Patching exported files...\" ;
+     [ \"${NETWORK}\" = \"preprod\" ] && find $${EXPORTED_CONFIG} -name '*.json' -print0 | xargs -0 sed -i 's/764824073/1/g' ;
+     [ \"${NETWORK}\" = \"preview\" ] && find $${EXPORTED_CONFIG} -name '*.json' -print0 | xargs -0 sed -i 's/764824073/2/g' ;
+     find $${EXPORTED_CONFIG} -name '*.json' -print0 | xargs -0 sed -i \"s#${CARDANO_NODE_HOME}/files#$${EXPORTED_CONFIG}#g\" ;
+     echo 'Config files exported:' ;
+     ls -ls $${EXPORTED_CONFIG} ;
+     ./entrypoint.sh ;
+     "
+   restart: always
+   healthcheck:
+     test: ["CMD-SHELL", "netstat -ntlp | grep 12798"]
+     interval: 30s
+     timeout: 10s
+     retries: 3
+   logging:
+     driver: "json-file"
+     options:
+       max-size: "200k"
+       max-file: "10"
+
+volumes:
+  node-db:
+  node-ipc:       

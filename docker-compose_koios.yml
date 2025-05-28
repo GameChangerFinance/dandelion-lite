@@ -1,0 +1,50 @@
+  postgrest:
+    image: postgrest/postgrest:v12.0.2
+    hostname: ${POSTGREST_HOST}
+    depends_on:
+      postgress:
+        condition: service_healthy
+    ports:
+      - ${POSTGREST_PORT:-8050}:8050
+    volumes:
+      - ./scripts/:/scripts/
+    environment:
+      # not using exposed ${POSTGRES_PORT} because using internal docker network connection
+      PGRST_DB_URI: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:5432/${POSTGRES_DB}
+      PGRST_DB_ANON_ROLE: ${POSTGREST_DB_ANON_ROLE}
+      PGRST_DB_SCHEMAS: "${POSTGREST_DB_SCHEMAS}" # first one is default
+      PGRST_SERVER_PORT: 8050
+      PGRST_OPENAPI_SERVER_PROXY_URI: http://0.0.0.0:8050
+      PGRST_DB_MAX_ROWS: 1000
+      PGRST_DB_AGGREGATES_ENABLED: true
+      PGRST_DB_EXTRA_SEARCH_PATH: "${POSTGREST_DB_EXTRA_SEARCH_PATH}"
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
+
+  cron:
+    build: .
+    environment:
+      NETWORK: ${NETWORK}
+      POSTGRES_HOST: ${POSTGRES_HOST}
+      POSTGRES_PORT: ${POSTGRES_PORT}
+      PGDATABASE: ${POSTGRES_DB}
+      PGUSER: ${POSTGRES_USER}
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+      #RPC_SCHEMA: ${RPC_SCHEMA}
+      KOIOS_LITE_SCHEMA: ${KOIOS_LITE_SCHEMA}
+      KOIOS_ARTIFACTS_SCHEMA: ${KOIOS_ARTIFACTS_SCHEMA}
+      DBLESS_CARDANO_TOKEN_REGISTRY_DATA: /root/token-registry
+      DUCKDNS_DOMAINS: ${DUCKDNS_DOMAINS:-}
+      DUCKDNS_TOKEN: ${DUCKDNS_TOKEN:-}
+      DUCKDNS_IP: ${DUCKDNS_IP:-}
+    volumes:
+      - ./scripts/cron:/etc/cron.d/
+      - ./scripts:/scripts
+      - dbless-cardano-token-registry-data:/root/token-registry
+    # Uncomment for persistent logs
+    # - ./logs:/var/log
+    restart: always

@@ -1,0 +1,36 @@
+services:
+ cardano-sql-companion:
+   #image: cardano-sql-companion:latest
+   build:
+     context: ./src/cardano-sql/companion
+     target: production-build-stage
+   restart: always
+   environment:
+     NETWORK: ${NETWORK}
+     DLT: ${DLT}
+     NODE_NAME: ${NODE_NAME}
+     NODE_GROUPS: ${NODE_GROUPS}
+     NODE_EXTENSIONS: ${NODE_EXTENSIONS}
+     
+     CARDANO_NODE_VERSION: ${CARDANO_NODE_VERSION}
+     CARDANO_NODE_IMAGE: ${CARDANO_NODE_IMAGE}
+     
+     CARDANO_DB_SYNC_VERSION: ${CARDANO_DB_SYNC_VERSION}
+     CARDANO_DB_SYNC_IMAGE: ${CARDANO_DB_SYNC_IMAGE}
+     
+     OGMIOS_VERSION: ${OGMIOS_VERSION}
+     OGMIOS_IMAGE: ${OGMIOS_IMAGE}
+     OGMIOS_PORT: ${OGMIOS_PORT}
+     # used for service connection, others are for public manifest
+     USE_OGMIOS_HOST: ${OGMIOS_HOST:-ogmios}
+     USE_OGMIOS_PORT: 1337
+
+     CARDANO_SQL_EXTENSIONS: ${CARDANO_SQL_EXTENSIONS}
+     CARDANO_SQL_COMPANION_PORT: ${CARDANO_SQL_COMPANION_PORT}
+
+     POSTGREST_PORT: ${POSTGREST_PORT}
+     UNIMATRIX_PORT: ${UNIMATRIX_PORT:-8765}
+     PGADMIN_PORT: ${PGADMIN_PORT}
+     SWAGGER_PORT: ${SWAGGER_PORT}
+   ports:
+     - ${CARDANO_SQL_COMPANION_PORT:-4000}:4000

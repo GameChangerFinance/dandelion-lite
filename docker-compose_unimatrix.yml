@@ -1,0 +1,17 @@
+services: 
+  unimatrix:
+    #image: unimatrix-peer:latest
+    build:
+      context: ./src/unimatrix    
+    restart: always
+    environment:
+      UNIMATRIX_PORT: 8765
+    # static http server can be exposed as well
+    ports:
+      - ${UNIMATRIX_PORT:-8765}:8765
+    # TODO: link to persistent volume
+    volumes:
+      - unimatrix-data:/work/data
+
+volumes:
+  unimatrix-data:      

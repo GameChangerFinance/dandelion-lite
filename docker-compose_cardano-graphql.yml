@@ -1,0 +1,95 @@
+services:
+  cardano-graphql-hasura:
+    image: ${CARDANO_GRAPHQL_HASURA_IMAGE}
+    #image: cardanofoundation/cardano-graphql-hasura:${CARDANO_GRAPHQL_VERSION:-8.0.1}    
+    hostname: cardano-graphql-hasura
+    ports:
+      - ${CARDANO_GRAPHQL_HASURA_PORT:-8090}:8080
+    depends_on:
+      cardano-node-ogmios:
+        condition: service_healthy
+      postgress:
+        condition: service_healthy
+    restart: always
+    environment:
+      NETWORK: ${NETWORK}
+      POSTGRES_HOST: ${POSTGRES_HOST}
+      #POSTGRES_HOST: postgress      
+      HASURA_GRAPHQL_ENABLE_CONSOLE: ${CARDANO_GRAPHQL_HASURA_ENABLE_CONSOLE:-true}
+      HASURA_GRAPHQL_CORS_DOMAIN: ${CARDANO_GRAPHQL_HASURA_CORS_DOMAIN:-http://localhost:9695}
+    secrets:
+      - postgres_db
+      - postgres_password
+      - postgres_user
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
+
+  cardano-graphql-background:
+    image: ${CARDANO_GRAPHQL_BACKGROUND_IMAGE}
+    #image: cardanofoundation/cardano-graphql-background:${CARDANO_GRAPHQL_VERSION:-8.0.1}-${NETWORK:-mainnet}
+    depends_on:
+      postgress:
+        condition: service_healthy    
+      cardano-graphql-hasura:
+        condition: service_started
+    environment:
+      NETWORK: ${NETWORK}
+      POSTGRES_HOST: ${POSTGRES_HOST}      
+      HASURA_URI: http://cardano-graphql-hasura:8080
+      LOGGER_MIN_SEVERITY: ${CARDANO_GRAPHQL_BACKGROUND_LOGGER_MIN_SEVERITY:-info}
+      #Depends on network, so defaulting to https://tokens.cardano.org is not safe:
+      METADATA_SERVER_URI: ${CARDANO_GRAPHQL_BACKGROUND_METADATA_SERVER_URI}
+      CHAIN_FOLLOWER_START_SLOT: ${CARDANO_GRAPHQL_BACKGROUND_CHAIN_FOLLOWER_START_SLOT:-0}
+      CHAIN_FOLLOWER_START_ID: ${CARDANO_GRAPHQL_BACKGROUND_CHAIN_FOLLOWER_START_ID:-}
+    entrypoint: >
+      /bin/sh -c "
+      echo \"Applying patch to provide env vars due to hardcoded values:\" ;
+      echo \"   OGMIOS_HOST='${OGMIOS_HOST}'\" ;
+      echo \"   OGMIOS_PORT='1337'\" ;
+      OGMIOS_HOST=${OGMIOS_HOST} && OGMIOS_PORT=1337 && node background.js;
+      " 
+    restart: always
+    secrets:
+      - postgres_db
+      - postgres_password
+      - postgres_user
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
+
+  cardano-graphql-server:
+    platform: linux/x86_64
+    image: ${CARDANO_GRAPHQL_SERVER_IMAGE}
+    #image: cardanofoundation/cardano-graphql-server:${CARDANO_GRAPHQL_VERSION:-8.0.1}-${NETWORK:-mainnet}
+    environment:
+      NETWORK: ${NETWORK}
+      HASURA_URI: http://cardano-graphql-hasura:8080
+      ALLOW_INTROSPECTION: ${CARDANO_GRAPHQL_SERVER_ALLOW_INTROSPECTION:-true}
+      CACHE_ENABLED: ${CARDANO_GRAPHQL_SERVER_CACHE_ENABLED:-true}
+      LOGGER_MIN_SEVERITY: ${CARDANO_GRAPHQL_SERVER_LOGGER_MIN_SEVERITY:-info}
+      API_PORT: 3100
+    entrypoint: >
+      /bin/sh -c "
+      echo \"Applying patch to provide env vars due to hardcoded values:\" ;
+      echo \"   OGMIOS_HOST='${OGMIOS_HOST}'\" ;
+      echo \"   OGMIOS_PORT='1337'\" ;
+      OGMIOS_HOST=${OGMIOS_HOST} && OGMIOS_PORT=1337 && node index.js;
+      " 
+    depends_on:
+      postgress:
+        condition: service_healthy
+    # expose:
+    #   - ${CARDANO_GRAPHQL_SERVER_PORT:-3100}
+    ports:
+      - ${CARDANO_GRAPHQL_SERVER_PORT:-3100}:3100
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"

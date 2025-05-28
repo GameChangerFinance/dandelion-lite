@@ -1,0 +1,18 @@
+# TODO: add http backend ogmios and it's entry on /configs/haproxy/haproxy.cfg
+# Important: https://github.com/cardano-community/guild-operators/pull/1261/files
+
+services:
+  ogmios:
+    image: ${OGMIOS_IMAGE}
+    restart: always
+    environment:
+      NETWORK: ${NETWORK}
+    command: [ "--host", "0.0.0.0", "--node-socket", "${CARDANO_NODE_HOME}/sockets/node.socket", "--node-config", "${CARDANO_NODE_HOME}/sockets/exportedConfig/config.json" ]
+    volumes:
+      # exported automagically from cardano-node for plug-n-play ogmios
+      - node-ipc:${CARDANO_NODE_HOME}/sockets
+    ports:
+      - ${OGMIOS_PORT:-1337}:1337
+    depends_on:
+      cardano-node:
+        condition: service_healthy

@@ -1,0 +1,47 @@
+services:  
+  cardano-db-sync:
+    image:  ${CARDANO_DB_SYNC_IMAGE}
+    platform: linux/x86_64
+    hostname: cardano-db-sync
+    command: [
+      "--config", "/config/cardano-db-sync/config.json",
+      "--socket-path", "/node-ipc/node.socket"
+    ]
+    environment:
+      #DISABLE_LEDGER: ${CARDANO_DB_SYNC_DISABLE_LEDGER}
+      NETWORK: ${NETWORK}
+      POSTGRES_HOST: ${POSTGRES_HOST}
+      POSTGRES_PORT: 5432 # not using exposed ${POSTGRES_PORT} because using internal docker network connection 
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      RESTORE_SNAPSHOT: ${CARDANO_DB_SYNC_RESTORE_SNAPSHOT:-}
+      RESTORE_RECREATE_DB: N
+      #EXTRA_DB_SYNC_ARGS: ${CARDANO_DB_SYNC_ARGS:-}
+    healthcheck:
+      # test: ["CMD-SHELL", "/scripts/lib/dbsync_healthcheck.sh"]
+      test: ["CMD-SHELL", "/scripts/cardano-db-sync/healthcheck.sh"]
+      interval: 60s
+      timeout: 15s
+      retries: 5000000
+    depends_on:
+      # Depend on both services to be started before starting.
+      cardano-node-ogmios:
+        condition: service_started
+      postgress:
+        condition: service_started
+    volumes:
+      - ./configs/cardano/config/network/${NETWORK}:/config
+      - db-sync-data:/var/lib/cexplorer
+      - node-ipc:/node-ipc
+      - ./scripts/:/scripts/
+    restart: always
+    stop_signal: SIGINT
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
+
+volumes:
+  db-sync-data:        
