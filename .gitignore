@@ -1,4 +1,4 @@
-.env
+.env_core
 .*status
 .dependency_installation_status
 *.swp

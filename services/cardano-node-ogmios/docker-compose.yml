@@ -30,7 +30,7 @@ services:
       #- ./configs/cardano/config/network/${NETWORK}:/config
       - node-db:${CARDANO_NODE_HOME}/db
       - node-ipc:${CARDANO_NODE_HOME}/ipc
-      - ./scripts/cardano-node-ogmios/:/scripts/
+      - ./scripts/:/scripts/
 
 volumes:
   node-db:

@@ -20,7 +20,7 @@ services:
       #EXTRA_DB_SYNC_ARGS: ${CARDANO_DB_SYNC_ARGS:-}
     healthcheck:
       # test: ["CMD-SHELL", "/scripts/lib/dbsync_healthcheck.sh"]
-      test: ["CMD-SHELL", "/scripts/cardano-db-sync/healthcheck.sh"]
+      test: ["CMD-SHELL", "/scripts/healthcheck.sh"]
       interval: 60s
       timeout: 15s
       retries: 5000000
