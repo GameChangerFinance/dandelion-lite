@@ -14,15 +14,25 @@ async function haproxyFetch(path, method = 'GET', body = null) {
     body: body ? JSON.stringify(body) : null,
   });
 
-  if (!res.ok) {
+ if (!res.ok) {
     const errText = await res.text();
     throw new Error(`HTTP ${res.status}: ${errText}`);
   }
 
-  console.log("Status: ", res.status === 204 ? {} : res.json())
+  if (res.status === 204 || res.headers.get('content-length') === '0') {
+    console.log("✅ Response: No content");
+    return {};
+  }
 
-
-  return res.status === 204 ? {} : res.json();
+  const text = await res.text();
+  try {
+    const data = JSON.parse(text);
+    console.log("✅ Response:", data);
+    return data;
+  } catch (e) {
+    console.log("✅ Response (non-JSON):", text);
+    return text;
+  }
 }
 
 (async () => {
