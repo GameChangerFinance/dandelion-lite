@@ -1,20 +1,13 @@
 services: 
   haproxy:
-    image: haproxy:2.9.0-bookworm
+    image: haproxytech/haproxy-ubuntu:2.9
     hostname: ${HAPROXY_HOST}
     environment:
       # variables accesible in config/haproxy/haproxy.conf
       HAPROXY_PORT: ${HAPROXY_PORT}
       NETWORK: ${CORE_NETWORK}
-      OGMIOS_PORT: ${OGMIOS_PORT}
-      # POSTGREST_PORT: ${POSTGREST_PORT}
-      # CARDANO_GRAPHQL_SERVER_PORT: ${CARDANO_GRAPHQL_SERVER_PORT}
-      # DBLESS_CARDANO_TOKEN_REGISTRY_PORT: ${DBLESS_CARDANO_TOKEN_REGISTRY_PORT}
-      # DANDELION_POSTGREST_PORT: ${DANDELION_POSTGREST_PORT}
-      # CARDANO_SQL_POSTGREST_PORT: ${CARDANO_SQL_POSTGREST_PORT}
-      # UNIMATRIX_PORT: ${UNIMATRIX_PORT}
     volumes:
-      - ./configs/haproxy/:/usr/local/etc/haproxy/
+      - ./config/:/usr/local/etc/haproxy/:rw
       - ./scripts/:/scripts/
       - ./configs/ssl/server.pem:/etc/ssl/server.pem
     configs:
@@ -26,6 +19,7 @@ services:
         target: /usr/local/etc/www/index.html
     ports:
       - ${HAPROXY_BINDED_HOST}${HAPROXY_PORT:-8053}:8053
+      - 5000:5555
     healthcheck:
       test: ["CMD-SHELL", "haproxy -c -- /usr/local/etc/haproxy/haproxy.cfg"]
       interval: 10s
@@ -66,7 +60,7 @@ configs:
           <!-- <meta property="og:url" content="https://your-website.com"> -->
           <meta name="twitter:card" content="summary">
           <meta name="twitter:title" content="GC Node">
-          <meta name="twitter:description" content="${NODE_DESCRIPTION}">   
+          <meta name="twitter:description" content="${CORE_NODE_DESCRIPTION}">   
           <!-- End of Meta Tags for Social Media -->
       </head>
       <body>

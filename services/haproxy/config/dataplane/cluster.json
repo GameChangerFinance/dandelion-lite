@@ -1,0 +1,21 @@
+{
+  "status": "",
+  "cluster": {
+    "api_nodes_path": "",
+    "token": "",
+    "cluster_tls_dir": "",
+    "active_bootstrap_key": "",
+    "api_register_path": "",
+    "url": "",
+    "port": 0,
+    "storage_dir": "",
+    "bootstrap_key": "",
+    "id": "",
+    "api_base_path": "",
+    "cert_path": "",
+    "cert_fetched": false,
+    "name": "",
+    "description": "",
+    "cluster_id": ""
+  }
+}

@@ -1,0 +1,14 @@
+config_version: 2
+name: haproxy
+dataplaneapi:
+  advertised:
+    api_address: ""
+    api_port: 0
+  scheme:
+  - http
+  userlist:
+    userlist: haproxy-dataplaneapi
+    userlist_file: ""
+haproxy:
+  reload:
+    reload_strategy: custom
