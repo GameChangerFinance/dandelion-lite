@@ -5,49 +5,49 @@ services:
 #### guild node + ogmios ########
 #################################
 
-#  cardano-node:
-#    image: ${CARDANO_NODE_IMAGE}
-#    init: true
-#    hostname: cardano-node
-#    environment:
-#      NETWORK: ${NETWORK}
-#      SOCKET: "${CARDANO_NODE_HOME}/sockets/node.socket" 
-#      UPDATE_CHECK: "N"
-#      EXPORTED_CONFIG: "${CARDANO_NODE_HOME}/sockets/exportedConfig"
-#    volumes:
-#      - node-db:${CARDANO_NODE_HOME}/db
-#      - node-ipc:${CARDANO_NODE_HOME}/sockets
-#      - ./scripts/:/scripts/
-#    entrypoint: >
-#      /bin/sh -c "
-#      echo \"Preparing setup for network '${NETWORK}'\" ;
-#      mkdir -p $${EXPORTED_CONFIG};
-#      chown -Rv guild $${EXPORTED_CONFIG};
-#      rm -rf $${EXPORTED_CONFIG}/*.json;
-#      echo \"Exporting config files from '${CARDANO_NODE_HOME}/files' into '$${EXPORTED_CONFIG}'...\" ;
-#      cp ${CARDANO_NODE_HOME}/files/*.json $${EXPORTED_CONFIG} ;
-#      echo 'Identifying lines with potencial issues with protocol magic number and file paths...' ;
-#      grep -Rnw $${EXPORTED_CONFIG} -e '764824073' ;
-#      grep -Rnw $${EXPORTED_CONFIG} -e '${CARDANO_NODE_HOME}/files' ;
-#      echo \"Patching exported files...\" ;
-#      [ \"${NETWORK}\" = \"preprod\" ] && find $${EXPORTED_CONFIG} -name '*.json' -print0 | xargs -0 sed -i 's/764824073/1/g' ;
-#      [ \"${NETWORK}\" = \"preview\" ] && find $${EXPORTED_CONFIG} -name '*.json' -print0 | xargs -0 sed -i 's/764824073/2/g' ;
-#      find $${EXPORTED_CONFIG} -name '*.json' -print0 | xargs -0 sed -i \"s#${CARDANO_NODE_HOME}/files#$${EXPORTED_CONFIG}#g\" ;
-#      echo 'Config files exported:' ;
-#      ls -ls $${EXPORTED_CONFIG} ;
-#      ./entrypoint.sh ;
-#      "
-#    restart: always
-#    healthcheck:
-#      test: ["CMD-SHELL", "netstat -ntlp | grep 12798"]
-#      interval: 30s
-#      timeout: 10s
-#      retries: 3
-#    logging:
-#      driver: "json-file"
-#      options:
-#        max-size: "200k"
-#        max-file: "10"
+ cardano-node:
+   image: ${CARDANO_NODE_IMAGE}
+   init: true
+   hostname: cardano-node
+   environment:
+     NETWORK: ${NETWORK}
+     SOCKET: "${CARDANO_NODE_HOME}/sockets/node.socket" 
+    #  UPDATE_CHECK: "N"
+    #  EXPORTED_CONFIG: "${CARDANO_NODE_HOME}/sockets/exportedConfig"
+   volumes:
+     - node-db:${CARDANO_NODE_HOME}/db
+     - node-ipc:${CARDANO_NODE_HOME}/sockets
+     - ./scripts/:/scripts/
+  #  entrypoint: >
+  #    /bin/sh -c "
+  #    echo \"Preparing setup for network '${NETWORK}'\" ;
+  #    mkdir -p $${EXPORTED_CONFIG};
+  #    chown -Rv guild $${EXPORTED_CONFIG};
+  #    rm -rf $${EXPORTED_CONFIG}/*.json;
+  #    echo \"Exporting config files from '${CARDANO_NODE_HOME}/files' into '$${EXPORTED_CONFIG}'...\" ;
+  #    cp ${CARDANO_NODE_HOME}/files/*.json $${EXPORTED_CONFIG} ;
+  #    echo 'Identifying lines with potencial issues with protocol magic number and file paths...' ;
+  #    grep -Rnw $${EXPORTED_CONFIG} -e '764824073' ;
+  #    grep -Rnw $${EXPORTED_CONFIG} -e '${CARDANO_NODE_HOME}/files' ;
+  #    echo \"Patching exported files...\" ;
+  #    [ \"${NETWORK}\" = \"preprod\" ] && find $${EXPORTED_CONFIG} -name '*.json' -print0 | xargs -0 sed -i 's/764824073/1/g' ;
+  #    [ \"${NETWORK}\" = \"preview\" ] && find $${EXPORTED_CONFIG} -name '*.json' -print0 | xargs -0 sed -i 's/764824073/2/g' ;
+  #    find $${EXPORTED_CONFIG} -name '*.json' -print0 | xargs -0 sed -i \"s#${CARDANO_NODE_HOME}/files#$${EXPORTED_CONFIG}#g\" ;
+  #    echo 'Config files exported:' ;
+  #    ls -ls $${EXPORTED_CONFIG} ;
+  #    ./entrypoint.sh ;
+  #    "
+   restart: always
+  #  healthcheck:
+  #    test: ["CMD-SHELL", "netstat -ntlp | grep 12798"]
+  #    interval: 30s
+  #    timeout: 10s
+  #    retries: 3
+   logging:
+     driver: "json-file"
+     options:
+       max-size: "200k"
+       max-file: "10"
 
   # TODO: add http backend ogmios and it's entry on /configs/haproxy/haproxy.cfg
   # Important: https://github.com/cardano-community/guild-operators/pull/1261/files
@@ -74,241 +74,241 @@ services:
 ### node + ogmios + indexer #####
 #################################
 
-  cardano-node-ogmios:
-    image: ${CARDANO_NODE_OGMIOS_IMAGE}
-    hostname: cardano-node
-    #init: true
-    platform: linux/x86_64
-    restart: always
-    healthcheck:
-      test: ["CMD-SHELL", "/scripts/healthcheck.sh"]
-      interval: 30s
-      timeout: 10s
-      retries: 1000000
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "400k"
-        max-file: "10"
-    ports:
-      - ${OGMIOS_PORT:-1337}:1337
-    environment:
-      NETWORK: ${NETWORK}
-      #SOCKET: "${CARDANO_NODE_HOME}/ipc/node.socket" 
-      #UPDATE_CHECK: "N"
-      #EXPORTED_CONFIG: "${CARDANO_NODE_HOME}/config"
-    volumes:
-      #- node-db:/db
-      #- node-ipc:/ipc 
-      # Uncomment if you want to use your own config files or the provided ones.
-      # Current configs are also available at: https://book.world.dev.cardano.org/
-      #- ./configs/cardano/config/network/${NETWORK}:/config
-      - node-db:${CARDANO_NODE_HOME}/db
-      - node-ipc:${CARDANO_NODE_HOME}/ipc
-      - ./scripts/cardano-node-ogmios/:/scripts/
+  # cardano-node-ogmios:
+  #   image: ${CARDANO_NODE_OGMIOS_IMAGE}
+  #   hostname: cardano-node
+  #   #init: true
+  #   platform: linux/x86_64
+  #   restart: always
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "/scripts/healthcheck.sh"]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 1000000
+  #   logging:
+  #     driver: "json-file"
+  #     options:
+  #       max-size: "400k"
+  #       max-file: "10"
+  #   ports:
+  #     - ${OGMIOS_PORT:-1337}:1337
+  #   environment:
+  #     NETWORK: ${NETWORK}
+  #     #SOCKET: "${CARDANO_NODE_HOME}/ipc/node.socket" 
+  #     #UPDATE_CHECK: "N"
+  #     #EXPORTED_CONFIG: "${CARDANO_NODE_HOME}/config"
+  #   volumes:
+  #     #- node-db:/db
+  #     #- node-ipc:/ipc 
+  #     # Uncomment if you want to use your own config files or the provided ones.
+  #     # Current configs are also available at: https://book.world.dev.cardano.org/
+  #     #- ./configs/cardano/config/network/${NETWORK}:/config
+  #     - node-db:${CARDANO_NODE_HOME}/db
+  #     - node-ipc:${CARDANO_NODE_HOME}/ipc
+  #     - ./scripts/cardano-node-ogmios/:/scripts/
 
-  cardano-db-sync:
-    image:  ${CARDANO_DB_SYNC_IMAGE}
-    platform: linux/x86_64
-    hostname: cardano-db-sync
-    command: [
-      "--config", "/config/cardano-db-sync/config.json",
-      "--socket-path", "/node-ipc/node.socket"
-    ]
-    environment:
-      #DISABLE_LEDGER: ${CARDANO_DB_SYNC_DISABLE_LEDGER}
-      NETWORK: ${NETWORK}
-      POSTGRES_HOST: ${POSTGRES_HOST}
-      POSTGRES_PORT: 5432 # not using exposed ${POSTGRES_PORT} because using internal docker network connection 
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      RESTORE_SNAPSHOT: ${CARDANO_DB_SYNC_RESTORE_SNAPSHOT:-}
-      RESTORE_RECREATE_DB: N
-      #EXTRA_DB_SYNC_ARGS: ${CARDANO_DB_SYNC_ARGS:-}
-    healthcheck:
-      # test: ["CMD-SHELL", "/scripts/lib/dbsync_healthcheck.sh"]
-      test: ["CMD-SHELL", "/scripts/cardano-db-sync/healthcheck.sh"]
-      interval: 60s
-      timeout: 15s
-      retries: 5000000
-    depends_on:
-      # Depend on both services to be started before starting.
-      cardano-node-ogmios:
-        condition: service_started
-      postgress:
-        condition: service_started
-    volumes:
-      - ./configs/cardano/config/network/${NETWORK}:/config
-      - db-sync-data:/var/lib/cexplorer
-      - node-ipc:/node-ipc
-      - ./scripts/:/scripts/
-    restart: always
-    stop_signal: SIGINT
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "200k"
-        max-file: "10"
+  # cardano-db-sync:
+  #   image:  ${CARDANO_DB_SYNC_IMAGE}
+  #   platform: linux/x86_64
+  #   hostname: cardano-db-sync
+  #   command: [
+  #     "--config", "/config/cardano-db-sync/config.json",
+  #     "--socket-path", "/node-ipc/node.socket"
+  #   ]
+  #   environment:
+  #     #DISABLE_LEDGER: ${CARDANO_DB_SYNC_DISABLE_LEDGER}
+  #     NETWORK: ${NETWORK}
+  #     POSTGRES_HOST: ${POSTGRES_HOST}
+  #     POSTGRES_PORT: 5432 # not using exposed ${POSTGRES_PORT} because using internal docker network connection 
+  #     POSTGRES_DB: ${POSTGRES_DB}
+  #     POSTGRES_USER: ${POSTGRES_USER}
+  #     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+  #     RESTORE_SNAPSHOT: ${CARDANO_DB_SYNC_RESTORE_SNAPSHOT:-}
+  #     RESTORE_RECREATE_DB: N
+  #     #EXTRA_DB_SYNC_ARGS: ${CARDANO_DB_SYNC_ARGS:-}
+  #   healthcheck:
+  #     # test: ["CMD-SHELL", "/scripts/lib/dbsync_healthcheck.sh"]
+  #     test: ["CMD-SHELL", "/scripts/cardano-db-sync/healthcheck.sh"]
+  #     interval: 60s
+  #     timeout: 15s
+  #     retries: 5000000
+  #   depends_on:
+  #     # Depend on both services to be started before starting.
+  #     cardano-node-ogmios:
+  #       condition: service_started
+  #     postgress:
+  #       condition: service_started
+  #   volumes:
+  #     - ./configs/cardano/config/network/${NETWORK}:/config
+  #     - db-sync-data:/var/lib/cexplorer
+  #     - node-ipc:/node-ipc
+  #     - ./scripts/:/scripts/
+  #   restart: always
+  #   stop_signal: SIGINT
+  #   logging:
+  #     driver: "json-file"
+  #     options:
+  #       max-size: "200k"
+  #       max-file: "10"
 
-  postgress:
-    hostname: ${POSTGRES_HOST}    
-    #image: postgrest-extended:16.1-bullseye
-    build:
-      context: ./src/postgres
-    volumes:
-      - postgresdb:/var/lib/postgresql/data
-      - ./scripts/:/scripts/
-      #- ./src/postgres/init_scripts:/docker-entrypoint-initdb.d
-    ports:
-      - ${POSTGRES_PORT:-5432}:5432
-    environment:
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_DB: ${POSTGRES_DB}      
-      # For init_postgres.sh variable placeholder system:
-      DANDELION_POSTGREST_SCHEMA: ${DANDELION_POSTGREST_SCHEMA}
-      CARDANO_SQL_SCHEMA: ${CARDANO_SQL_SCHEMA}
-      #RPC_SCHEMA: ${RPC_SCHEMA} #Deprecated, use the ones down below:
-      KOIOS_LITE_SCHEMA: ${KOIOS_LITE_SCHEMA}
-      KOIOS_ARTIFACTS_SCHEMA: ${KOIOS_ARTIFACTS_SCHEMA}
-    shm_size: '2gb'
-    healthcheck:
-      test:  ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
-      interval: 15s
-      timeout: 5s
-      retries: 100  
-    command: postgres ${POSTGRES_ARGS}
-    restart: always
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "200k"
-        max-file: "10"
+  # postgress:
+  #   hostname: ${POSTGRES_HOST}    
+  #   #image: postgrest-extended:16.1-bullseye
+  #   build:
+  #     context: ./src/postgres
+  #   volumes:
+  #     - postgresdb:/var/lib/postgresql/data
+  #     - ./scripts/:/scripts/
+  #     #- ./src/postgres/init_scripts:/docker-entrypoint-initdb.d
+  #   ports:
+  #     - ${POSTGRES_PORT:-5432}:5432
+  #   environment:
+  #     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+  #     POSTGRES_USER: ${POSTGRES_USER}
+  #     POSTGRES_DB: ${POSTGRES_DB}      
+  #     # For init_postgres.sh variable placeholder system:
+  #     DANDELION_POSTGREST_SCHEMA: ${DANDELION_POSTGREST_SCHEMA}
+  #     CARDANO_SQL_SCHEMA: ${CARDANO_SQL_SCHEMA}
+  #     #RPC_SCHEMA: ${RPC_SCHEMA} #Deprecated, use the ones down below:
+  #     KOIOS_LITE_SCHEMA: ${KOIOS_LITE_SCHEMA}
+  #     KOIOS_ARTIFACTS_SCHEMA: ${KOIOS_ARTIFACTS_SCHEMA}
+  #   shm_size: '2gb'
+  #   healthcheck:
+  #     test:  ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+  #     interval: 15s
+  #     timeout: 5s
+  #     retries: 100  
+  #   command: postgres ${POSTGRES_ARGS}
+  #   restart: always
+  #   logging:
+  #     driver: "json-file"
+  #     options:
+  #       max-size: "200k"
+  #       max-file: "10"
 
 #################################
 ######  cardano-graphql  ########
 #################################
 
 
-  cardano-graphql-hasura:
-    image: ${CARDANO_GRAPHQL_HASURA_IMAGE}
-    #image: cardanofoundation/cardano-graphql-hasura:${CARDANO_GRAPHQL_VERSION:-8.0.1}    
-    hostname: cardano-graphql-hasura
-    ports:
-      - ${CARDANO_GRAPHQL_HASURA_PORT:-8090}:8080
-    depends_on:
-      cardano-node-ogmios:
-        condition: service_healthy
-      postgress:
-        condition: service_healthy
-    restart: always
-    environment:
-      NETWORK: ${NETWORK}
-      POSTGRES_HOST: ${POSTGRES_HOST}
-      #POSTGRES_HOST: postgress      
-      HASURA_GRAPHQL_ENABLE_CONSOLE: ${CARDANO_GRAPHQL_HASURA_ENABLE_CONSOLE:-true}
-      HASURA_GRAPHQL_CORS_DOMAIN: ${CARDANO_GRAPHQL_HASURA_CORS_DOMAIN:-http://localhost:9695}
-    secrets:
-      - postgres_db
-      - postgres_password
-      - postgres_user
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "200k"
-        max-file: "10"
+  # cardano-graphql-hasura:
+  #   image: ${CARDANO_GRAPHQL_HASURA_IMAGE}
+  #   #image: cardanofoundation/cardano-graphql-hasura:${CARDANO_GRAPHQL_VERSION:-8.0.1}    
+  #   hostname: cardano-graphql-hasura
+  #   ports:
+  #     - ${CARDANO_GRAPHQL_HASURA_PORT:-8090}:8080
+  #   depends_on:
+  #     cardano-node-ogmios:
+  #       condition: service_healthy
+  #     postgress:
+  #       condition: service_healthy
+  #   restart: always
+  #   environment:
+  #     NETWORK: ${NETWORK}
+  #     POSTGRES_HOST: ${POSTGRES_HOST}
+  #     #POSTGRES_HOST: postgress      
+  #     HASURA_GRAPHQL_ENABLE_CONSOLE: ${CARDANO_GRAPHQL_HASURA_ENABLE_CONSOLE:-true}
+  #     HASURA_GRAPHQL_CORS_DOMAIN: ${CARDANO_GRAPHQL_HASURA_CORS_DOMAIN:-http://localhost:9695}
+  #   secrets:
+  #     - postgres_db
+  #     - postgres_password
+  #     - postgres_user
+  #   logging:
+  #     driver: "json-file"
+  #     options:
+  #       max-size: "200k"
+  #       max-file: "10"
 
-  cardano-graphql-background:
-    image: ${CARDANO_GRAPHQL_BACKGROUND_IMAGE}
-    #image: cardanofoundation/cardano-graphql-background:${CARDANO_GRAPHQL_VERSION:-8.0.1}-${NETWORK:-mainnet}
-    depends_on:
-      postgress:
-        condition: service_healthy    
-      cardano-graphql-hasura:
-        condition: service_started
-    environment:
-      NETWORK: ${NETWORK}
-      POSTGRES_HOST: ${POSTGRES_HOST}      
-      HASURA_URI: http://cardano-graphql-hasura:8080
-      LOGGER_MIN_SEVERITY: ${CARDANO_GRAPHQL_BACKGROUND_LOGGER_MIN_SEVERITY:-info}
-      #Depends on network, so defaulting to https://tokens.cardano.org is not safe:
-      METADATA_SERVER_URI: ${CARDANO_GRAPHQL_BACKGROUND_METADATA_SERVER_URI}
-      CHAIN_FOLLOWER_START_SLOT: ${CARDANO_GRAPHQL_BACKGROUND_CHAIN_FOLLOWER_START_SLOT:-0}
-      CHAIN_FOLLOWER_START_ID: ${CARDANO_GRAPHQL_BACKGROUND_CHAIN_FOLLOWER_START_ID:-}
-    entrypoint: >
-      /bin/sh -c "
-      echo \"Applying patch to provide env vars due to hardcoded values:\" ;
-      echo \"   OGMIOS_HOST='${OGMIOS_HOST}'\" ;
-      echo \"   OGMIOS_PORT='1337'\" ;
-      OGMIOS_HOST=${OGMIOS_HOST} && OGMIOS_PORT=1337 && node background.js;
-      " 
-    restart: always
-    secrets:
-      - postgres_db
-      - postgres_password
-      - postgres_user
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "200k"
-        max-file: "10"
+  # cardano-graphql-background:
+  #   image: ${CARDANO_GRAPHQL_BACKGROUND_IMAGE}
+  #   #image: cardanofoundation/cardano-graphql-background:${CARDANO_GRAPHQL_VERSION:-8.0.1}-${NETWORK:-mainnet}
+  #   depends_on:
+  #     postgress:
+  #       condition: service_healthy    
+  #     cardano-graphql-hasura:
+  #       condition: service_started
+  #   environment:
+  #     NETWORK: ${NETWORK}
+  #     POSTGRES_HOST: ${POSTGRES_HOST}      
+  #     HASURA_URI: http://cardano-graphql-hasura:8080
+  #     LOGGER_MIN_SEVERITY: ${CARDANO_GRAPHQL_BACKGROUND_LOGGER_MIN_SEVERITY:-info}
+  #     #Depends on network, so defaulting to https://tokens.cardano.org is not safe:
+  #     METADATA_SERVER_URI: ${CARDANO_GRAPHQL_BACKGROUND_METADATA_SERVER_URI}
+  #     CHAIN_FOLLOWER_START_SLOT: ${CARDANO_GRAPHQL_BACKGROUND_CHAIN_FOLLOWER_START_SLOT:-0}
+  #     CHAIN_FOLLOWER_START_ID: ${CARDANO_GRAPHQL_BACKGROUND_CHAIN_FOLLOWER_START_ID:-}
+  #   entrypoint: >
+  #     /bin/sh -c "
+  #     echo \"Applying patch to provide env vars due to hardcoded values:\" ;
+  #     echo \"   OGMIOS_HOST='${OGMIOS_HOST}'\" ;
+  #     echo \"   OGMIOS_PORT='1337'\" ;
+  #     OGMIOS_HOST=${OGMIOS_HOST} && OGMIOS_PORT=1337 && node background.js;
+  #     " 
+  #   restart: always
+  #   secrets:
+  #     - postgres_db
+  #     - postgres_password
+  #     - postgres_user
+  #   logging:
+  #     driver: "json-file"
+  #     options:
+  #       max-size: "200k"
+  #       max-file: "10"
 
-  cardano-graphql-server:
-    platform: linux/x86_64
-    image: ${CARDANO_GRAPHQL_SERVER_IMAGE}
-    #image: cardanofoundation/cardano-graphql-server:${CARDANO_GRAPHQL_VERSION:-8.0.1}-${NETWORK:-mainnet}
-    environment:
-      NETWORK: ${NETWORK}
-      HASURA_URI: http://cardano-graphql-hasura:8080
-      ALLOW_INTROSPECTION: ${CARDANO_GRAPHQL_SERVER_ALLOW_INTROSPECTION:-true}
-      CACHE_ENABLED: ${CARDANO_GRAPHQL_SERVER_CACHE_ENABLED:-true}
-      LOGGER_MIN_SEVERITY: ${CARDANO_GRAPHQL_SERVER_LOGGER_MIN_SEVERITY:-info}
-      API_PORT: 3100
-    entrypoint: >
-      /bin/sh -c "
-      echo \"Applying patch to provide env vars due to hardcoded values:\" ;
-      echo \"   OGMIOS_HOST='${OGMIOS_HOST}'\" ;
-      echo \"   OGMIOS_PORT='1337'\" ;
-      OGMIOS_HOST=${OGMIOS_HOST} && OGMIOS_PORT=1337 && node index.js;
-      " 
-    depends_on:
-      postgress:
-        condition: service_healthy
-    # expose:
-    #   - ${CARDANO_GRAPHQL_SERVER_PORT:-3100}
-    ports:
-      - ${CARDANO_GRAPHQL_SERVER_PORT:-3100}:3100
-    restart: always
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "200k"
-        max-file: "10"
+  # cardano-graphql-server:
+  #   platform: linux/x86_64
+  #   image: ${CARDANO_GRAPHQL_SERVER_IMAGE}
+  #   #image: cardanofoundation/cardano-graphql-server:${CARDANO_GRAPHQL_VERSION:-8.0.1}-${NETWORK:-mainnet}
+  #   environment:
+  #     NETWORK: ${NETWORK}
+  #     HASURA_URI: http://cardano-graphql-hasura:8080
+  #     ALLOW_INTROSPECTION: ${CARDANO_GRAPHQL_SERVER_ALLOW_INTROSPECTION:-true}
+  #     CACHE_ENABLED: ${CARDANO_GRAPHQL_SERVER_CACHE_ENABLED:-true}
+  #     LOGGER_MIN_SEVERITY: ${CARDANO_GRAPHQL_SERVER_LOGGER_MIN_SEVERITY:-info}
+  #     API_PORT: 3100
+  #   entrypoint: >
+  #     /bin/sh -c "
+  #     echo \"Applying patch to provide env vars due to hardcoded values:\" ;
+  #     echo \"   OGMIOS_HOST='${OGMIOS_HOST}'\" ;
+  #     echo \"   OGMIOS_PORT='1337'\" ;
+  #     OGMIOS_HOST=${OGMIOS_HOST} && OGMIOS_PORT=1337 && node index.js;
+  #     " 
+  #   depends_on:
+  #     postgress:
+  #       condition: service_healthy
+  #   # expose:
+  #   #   - ${CARDANO_GRAPHQL_SERVER_PORT:-3100}
+  #   ports:
+  #     - ${CARDANO_GRAPHQL_SERVER_PORT:-3100}:3100
+  #   restart: always
+  #   logging:
+  #     driver: "json-file"
+  #     options:
+  #       max-size: "200k"
+  #       max-file: "10"
 
 #################################
 ####     token registry  ########
 #################################
 
-  cardano-token-registry:
-    #image: cardanofoundation/cf-token-metadata-registry-api:latest            
-    image: ${CARDANO_TOKEN_REGISTRY_IMAGE}
-    hostname: ${CARDANO_TOKEN_REGISTRY_HOSTNAME}
-    ports:
-      - ${CARDANO_TOKEN_REGISTRY_PORT:-8080}:8080
-    environment:
-      TOKEN_METADATA_SYNC_JOB: ${CARDANO_TOKEN_REGISTRY_SYNC_JOB}
-      GITHUB_ORGANIZATION: ${CARDANO_TOKEN_REGISTRY_GITHUB_ORGANIZATION}
-      GITHUB_PROJECT_NAME: ${CARDANO_TOKEN_REGISTRY_GITHUB_PROJECT_NAME}
-      GITHUB_MAPPINGS_FOLDER: ${CARDANO_TOKEN_REGISTRY_GITHUB_MAPPINGS_FOLDER}
-      DB_USERNAME: ${POSTGRES_USER}
-      DB_PASSWORD: ${POSTGRES_PASSWORD}
-      DB_NAME: ${POSTGRES_DB}
-      DB_URL: jdbc:postgresql://${POSTGRES_HOST}:5432/${POSTGRES_DB}?currentSchema=${CARDANO_TOKEN_REGISTRY_SCHEMA}
-    depends_on:
-      postgress:
-        condition: service_healthy      
-    restart: always
+  # cardano-token-registry:
+  #   #image: cardanofoundation/cf-token-metadata-registry-api:latest            
+  #   image: ${CARDANO_TOKEN_REGISTRY_IMAGE}
+  #   hostname: ${CARDANO_TOKEN_REGISTRY_HOSTNAME}
+  #   ports:
+  #     - ${CARDANO_TOKEN_REGISTRY_PORT:-8080}:8080
+  #   environment:
+  #     TOKEN_METADATA_SYNC_JOB: ${CARDANO_TOKEN_REGISTRY_SYNC_JOB}
+  #     GITHUB_ORGANIZATION: ${CARDANO_TOKEN_REGISTRY_GITHUB_ORGANIZATION}
+  #     GITHUB_PROJECT_NAME: ${CARDANO_TOKEN_REGISTRY_GITHUB_PROJECT_NAME}
+  #     GITHUB_MAPPINGS_FOLDER: ${CARDANO_TOKEN_REGISTRY_GITHUB_MAPPINGS_FOLDER}
+  #     DB_USERNAME: ${POSTGRES_USER}
+  #     DB_PASSWORD: ${POSTGRES_PASSWORD}
+  #     DB_NAME: ${POSTGRES_DB}
+  #     DB_URL: jdbc:postgresql://${POSTGRES_HOST}:5432/${POSTGRES_DB}?currentSchema=${CARDANO_TOKEN_REGISTRY_SCHEMA}
+  #   depends_on:
+  #     postgress:
+  #       condition: service_healthy      
+  #   restart: always
 
 #
 #  dbless-cardano-token-registry:
@@ -332,183 +332,183 @@ services:
 ### koios + postgrest + cron  ###
 #################################
 
-  postgrest:
-    image: postgrest/postgrest:v12.0.2
-    hostname: ${POSTGREST_HOST}
-    depends_on:
-      postgress:
-        condition: service_healthy
-    ports:
-      - ${POSTGREST_PORT:-8050}:8050
-    volumes:
-      - ./scripts/:/scripts/
-    environment:
-      # not using exposed ${POSTGRES_PORT} because using internal docker network connection
-      PGRST_DB_URI: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:5432/${POSTGRES_DB}
-      PGRST_DB_ANON_ROLE: ${POSTGREST_DB_ANON_ROLE}
-      PGRST_DB_SCHEMAS: "${POSTGREST_DB_SCHEMAS}" # first one is default
-      PGRST_SERVER_PORT: 8050
-      PGRST_OPENAPI_SERVER_PROXY_URI: http://0.0.0.0:8050
-      PGRST_DB_MAX_ROWS: 1000
-      PGRST_DB_AGGREGATES_ENABLED: true
-      PGRST_DB_EXTRA_SEARCH_PATH: "${POSTGREST_DB_EXTRA_SEARCH_PATH}"
-    restart: always
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "200k"
-        max-file: "10"
+  # postgrest:
+  #   image: postgrest/postgrest:v12.0.2
+  #   hostname: ${POSTGREST_HOST}
+  #   depends_on:
+  #     postgress:
+  #       condition: service_healthy
+  #   ports:
+  #     - ${POSTGREST_PORT:-8050}:8050
+  #   volumes:
+  #     - ./scripts/:/scripts/
+  #   environment:
+  #     # not using exposed ${POSTGRES_PORT} because using internal docker network connection
+  #     PGRST_DB_URI: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:5432/${POSTGRES_DB}
+  #     PGRST_DB_ANON_ROLE: ${POSTGREST_DB_ANON_ROLE}
+  #     PGRST_DB_SCHEMAS: "${POSTGREST_DB_SCHEMAS}" # first one is default
+  #     PGRST_SERVER_PORT: 8050
+  #     PGRST_OPENAPI_SERVER_PROXY_URI: http://0.0.0.0:8050
+  #     PGRST_DB_MAX_ROWS: 1000
+  #     PGRST_DB_AGGREGATES_ENABLED: true
+  #     PGRST_DB_EXTRA_SEARCH_PATH: "${POSTGREST_DB_EXTRA_SEARCH_PATH}"
+  #   restart: always
+  #   logging:
+  #     driver: "json-file"
+  #     options:
+  #       max-size: "200k"
+  #       max-file: "10"
 
-  cron:
-    build: .
-    environment:
-      NETWORK: ${NETWORK}
-      POSTGRES_HOST: ${POSTGRES_HOST}
-      POSTGRES_PORT: ${POSTGRES_PORT}
-      PGDATABASE: ${POSTGRES_DB}
-      PGUSER: ${POSTGRES_USER}
-      PGPASSWORD: ${POSTGRES_PASSWORD}
-      #RPC_SCHEMA: ${RPC_SCHEMA}
-      KOIOS_LITE_SCHEMA: ${KOIOS_LITE_SCHEMA}
-      KOIOS_ARTIFACTS_SCHEMA: ${KOIOS_ARTIFACTS_SCHEMA}
-      DBLESS_CARDANO_TOKEN_REGISTRY_DATA: /root/token-registry
-      DUCKDNS_DOMAINS: ${DUCKDNS_DOMAINS:-}
-      DUCKDNS_TOKEN: ${DUCKDNS_TOKEN:-}
-      DUCKDNS_IP: ${DUCKDNS_IP:-}
-    volumes:
-      - ./scripts/cron:/etc/cron.d/
-      - ./scripts:/scripts
-      - dbless-cardano-token-registry-data:/root/token-registry
-    # Uncomment for persistent logs
-    # - ./logs:/var/log
-    restart: always
+  # cron:
+  #   build: .
+  #   environment:
+  #     NETWORK: ${NETWORK}
+  #     POSTGRES_HOST: ${POSTGRES_HOST}
+  #     POSTGRES_PORT: ${POSTGRES_PORT}
+  #     PGDATABASE: ${POSTGRES_DB}
+  #     PGUSER: ${POSTGRES_USER}
+  #     PGPASSWORD: ${POSTGRES_PASSWORD}
+  #     #RPC_SCHEMA: ${RPC_SCHEMA}
+  #     KOIOS_LITE_SCHEMA: ${KOIOS_LITE_SCHEMA}
+  #     KOIOS_ARTIFACTS_SCHEMA: ${KOIOS_ARTIFACTS_SCHEMA}
+  #     DBLESS_CARDANO_TOKEN_REGISTRY_DATA: /root/token-registry
+  #     DUCKDNS_DOMAINS: ${DUCKDNS_DOMAINS:-}
+  #     DUCKDNS_TOKEN: ${DUCKDNS_TOKEN:-}
+  #     DUCKDNS_IP: ${DUCKDNS_IP:-}
+  #   volumes:
+  #     - ./scripts/cron:/etc/cron.d/
+  #     - ./scripts:/scripts
+  #     - dbless-cardano-token-registry-data:/root/token-registry
+  #   # Uncomment for persistent logs
+  #   # - ./logs:/var/log
+  #   restart: always
 
 
 #################################
 #### Dandelion PostGREST API#####
 #################################
 
-  dandelion-postgrest:
-    image: postgrest/postgrest:v12.0.2
-    hostname: ${DANDELION_POSTGREST_HOST}
-    depends_on:
-      postgress:
-        condition: service_healthy
-    ports:
-      - ${DANDELION_POSTGREST_PORT:-8050}:8050
-    volumes:
-      - ./scripts/:/scripts/
-    environment:
-      # not using exposed ${POSTGRES_PORT} because using internal docker network connection
-      PGRST_DB_URI: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:5432/${POSTGRES_DB}
-      PGRST_DB_ANON_ROLE: ${DANDELION_POSTGREST_DB_ANON_ROLE}
-      PGRST_DB_SCHEMAS: "${DANDELION_POSTGREST_DB_SCHEMAS}" # first one is default
-      PGRST_SERVER_PORT: 8060
-      PGRST_OPENAPI_SERVER_PROXY_URI: http://0.0.0.0:8060
-      PGRST_DB_MAX_ROWS: 1000
-      PGRST_DB_AGGREGATES_ENABLED: true
-      PGRST_DB_EXTRA_SEARCH_PATH: "${DANDELION_POSTGREST_DB_EXTRA_SEARCH_PATH}"
-    restart: always
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "200k"
-        max-file: "10"
+  # dandelion-postgrest:
+  #   image: postgrest/postgrest:v12.0.2
+  #   hostname: ${DANDELION_POSTGREST_HOST}
+  #   depends_on:
+  #     postgress:
+  #       condition: service_healthy
+  #   ports:
+  #     - ${DANDELION_POSTGREST_PORT:-8050}:8050
+  #   volumes:
+  #     - ./scripts/:/scripts/
+  #   environment:
+  #     # not using exposed ${POSTGRES_PORT} because using internal docker network connection
+  #     PGRST_DB_URI: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:5432/${POSTGRES_DB}
+  #     PGRST_DB_ANON_ROLE: ${DANDELION_POSTGREST_DB_ANON_ROLE}
+  #     PGRST_DB_SCHEMAS: "${DANDELION_POSTGREST_DB_SCHEMAS}" # first one is default
+  #     PGRST_SERVER_PORT: 8060
+  #     PGRST_OPENAPI_SERVER_PROXY_URI: http://0.0.0.0:8060
+  #     PGRST_DB_MAX_ROWS: 1000
+  #     PGRST_DB_AGGREGATES_ENABLED: true
+  #     PGRST_DB_EXTRA_SEARCH_PATH: "${DANDELION_POSTGREST_DB_EXTRA_SEARCH_PATH}"
+  #   restart: always
+  #   logging:
+  #     driver: "json-file"
+  #     options:
+  #       max-size: "200k"
+  #       max-file: "10"
 
 
 #################################
 ### Cardano SQL PostGREST API ###
 #################################
 
-  cardano-sql-postgrest:
-    image: postgrest/postgrest:v12.0.2
-    hostname: ${CARDANO_SQL_POSTGREST_HOST}
-    depends_on:
-      postgress:
-        condition: service_healthy
-    ports:
-      - ${CARDANO_SQL_POSTGREST_PORT:-8050}:8050
-    volumes:
-      - ./scripts/:/scripts/
-    environment:
-      # not using exposed ${POSTGRES_PORT} because using internal docker network connection
-      PGRST_DB_URI: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:5432/${POSTGRES_DB}
-      PGRST_DB_ANON_ROLE: ${CARDANO_SQL_POSTGREST_DB_ANON_ROLE}
-      PGRST_DB_SCHEMAS: "${CARDANO_SQL_POSTGREST_DB_SCHEMAS}" # first one is default
-      PGRST_SERVER_PORT: 8070
-      PGRST_OPENAPI_SERVER_PROXY_URI: http://0.0.0.0:8070
-      PGRST_DB_MAX_ROWS: 1000
-      PGRST_DB_AGGREGATES_ENABLED: true
-      PGRST_DB_EXTRA_SEARCH_PATH: "${CARDANO_SQL_POSTGREST_DB_EXTRA_SEARCH_PATH}"
-    restart: always
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "200k"
-        max-file: "10"
+  # cardano-sql-postgrest:
+  #   image: postgrest/postgrest:v12.0.2
+  #   hostname: ${CARDANO_SQL_POSTGREST_HOST}
+  #   depends_on:
+  #     postgress:
+  #       condition: service_healthy
+  #   ports:
+  #     - ${CARDANO_SQL_POSTGREST_PORT:-8050}:8050
+  #   volumes:
+  #     - ./scripts/:/scripts/
+  #   environment:
+  #     # not using exposed ${POSTGRES_PORT} because using internal docker network connection
+  #     PGRST_DB_URI: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:5432/${POSTGRES_DB}
+  #     PGRST_DB_ANON_ROLE: ${CARDANO_SQL_POSTGREST_DB_ANON_ROLE}
+  #     PGRST_DB_SCHEMAS: "${CARDANO_SQL_POSTGREST_DB_SCHEMAS}" # first one is default
+  #     PGRST_SERVER_PORT: 8070
+  #     PGRST_OPENAPI_SERVER_PROXY_URI: http://0.0.0.0:8070
+  #     PGRST_DB_MAX_ROWS: 1000
+  #     PGRST_DB_AGGREGATES_ENABLED: true
+  #     PGRST_DB_EXTRA_SEARCH_PATH: "${CARDANO_SQL_POSTGREST_DB_EXTRA_SEARCH_PATH}"
+  #   restart: always
+  #   logging:
+  #     driver: "json-file"
+  #     options:
+  #       max-size: "200k"
+  #       max-file: "10"
 
 
 #################################
 #### unimatrix (gundb relay)#####
 #################################
 
-  unimatrix:
-    #image: unimatrix-peer:latest
-    build:
-      context: ./src/unimatrix    
-    restart: always
-    environment:
-      UNIMATRIX_PORT: 8765
-    # static http server can be exposed as well
-    ports:
-      - ${UNIMATRIX_PORT:-8765}:8765
-    # TODO: link to persistent volume
-    volumes:
-      - unimatrix-data:/work/data
+  # unimatrix:
+  #   #image: unimatrix-peer:latest
+  #   build:
+  #     context: ./src/unimatrix    
+  #   restart: always
+  #   environment:
+  #     UNIMATRIX_PORT: 8765
+  #   # static http server can be exposed as well
+  #   ports:
+  #     - ${UNIMATRIX_PORT:-8765}:8765
+  #   # TODO: link to persistent volume
+  #   volumes:
+  #     - unimatrix-data:/work/data
 
 
 #################################
 ####   HAPROXY - Ingress    #####
 #################################
 
-  haproxy:
-    image: haproxy:2.9.0-bookworm
-    hostname: ${HAPROXY_HOST}
-    environment:
-      # variables accesible in config/haproxy/haproxy.conf
-      HAPROXY_PORT: ${HAPROXY_PORT}
-      NETWORK: ${NETWORK}
-      OGMIOS_PORT: ${OGMIOS_PORT}
-      POSTGREST_PORT: ${POSTGREST_PORT}
-      CARDANO_GRAPHQL_SERVER_PORT: ${CARDANO_GRAPHQL_SERVER_PORT}
-      DBLESS_CARDANO_TOKEN_REGISTRY_PORT: ${DBLESS_CARDANO_TOKEN_REGISTRY_PORT}
-      DANDELION_POSTGREST_PORT: ${DANDELION_POSTGREST_PORT}
-      CARDANO_SQL_POSTGREST_PORT: ${CARDANO_SQL_POSTGREST_PORT}
-      UNIMATRIX_PORT: ${UNIMATRIX_PORT}
-    volumes:
-      - ./configs/haproxy/:/usr/local/etc/haproxy/
-      - ./scripts/:/scripts/
-      - ./configs/ssl/server.pem:/etc/ssl/server.pem
-    configs:
-      - source: manifest_json
-        #target: /usr/local/etc/haproxy/manifest.json
-        target: /usr/local/etc/www/manifest.json
-      - source: index_html
-        #target: /usr/local/etc/haproxy/index.html
-        target: /usr/local/etc/www/index.html
-    ports:
-      - ${HAPROXY_BINDED_HOST}${HAPROXY_PORT:-8053}:8053
-    healthcheck:
-      test: ["CMD-SHELL", "haproxy -c -- /usr/local/etc/haproxy/haproxy.cfg"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    restart: always
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "200k"
-        max-file: "10"
+  # haproxy:
+  #   image: haproxy:2.9.0-bookworm
+  #   hostname: ${HAPROXY_HOST}
+  #   environment:
+  #     # variables accesible in config/haproxy/haproxy.conf
+  #     HAPROXY_PORT: ${HAPROXY_PORT}
+  #     NETWORK: ${NETWORK}
+  #     OGMIOS_PORT: ${OGMIOS_PORT}
+  #     POSTGREST_PORT: ${POSTGREST_PORT}
+  #     CARDANO_GRAPHQL_SERVER_PORT: ${CARDANO_GRAPHQL_SERVER_PORT}
+  #     DBLESS_CARDANO_TOKEN_REGISTRY_PORT: ${DBLESS_CARDANO_TOKEN_REGISTRY_PORT}
+  #     DANDELION_POSTGREST_PORT: ${DANDELION_POSTGREST_PORT}
+  #     CARDANO_SQL_POSTGREST_PORT: ${CARDANO_SQL_POSTGREST_PORT}
+  #     UNIMATRIX_PORT: ${UNIMATRIX_PORT}
+  #   volumes:
+  #     - ./configs/haproxy/:/usr/local/etc/haproxy/
+  #     - ./scripts/:/scripts/
+  #     - ./configs/ssl/server.pem:/etc/ssl/server.pem
+  #   configs:
+  #     - source: manifest_json
+  #       #target: /usr/local/etc/haproxy/manifest.json
+  #       target: /usr/local/etc/www/manifest.json
+  #     - source: index_html
+  #       #target: /usr/local/etc/haproxy/index.html
+  #       target: /usr/local/etc/www/index.html
+  #   ports:
+  #     - ${HAPROXY_BINDED_HOST}${HAPROXY_PORT:-8053}:8053
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "haproxy -c -- /usr/local/etc/haproxy/haproxy.cfg"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+  #   restart: always
+  #   logging:
+  #     driver: "json-file"
+  #     options:
+  #       max-size: "200k"
+  #       max-file: "10"
 
 
 ############################################################################
@@ -625,67 +625,67 @@ services:
 volumes:
   node-db:
   node-ipc:
-  db-sync-data:
-  postgresdb:
-  portainer-data:
-  pgadmin-data:
-  unimatrix-data:
-  dbless-cardano-token-registry-data:
+  # db-sync-data:
+  # postgresdb:
+  # portainer-data:
+  # pgadmin-data:
+  # unimatrix-data:
+  # dbless-cardano-token-registry-data:
 
-secrets:
-  postgres_password:
-    environment: POSTGRES_PASSWORD
-  postgres_user:
-    environment: POSTGRES_USER
-  postgres_db:
-    environment: POSTGRES_DB
+# secrets:
+#   postgres_password:
+#     environment: POSTGRES_PASSWORD
+#   postgres_user:
+#     environment: POSTGRES_USER
+#   postgres_db:
+#     environment: POSTGRES_DB
 
-configs:
-  manifest_json:
-    content: |
-      {
-      "dltTag": "${DLT}",
-      "networkTag": "${NETWORK}",
-      "name": "${NODE_NAME}",
-      "description": "${NODE_DESCRIPTION}",      
-      "ticker": "${NODE_TICKER}",
-      "groups": ${NODE_GROUPS},
-      "extensions":[${NODE_EXTENSIONS}]
-      }
-  index_html:
-    content: |
-      <!DOCTYPE html>
-      <html lang="en">
-      <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>GC Node - ${NODE_NAME} [${NODE_TICKER}] - ${DLT} - ${NETWORK}</title>
-          <!-- Meta Tags for Social Media -->
-          <meta name="description" content="${NODE_DESCRIPTION}">
-          <meta property="og:title" content="GC Node">
-          <meta property="og:description" content="${NODE_DESCRIPTION}">
-          <!-- <meta property="og:image" content="https://your-website.com/path/to/image.jpg"> -->
-          <!-- <meta property="og:url" content="https://your-website.com"> -->
-          <meta name="twitter:card" content="summary">
-          <meta name="twitter:title" content="GC Node">
-          <meta name="twitter:description" content="${NODE_DESCRIPTION}">   
-          <!-- End of Meta Tags for Social Media -->
-      </head>
-      <body>
-          <div class="container">
-              <h1><i>'${NODE_NAME}'</i> [${NODE_TICKER}]</h1>
-              <p>Welcome to the <b>Decentralized Dandelion Network!</b></p>              
-              <p><b>Description:</b> ${NODE_DESCRIPTION}</p>
-              <p></p>
-              <p>APIs available on this ${DLT} ${NETWORK} <b>Dandelion Lite Node</b>:</p>
-              <ul class="api-list">
-                  ${INDEX_LINKS}
-              </ul>
-          </div>
-          <div class="footer">
-              Made with ❤️ by GameChanger Finance + M2Tec
-          </div>
-      </body>
-      </html>
+# configs:
+#   manifest_json:
+#     content: |
+#       {
+#       "dltTag": "${DLT}",
+#       "networkTag": "${NETWORK}",
+#       "name": "${NODE_NAME}",
+#       "description": "${NODE_DESCRIPTION}",      
+#       "ticker": "${NODE_TICKER}",
+#       "groups": ${NODE_GROUPS},
+#       "extensions":[${NODE_EXTENSIONS}]
+#       }
+#   index_html:
+#     content: |
+#       <!DOCTYPE html>
+#       <html lang="en">
+#       <head>
+#           <meta charset="UTF-8">
+#           <meta name="viewport" content="width=device-width, initial-scale=1.0">
+#           <title>GC Node - ${NODE_NAME} [${NODE_TICKER}] - ${DLT} - ${NETWORK}</title>
+#           <!-- Meta Tags for Social Media -->
+#           <meta name="description" content="${NODE_DESCRIPTION}">
+#           <meta property="og:title" content="GC Node">
+#           <meta property="og:description" content="${NODE_DESCRIPTION}">
+#           <!-- <meta property="og:image" content="https://your-website.com/path/to/image.jpg"> -->
+#           <!-- <meta property="og:url" content="https://your-website.com"> -->
+#           <meta name="twitter:card" content="summary">
+#           <meta name="twitter:title" content="GC Node">
+#           <meta name="twitter:description" content="${NODE_DESCRIPTION}">   
+#           <!-- End of Meta Tags for Social Media -->
+#       </head>
+#       <body>
+#           <div class="container">
+#               <h1><i>'${NODE_NAME}'</i> [${NODE_TICKER}]</h1>
+#               <p>Welcome to the <b>Decentralized Dandelion Network!</b></p>              
+#               <p><b>Description:</b> ${NODE_DESCRIPTION}</p>
+#               <p></p>
+#               <p>APIs available on this ${DLT} ${NETWORK} <b>Dandelion Lite Node</b>:</p>
+#               <ul class="api-list">
+#                   ${INDEX_LINKS}
+#               </ul>
+#           </div>
+#           <div class="footer">
+#               Made with ❤️ by GameChanger Finance + M2Tec
+#           </div>
+#       </body>
+#       </html>
 
 
