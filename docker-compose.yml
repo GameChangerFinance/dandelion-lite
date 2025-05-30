@@ -11,13 +11,13 @@ services:
    hostname: cardano-node
    environment:
      NETWORK: ${NETWORK}
-     SOCKET: "${CARDANO_NODE_HOME}/sockets/node.socket" 
+    #  SOCKET: "${CARDANO_NODE_HOME}/sockets/node.socket" 
     #  UPDATE_CHECK: "N"
     #  EXPORTED_CONFIG: "${CARDANO_NODE_HOME}/sockets/exportedConfig"
-   volumes:
-     - node-db:${CARDANO_NODE_HOME}/db
-     - node-ipc:${CARDANO_NODE_HOME}/sockets
-     - ./scripts/:/scripts/
+  #  volumes:
+    #  - ./node-db:/${CARDANO_NODE_HOME}/db
+    #  - ./node-ipc:/${CARDANO_NODE_HOME}/sockets
+    #  - ./scripts/:/scripts/
   #  entrypoint: >
   #    /bin/sh -c "
   #    echo \"Preparing setup for network '${NETWORK}'\" ;
