@@ -582,17 +582,19 @@ services:
 
 ############################################################################
 
-
-
 #################################
 ####    optional extras     #####
 #################################
 
-
-
-
-
-
+  certbot:
+    build:
+      context: ./certbot
+    environment:
+      - DUCKDNS_DOMAINS=${DUCKDNS_DOMAINS}    
+    volumes:
+      - ./config/ssl:/etc/letsencrypt
+      - "${NGINX_WWW_BACKUP_DIR}:/var/www/certbot"
+     
 #################################
 ####         nginx          #####
 #################################
