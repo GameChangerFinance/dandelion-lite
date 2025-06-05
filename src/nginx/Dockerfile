@@ -15,6 +15,9 @@ ENV NGINX_WWW_BACKUP_PASSWORD=${NGINX_WWW_BACKUP_PASSWORD}
 RUN mkdir -p /output && \
     htpasswd -bc /output/.htpasswd "$NGINX_WWW_BACKUP_USER" "$NGINX_WWW_BACKUP_PASSWORD"
 
+# Create webroot folder for certbot
+RUN mkdir -p /usr/share/nginx/ssl
+
 # Stage 2: Final nginx image
 FROM "${NGINX_IMAGE}"
 
