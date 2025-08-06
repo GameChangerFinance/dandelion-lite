@@ -2,7 +2,7 @@
   "EnableFutureGenesis": true,
   "EnableLogMetrics": false,
   "EnableLogging": true,
-  "NetworkName": "preview",
+  "NetworkName": "sanchonet",
   "NodeConfigFile": "../cardano-node/config.json",
   "PrometheusPort": 8080,
   "RequiresNetworkMagic": "RequiresMagic",
@@ -15,6 +15,13 @@
       "stdout"
     ]
   ],
+  "insert_options": {
+    "tx_out": {
+      "value": "consumed",
+      "force_tx_in":true
+    },
+    "tx_cbor": "enable"
+  },
   "minSeverity": "Info",
   "options": {
     "cfokey": {
