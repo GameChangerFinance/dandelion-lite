@@ -15,8 +15,8 @@ UPDATE_URL="https://myaddr.io/update"
 # Log update attempt
 echo "[UPDATE] $(date -u)"
 
-#CURRENT_IP=$(curl -s https://api.ipify.org)
-CURRENT_IP=$(curl -s https://ifconfig.me)
+CURRENT_IP=$(curl -s https://api.ipify.org)
+#CURRENT_IP=$(curl -s https://ifconfig.me)
 #CURRENT_IP=$(curl -s https://icanhazip.com)
 
 if [[ -n ${MYADDR_DOMAIN} ]]; then
