@@ -15,6 +15,13 @@
       "stdout"
     ]
   ],
+  "insert_options": {
+    "tx_out": {
+      "value": "consumed",
+      "force_tx_in":true
+    },
+    "tx_cbor": "enable"
+  },
   "minSeverity": "Info",
   "options": {
     "cfokey": {
