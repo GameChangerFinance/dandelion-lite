@@ -1,0 +1,2 @@
+# myaddrdns
+*/3 * * * * /scripts/cron/myaddrdns/update.sh >> /var/log/myaddrdns_update.log 2>&1

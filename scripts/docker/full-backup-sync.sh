@@ -40,14 +40,15 @@ for volumeName in $volumeNames; do
     outputFile="${backupDir}${fileName}.tar.gz"
 
     echo "Downloading: $url → $outputFile"
-
+ 
+    # Important: remove -k to block non HTTPS URLs
     if [[ $use_auth -eq 1 ]]; then
-      curl --fail -# --show-error --location \
+      curl -k --fail -# --show-error --location \
            --continue-at - \
            --user "$remoteBackupUser:$remoteBackupPassword" \
            --output "$outputFile" "$url"
     else
-      curl --fail -# --show-error --location \
+      curl -k --fail -# --show-error --location \
            --continue-at - \
            --output "$outputFile" "$url"
     fi
