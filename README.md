@@ -13,6 +13,8 @@ ___  ____ __ _ ___  ____ _    _ ____ __ _
 
 [ ❤️ Support the Dandelion Network on Catalyst](https://github.com/GameChangerFinance/gamechanger.wallet/blob/main/catalyst/FUND13.md)
 
+ [⚠️⚠️ LATEST UPDATES! ⚠️⚠️](#relay-node-configuration)
+
 # What's this?
 
 **Dandelion** is a community-supported project led by GimbaLabs and operated by La PEACEpool Cardano repsist₳nce. Every Cardano API available. From bottom to top, from testnet to mainnet.
@@ -322,3 +324,7 @@ All basic endpoints + **cardano-submit-api** + **ogmios** are supported. Other a
 Default **Blockfrost RYO** support can be examined with it's latest test reports
 - [preprod](tests/blockfrost/preprod.report)
 - [mainnet](tests/blockfrost/mainnet.report)
+
+### Relay Node Configuration
+
+To enable relay capabilities, simply edit the [topology.config](./configs/cardano/config/network/mainnet/cardano-node/topology.json) with your block producer (localRoots) and/or relay (publicRoots) IP addresses.  Make sure `valency` value is set to the amount of nodes you list.

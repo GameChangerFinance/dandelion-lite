@@ -15,16 +15,28 @@
   ],
   "localRoots": [
     {
-      "accessPoints": [],
+      "accessPoints": [
+        {
+          "address": "block-producer-ip_address",
+          "port": 6000,
+          "name": "block-producer"
+        },
+      ],
       "advertise": false,
-      "trustable": false,
+      "trustable": true,
       "valency": 1
     }
   ],
   "publicRoots": [
     {
-      "accessPoints": [],
-      "advertise": false
+      "accessPoints": [
+        {
+          "address": "relay-ip_address",
+          "port": 6000,
+          "name": "relay"
+        }
+      ],
+      "advertise": true
     }
   ],
   "useLedgerAfterSlot": 128908821
