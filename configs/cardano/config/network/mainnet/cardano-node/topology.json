@@ -20,7 +20,7 @@
           "address": "block-producer-ip_address",
           "port": 6000,
           "name": "block-producer"
-        },
+        }
       ],
       "advertise": false,
       "trustable": true,
