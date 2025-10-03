@@ -188,16 +188,60 @@ services:
         max-file: "10"
 
 #################################
-######  cardano-graphql  ########
+##### cardano-graphql-mk2  #####
 #################################
 
 
+  cardano-graphql:
+    image: ${CARDANO_GRAPHQL_IMAGE}
+    hostname: cardano-graphql
+    ports:
+      - ${CARDANO_GRAPHQL_PORT:-4000}:4000
+    depends_on:
+      cardano-node-ogmios:
+        condition: service_healthy
+      postgress:
+        condition: service_healthy
+    restart: always
+    environment:
+      GRAPHILE_ENV: development
+      CORS: true 
+
+      CARDANO_GRAPHQL_PORT: ${CARDANO_GRAPHQL_PORT}
+      CARDANO_GRAPHQL_GRAPHQL_PATH: ${CARDANO_GRAPHQL_GRAPHQL_PATH}
+      CARDANO_GRAPHQL_GRAPHQL_PLAYGROUND_STATIC_PATH: ${CARDANO_GRAPHQL_GRAPHQL_PLAYGROUND_STATIC_PATH}
+      CARDANO_GRAPHQL_GRAPHQL_PLAYGROUND_PATH: ${CARDANO_GRAPHQL_GRAPHQL_PLAYGROUND_PATH}
+      CARDANO_GRAPHQL_SERVER_URI: ${CARDANO_GRAPHQL_SERVER_URI}
+      
+      CARDANO_GRAPHQL_DLT: ${CARDANO_GRAPHQL_DLT}
+      CARDANO_GRAPHQL_NETWORK: ${CARDANO_GRAPHQL_NETWORK}
+
+      CARDANO_GRAPHQL_POSTGRES_URI: ${CARDANO_GRAPHQL_POSTGRES_URI}
+      CARDANO_GRAPHQL_POSTGRES_ROLE: ${CARDANO_GRAPHQL_POSTGRES_ROLE}
+
+      CARDANO_GRAPHQL_OGMIOS_URI: ${CARDANO_GRAPHQL_OGMIOS_URI}
+      CARDANO_GRAPHQL_OGMIOS_MIN_SYNC: ${CARDANO_GRAPHQL_OGMIOS_MIN_SYNC}
+
+
+      CARDANO_GRAPHQL_CORS: ${CARDANO_GRAPHQL_CORS}
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
+
+
+########################################
+######  cardano-graphql-legacy  ########
+########################################
+
+
   cardano-graphql-hasura:
-    image: ${CARDANO_GRAPHQL_HASURA_IMAGE}
-    #image: cardanofoundation/cardano-graphql-hasura:${CARDANO_GRAPHQL_VERSION:-8.0.1}    
+    image: ${CARDANO_GRAPHQL_LEGACY_HASURA_IMAGE}
+    #image: cardanofoundation/cardano-graphql-hasura:${CARDANO_GRAPHQL_LEGACY_VERSION:-8.0.1}    
     hostname: cardano-graphql-hasura
     ports:
-      - ${CARDANO_GRAPHQL_HASURA_PORT:-8090}:8080
+      - ${CARDANO_GRAPHQL_LEGACY_HASURA_PORT:-8090}:8080
     depends_on:
       cardano-node-ogmios:
         condition: service_healthy
@@ -208,8 +252,8 @@ services:
       NETWORK: ${NETWORK}
       POSTGRES_HOST: ${POSTGRES_HOST}
       #POSTGRES_HOST: postgress      
-      HASURA_GRAPHQL_ENABLE_CONSOLE: ${CARDANO_GRAPHQL_HASURA_ENABLE_CONSOLE:-true}
-      HASURA_GRAPHQL_CORS_DOMAIN: ${CARDANO_GRAPHQL_HASURA_CORS_DOMAIN:-http://localhost:9695}
+      HASURA_GRAPHQL_ENABLE_CONSOLE: ${CARDANO_GRAPHQL_LEGACY_HASURA_ENABLE_CONSOLE:-true}
+      HASURA_GRAPHQL_CORS_DOMAIN: ${CARDANO_GRAPHQL_LEGACY_HASURA_CORS_DOMAIN:-http://localhost:9695}
     secrets:
       - postgres_db
       - postgres_password
@@ -221,8 +265,8 @@ services:
         max-file: "10"
 
   cardano-graphql-background:
-    image: ${CARDANO_GRAPHQL_BACKGROUND_IMAGE}
-    #image: cardanofoundation/cardano-graphql-background:${CARDANO_GRAPHQL_VERSION:-8.0.1}-${NETWORK:-mainnet}
+    image: ${CARDANO_GRAPHQL_LEGACY_BACKGROUND_IMAGE}
+    #image: cardanofoundation/cardano-graphql-background:${CARDANO_GRAPHQL_LEGACY_VERSION:-8.0.1}-${NETWORK:-mainnet}
     depends_on:
       postgress:
         condition: service_healthy    
@@ -232,11 +276,11 @@ services:
       NETWORK: ${NETWORK}
       POSTGRES_HOST: ${POSTGRES_HOST}      
       HASURA_URI: http://cardano-graphql-hasura:8080
-      LOGGER_MIN_SEVERITY: ${CARDANO_GRAPHQL_BACKGROUND_LOGGER_MIN_SEVERITY:-info}
+      LOGGER_MIN_SEVERITY: ${CARDANO_GRAPHQL_LEGACY_BACKGROUND_LOGGER_MIN_SEVERITY:-info}
       #Depends on network, so defaulting to https://tokens.cardano.org is not safe:
-      METADATA_SERVER_URI: ${CARDANO_GRAPHQL_BACKGROUND_METADATA_SERVER_URI}
-      CHAIN_FOLLOWER_START_SLOT: ${CARDANO_GRAPHQL_BACKGROUND_CHAIN_FOLLOWER_START_SLOT:-0}
-      CHAIN_FOLLOWER_START_ID: ${CARDANO_GRAPHQL_BACKGROUND_CHAIN_FOLLOWER_START_ID:-}
+      METADATA_SERVER_URI: ${CARDANO_GRAPHQL_LEGACY_BACKGROUND_METADATA_SERVER_URI}
+      CHAIN_FOLLOWER_START_SLOT: ${CARDANO_GRAPHQL_LEGACY_BACKGROUND_CHAIN_FOLLOWER_START_SLOT:-0}
+      CHAIN_FOLLOWER_START_ID: ${CARDANO_GRAPHQL_LEGACY_BACKGROUND_CHAIN_FOLLOWER_START_ID:-}
     entrypoint: >
       /bin/sh -c "
       echo \"Applying patch to provide env vars due to hardcoded values:\" ;
@@ -257,14 +301,14 @@ services:
 
   cardano-graphql-server:
     platform: linux/x86_64
-    image: ${CARDANO_GRAPHQL_SERVER_IMAGE}
-    #image: cardanofoundation/cardano-graphql-server:${CARDANO_GRAPHQL_VERSION:-8.0.1}-${NETWORK:-mainnet}
+    image: ${CARDANO_GRAPHQL_LEGACY_SERVER_IMAGE}
+    #image: cardanofoundation/cardano-graphql-server:${CARDANO_GRAPHQL_LEGACY_VERSION:-8.0.1}-${NETWORK:-mainnet}
     environment:
       NETWORK: ${NETWORK}
       HASURA_URI: http://cardano-graphql-hasura:8080
-      ALLOW_INTROSPECTION: ${CARDANO_GRAPHQL_SERVER_ALLOW_INTROSPECTION:-true}
-      CACHE_ENABLED: ${CARDANO_GRAPHQL_SERVER_CACHE_ENABLED:-true}
-      LOGGER_MIN_SEVERITY: ${CARDANO_GRAPHQL_SERVER_LOGGER_MIN_SEVERITY:-info}
+      ALLOW_INTROSPECTION: ${CARDANO_GRAPHQL_LEGACY_SERVER_ALLOW_INTROSPECTION:-true}
+      CACHE_ENABLED: ${CARDANO_GRAPHQL_LEGACY_SERVER_CACHE_ENABLED:-true}
+      LOGGER_MIN_SEVERITY: ${CARDANO_GRAPHQL_LEGACY_SERVER_LOGGER_MIN_SEVERITY:-info}
       API_PORT: 3100
     entrypoint: >
       /bin/sh -c "
@@ -277,9 +321,9 @@ services:
       postgress:
         condition: service_healthy
     # expose:
-    #   - ${CARDANO_GRAPHQL_SERVER_PORT:-3100}
+    #   - ${CARDANO_GRAPHQL_LEGACY_SERVER_PORT:-3100}
     ports:
-      - ${CARDANO_GRAPHQL_SERVER_PORT:-3100}:3100
+      - ${CARDANO_GRAPHQL_LEGACY_SERVER_PORT:-3100}:3100
     restart: always
     logging:
       driver: "json-file"
@@ -553,7 +597,8 @@ services:
       NETWORK: ${NETWORK}
       OGMIOS_PORT: ${OGMIOS_PORT}
       POSTGREST_PORT: ${POSTGREST_PORT}
-      CARDANO_GRAPHQL_SERVER_PORT: ${CARDANO_GRAPHQL_SERVER_PORT}
+      CARDANO_GRAPHQL_PORT: ${CARDANO_GRAPHQL_PORT}
+      CARDANO_GRAPHQL_LEGACY_SERVER_PORT: ${CARDANO_GRAPHQL_LEGACY_SERVER_PORT}
       DBLESS_CARDANO_TOKEN_REGISTRY_PORT: ${DBLESS_CARDANO_TOKEN_REGISTRY_PORT}
       DANDELION_POSTGREST_PORT: ${DANDELION_POSTGREST_PORT}
       CARDANO_SQL_POSTGREST_PORT: ${CARDANO_SQL_POSTGREST_PORT}
