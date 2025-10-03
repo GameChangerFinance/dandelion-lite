@@ -354,29 +354,78 @@ FROM ma_tx_out
 JOIN multi_asset
   ON ma_tx_out.ident = multi_asset.id;
 
-CREATE OR REPLACE VIEW cardano_graphql."Transaction" AS
-SELECT
-  block.hash AS "blockHash",
-  tx.block_index AS "blockIndex",
-  tx.deposit AS "deposit",
-  COALESCE(tx.fee, 0) AS fee,
-  tx.hash,
-  tx.id,
-  block.time AS "includedAt",
-  tx.invalid_before AS "invalidBefore",
-  tx.invalid_hereafter AS "invalidHereafter",
-  tx.script_size AS "scriptSize",
-  tx.size,
-  CAST(COALESCE((SELECT SUM("value") FROM tx_out WHERE tx_id = tx.id), 0) AS bigint) AS "totalOutput",
-  tx.valid_contract AS "validContract",
-  tx.treasury_donation AS "treasuryDonation",
-  tx_cbor.bytes as "bytes" -- added tx cbor
-FROM
-  tx
-JOIN tx_cbor
-  ON tx.id = tx_cbor.tx_id
-INNER JOIN block
-  ON block.id = tx.block_id;
+DO $DDL$
+BEGIN
+  IF EXISTS (
+    SELECT 1
+    FROM pg_class c
+    JOIN pg_namespace n ON n.oid = c.relnamespace
+    WHERE n.nspname = 'public' AND c.relname = 'tx_cbor' AND c.relkind = 'r'
+  ) THEN
+    RAISE NOTICE 'cardano_graphql."Transaction": public.tx_cbor table FOUND → bytes column will be enabled';
+    EXECUTE $$
+
+        -- public.tx_cbor table exist on this dbsync config setup 
+        CREATE OR REPLACE VIEW cardano_graphql."Transaction" AS
+        SELECT
+          block.hash AS "blockHash",
+          tx.block_index AS "blockIndex",
+          tx.deposit AS "deposit",
+          COALESCE(tx.fee, 0) AS fee,
+          tx.hash,
+          tx.id,
+          block.time AS "includedAt",
+          tx.invalid_before AS "invalidBefore",
+          tx.invalid_hereafter AS "invalidHereafter",
+          tx.script_size AS "scriptSize",
+          tx.size,
+          CAST(COALESCE((SELECT SUM("value") FROM tx_out WHERE tx_id = tx.id), 0) AS bigint) AS "totalOutput",
+          tx.valid_contract AS "validContract",
+          tx.treasury_donation AS "treasuryDonation",
+          tx_cbor.bytes as "bytes" -- added tx cbor
+        FROM
+          tx
+        INNER JOIN block
+          ON block.id = tx.block_id
+        LEFT JOIN public.tx_cbor tx_cbor -- PostgreSQL can eliminate a LEFT JOIN when none of its columns are referenced (“join removal”), so to avoid extra work when bytes isn’t requested.
+          ON tx_cbor.tx_id = tx.id;
+
+
+    $$;
+  ELSE
+    RAISE NOTICE 'cardano_graphql."Transaction": public.tx_cbor table NOT FOUND → using bytes column as NULL';
+    EXECUTE $$
+
+        -- else public.tx_cbor table does not exist on this dbsync config setup 
+        CREATE OR REPLACE VIEW cardano_graphql."Transaction" AS
+        SELECT
+          block.hash AS "blockHash",
+          tx.block_index AS "blockIndex",
+          tx.deposit AS "deposit",
+          COALESCE(tx.fee, 0) AS fee,
+          tx.hash,
+          tx.id,
+          block.time AS "includedAt",
+          tx.invalid_before AS "invalidBefore",
+          tx.invalid_hereafter AS "invalidHereafter",
+          tx.script_size AS "scriptSize",
+          tx.size,
+          CAST(COALESCE((SELECT SUM("value") FROM tx_out WHERE tx_id = tx.id), 0) AS bigint) AS "totalOutput",
+          tx.valid_contract AS "validContract",
+          tx.treasury_donation AS "treasuryDonation",
+          NULL::bytea AS "bytes" -- no tx cbor table on this dbsync deployment, lets patch with null
+        FROM
+          tx
+        INNER JOIN block
+          ON block.id = tx.block_id;
+
+
+    $$;
+  END IF;
+END
+$DDL$;
+
+
 
 CREATE OR REPLACE VIEW cardano_graphql."TransactionInput" AS
 SELECT
