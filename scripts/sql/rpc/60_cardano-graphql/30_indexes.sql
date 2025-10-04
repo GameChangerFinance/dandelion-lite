@@ -91,14 +91,16 @@ ON public.multi_asset (fingerprint);
 -------------------------------------------------------------------------
 -- For Grafast plans produced by paymentAddresses:
 --------------------------------------------------------------------------
-
--- Filter by address quickly (used by WHERE ab.address = ...)
--- Pick ONE: simple or composite. Composite can also help downstream join patterns.
-CREATE INDEX IF NOT EXISTS tx_out_address_idx
-  ON public.tx_out(address);
--- Or:
--- CREATE INDEX CONCURRENTLY IF NOT EXISTS tx_out_address_id_idx
---   ON public.tx_out(address, id);
+-- Removed as producing errors on mainnet: 
+--    ERROR:  index row requires 10520 bytes, maximum size is 8191
+DROP INDEX IF EXISTS tx_out_address_idx;
+-- -- Filter by address quickly (used by WHERE ab.address = ...)
+-- -- Pick ONE: simple or composite. Composite can also help downstream join patterns.
+-- CREATE INDEX IF NOT EXISTS tx_out_address_idx
+--   ON public.tx_out(address);
+-- -- Or:
+-- -- CREATE INDEX CONCURRENTLY IF NOT EXISTS tx_out_address_id_idx
+-- --   ON public.tx_out(address, id);
 
 -- Anti-join for "unspent": speeds WHERE NOT EXISTS/LEFT JOIN IS NULL
 CREATE INDEX IF NOT EXISTS tx_in_out_ref_idx
@@ -120,10 +122,13 @@ CREATE UNIQUE INDEX IF NOT EXISTS multi_asset_id_uq
 CREATE INDEX IF NOT EXISTS asset_registry_cache_policy_name_idx
   ON cardano_graphql.asset_registry_cache (asset_policy, asset_name);
 
--- Keep your simple address index (it’s in use).
--- Add a composite one to enable ordered reads for GROUP BY:
-CREATE INDEX IF NOT EXISTS tx_out_address_txid_index_idx
-  ON public.tx_out (address, tx_id, index);
+-- Removed as producing errors on mainnet: 
+--    ERROR:  index row requires 10520 bytes, maximum size is 8191
+DROP INDEX IF EXISTS tx_out_address_txid_index_idx;
+-- -- Keep your simple address index (it’s in use).
+-- -- Add a composite one to enable ordered reads for GROUP BY:
+-- CREATE INDEX IF NOT EXISTS tx_out_address_txid_index_idx
+--   ON public.tx_out (address, tx_id, index);
 
 
 -------------------------------------------------------------------------
