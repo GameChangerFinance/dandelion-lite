@@ -458,7 +458,8 @@ services:
       - ./configs/cardano/config/network/${NETWORK}:/config
       - node-ipc:/node-ipc
       - ./logs/cron:/var/log/
-      - ./configs/ssl/:/etc/letsencrypt/
+      - ./configs/letsencrypt:/etc/letsencrypt/
+      - ./configs/ssl/:/data/ssl/
     # Uncomment for persistent logs
     # - ./logs:/var/log
     restart: always
@@ -625,7 +626,7 @@ services:
     volumes:
       - ./configs/haproxy/:/usr/local/etc/haproxy/
       - ./scripts/:/scripts/
-      - ./configs/ssl/server.pem:/etc/ssl/server.pem
+      - ./configs/ssl/:/etc/ssl/
     configs:
       - source: manifest_json
         #target: /usr/local/etc/haproxy/manifest.json
