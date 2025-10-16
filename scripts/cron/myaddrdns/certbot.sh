@@ -6,27 +6,16 @@
 # Validate required token
 [[ -z ${MYADDR_TOKEN} ]] && echo "MYADDR_TOKEN variable not set, aborting..." && exit 1
 
-# Set IP (use 'self' if MYADDR_IP is not set)
-IP_TO_USE="${MYADDR_IP:-self}"
-
-# API endpoint
-UPDATE_URL="https://myaddr.io/update"
-
 # Log update attempt
 echo "[UPDATE] $(date -u)"
 
-CURRENT_IP=$(curl -s https://api.ipify.org)
-#CURRENT_IP=$(curl -s https://ifconfig.me)
-#CURRENT_IP=$(curl -s https://icanhazip.com)
+echo "Setting '${MYADDR_DOMAIN}.myaddr.io'" 
 
-if [[ -n ${MYADDR_DOMAIN} ]]; then
-  echo "Setting '${MYADDR_DOMAIN}.myaddr.io'" 
-  else
-  echo "Setting your '<DOMAIN>.myaddr.<tools|dev|io>' domain IP address to be '$CURRENT_IP' ..."
-fi
-
-certbot certonly --dry-run --manual --non-interactive --preferred-challenges dns \
-   --manual-auth-hook /scripts/cron/myaddrdns/certbot_authentication_hook.sh \
-   -d ${MYADDR_DOMAIN}.myaddr.io
+certbot certonly --agree-tos \
+                 --manual --non-interactive \
+                 --preferred-challenges dns \
+                 --manual-auth-hook /scripts/cron/myaddrdns/certbot_authentication_hook.sh \
+                 --manual-cleanup-hook /scripts/cron/myaddrdns/certbot_haproxy_hook.sh \
+                 -d ${MYADDR_DOMAIN}.myaddr.io
 
 echo
