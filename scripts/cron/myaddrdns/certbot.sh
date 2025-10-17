@@ -12,7 +12,7 @@ echo "[UPDATE] $(date -u)"
 echo "Setting '${MYADDR_DOMAIN}.myaddr.io'" 
 
 certbot certonly --agree-tos \
-                 --email ${NODE_EMAIL}
+                 --email ${NODE_EMAIL} \
                  --manual --non-interactive \
                  --preferred-challenges dns \
                  --manual-auth-hook /scripts/cron/myaddrdns/certbot_authentication_hook.sh \
