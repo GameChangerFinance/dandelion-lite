@@ -253,124 +253,124 @@ services:
 ########################################
 
 
-  cardano-graphql-hasura:
-    image: ${CARDANO_GRAPHQL_LEGACY_HASURA_IMAGE}
-    #image: cardanofoundation/cardano-graphql-hasura:${CARDANO_GRAPHQL_LEGACY_VERSION:-8.0.1}    
-    hostname: cardano-graphql-hasura
-    ports:
-      - ${CARDANO_GRAPHQL_LEGACY_HASURA_PORT:-8090}:8080
-    depends_on:
-      cardano-node-ogmios:
-        condition: service_healthy
-      postgress:
-        condition: service_healthy
-    restart: always
-    environment:
-      NETWORK: ${NETWORK}
-      POSTGRES_HOST: ${POSTGRES_HOST}
-      #POSTGRES_HOST: postgress      
-      HASURA_GRAPHQL_ENABLE_CONSOLE: ${CARDANO_GRAPHQL_LEGACY_HASURA_ENABLE_CONSOLE:-true}
-      HASURA_GRAPHQL_CORS_DOMAIN: ${CARDANO_GRAPHQL_LEGACY_HASURA_CORS_DOMAIN:-http://localhost:9695}
-    secrets:
-      - postgres_db
-      - postgres_password
-      - postgres_user
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "200k"
-        max-file: "10"
+  # cardano-graphql-hasura:
+  #   image: ${CARDANO_GRAPHQL_LEGACY_HASURA_IMAGE}
+  #   #image: cardanofoundation/cardano-graphql-hasura:${CARDANO_GRAPHQL_LEGACY_VERSION:-8.0.1}    
+  #   hostname: cardano-graphql-hasura
+  #   ports:
+  #     - ${CARDANO_GRAPHQL_LEGACY_HASURA_PORT:-8090}:8080
+  #   depends_on:
+  #     cardano-node-ogmios:
+  #       condition: service_healthy
+  #     postgress:
+  #       condition: service_healthy
+  #   restart: always
+  #   environment:
+  #     NETWORK: ${NETWORK}
+  #     POSTGRES_HOST: ${POSTGRES_HOST}
+  #     #POSTGRES_HOST: postgress      
+  #     HASURA_GRAPHQL_ENABLE_CONSOLE: ${CARDANO_GRAPHQL_LEGACY_HASURA_ENABLE_CONSOLE:-true}
+  #     HASURA_GRAPHQL_CORS_DOMAIN: ${CARDANO_GRAPHQL_LEGACY_HASURA_CORS_DOMAIN:-http://localhost:9695}
+  #   secrets:
+  #     - postgres_db
+  #     - postgres_password
+  #     - postgres_user
+  #   logging:
+  #     driver: "json-file"
+  #     options:
+  #       max-size: "200k"
+  #       max-file: "10"
 
-  cardano-graphql-background:
-    image: ${CARDANO_GRAPHQL_LEGACY_BACKGROUND_IMAGE}
-    #image: cardanofoundation/cardano-graphql-background:${CARDANO_GRAPHQL_LEGACY_VERSION:-8.0.1}-${NETWORK:-mainnet}
-    depends_on:
-      postgress:
-        condition: service_healthy    
-      cardano-graphql-hasura:
-        condition: service_started
-    environment:
-      NETWORK: ${NETWORK}
-      POSTGRES_HOST: ${POSTGRES_HOST}      
-      HASURA_URI: http://cardano-graphql-hasura:8080
-      LOGGER_MIN_SEVERITY: ${CARDANO_GRAPHQL_LEGACY_BACKGROUND_LOGGER_MIN_SEVERITY:-info}
-      #Depends on network, so defaulting to https://tokens.cardano.org is not safe:
-      METADATA_SERVER_URI: ${CARDANO_GRAPHQL_LEGACY_BACKGROUND_METADATA_SERVER_URI}
-      CHAIN_FOLLOWER_START_SLOT: ${CARDANO_GRAPHQL_LEGACY_BACKGROUND_CHAIN_FOLLOWER_START_SLOT:-0}
-      CHAIN_FOLLOWER_START_ID: ${CARDANO_GRAPHQL_LEGACY_BACKGROUND_CHAIN_FOLLOWER_START_ID:-}
-    entrypoint: >
-      /bin/sh -c "
-      echo \"Applying patch to provide env vars due to hardcoded values:\" ;
-      echo \"   OGMIOS_HOST='${OGMIOS_HOST}'\" ;
-      echo \"   OGMIOS_PORT='1337'\" ;
-      OGMIOS_HOST=${OGMIOS_HOST} && OGMIOS_PORT=1337 && node background.js;
-      " 
-    restart: always
-    secrets:
-      - postgres_db
-      - postgres_password
-      - postgres_user
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "200k"
-        max-file: "10"
+  # cardano-graphql-background:
+  #   image: ${CARDANO_GRAPHQL_LEGACY_BACKGROUND_IMAGE}
+  #   #image: cardanofoundation/cardano-graphql-background:${CARDANO_GRAPHQL_LEGACY_VERSION:-8.0.1}-${NETWORK:-mainnet}
+  #   depends_on:
+  #     postgress:
+  #       condition: service_healthy    
+  #     cardano-graphql-hasura:
+  #       condition: service_started
+  #   environment:
+  #     NETWORK: ${NETWORK}
+  #     POSTGRES_HOST: ${POSTGRES_HOST}      
+  #     HASURA_URI: http://cardano-graphql-hasura:8080
+  #     LOGGER_MIN_SEVERITY: ${CARDANO_GRAPHQL_LEGACY_BACKGROUND_LOGGER_MIN_SEVERITY:-info}
+  #     #Depends on network, so defaulting to https://tokens.cardano.org is not safe:
+  #     METADATA_SERVER_URI: ${CARDANO_GRAPHQL_LEGACY_BACKGROUND_METADATA_SERVER_URI}
+  #     CHAIN_FOLLOWER_START_SLOT: ${CARDANO_GRAPHQL_LEGACY_BACKGROUND_CHAIN_FOLLOWER_START_SLOT:-0}
+  #     CHAIN_FOLLOWER_START_ID: ${CARDANO_GRAPHQL_LEGACY_BACKGROUND_CHAIN_FOLLOWER_START_ID:-}
+  #   entrypoint: >
+  #     /bin/sh -c "
+  #     echo \"Applying patch to provide env vars due to hardcoded values:\" ;
+  #     echo \"   OGMIOS_HOST='${OGMIOS_HOST}'\" ;
+  #     echo \"   OGMIOS_PORT='1337'\" ;
+  #     OGMIOS_HOST=${OGMIOS_HOST} && OGMIOS_PORT=1337 && node background.js;
+  #     " 
+  #   restart: always
+  #   secrets:
+  #     - postgres_db
+  #     - postgres_password
+  #     - postgres_user
+  #   logging:
+  #     driver: "json-file"
+  #     options:
+  #       max-size: "200k"
+  #       max-file: "10"
 
-  cardano-graphql-server:
-    platform: linux/x86_64
-    image: ${CARDANO_GRAPHQL_LEGACY_SERVER_IMAGE}
-    #image: cardanofoundation/cardano-graphql-server:${CARDANO_GRAPHQL_LEGACY_VERSION:-8.0.1}-${NETWORK:-mainnet}
-    environment:
-      NETWORK: ${NETWORK}
-      HASURA_URI: http://cardano-graphql-hasura:8080
-      ALLOW_INTROSPECTION: ${CARDANO_GRAPHQL_LEGACY_SERVER_ALLOW_INTROSPECTION:-true}
-      CACHE_ENABLED: ${CARDANO_GRAPHQL_LEGACY_SERVER_CACHE_ENABLED:-true}
-      LOGGER_MIN_SEVERITY: ${CARDANO_GRAPHQL_LEGACY_SERVER_LOGGER_MIN_SEVERITY:-info}
-      API_PORT: 3100
-    entrypoint: >
-      /bin/sh -c "
-      echo \"Applying patch to provide env vars due to hardcoded values:\" ;
-      echo \"   OGMIOS_HOST='${OGMIOS_HOST}'\" ;
-      echo \"   OGMIOS_PORT='1337'\" ;
-      OGMIOS_HOST=${OGMIOS_HOST} && OGMIOS_PORT=1337 && node index.js;
-      " 
-    depends_on:
-      postgress:
-        condition: service_healthy
-    # expose:
-    #   - ${CARDANO_GRAPHQL_LEGACY_SERVER_PORT:-3100}
-    ports:
-      - ${CARDANO_GRAPHQL_LEGACY_SERVER_PORT:-3100}:3100
-    restart: always
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "200k"
-        max-file: "10"
+  # cardano-graphql-server:
+  #   platform: linux/x86_64
+  #   image: ${CARDANO_GRAPHQL_LEGACY_SERVER_IMAGE}
+  #   #image: cardanofoundation/cardano-graphql-server:${CARDANO_GRAPHQL_LEGACY_VERSION:-8.0.1}-${NETWORK:-mainnet}
+  #   environment:
+  #     NETWORK: ${NETWORK}
+  #     HASURA_URI: http://cardano-graphql-hasura:8080
+  #     ALLOW_INTROSPECTION: ${CARDANO_GRAPHQL_LEGACY_SERVER_ALLOW_INTROSPECTION:-true}
+  #     CACHE_ENABLED: ${CARDANO_GRAPHQL_LEGACY_SERVER_CACHE_ENABLED:-true}
+  #     LOGGER_MIN_SEVERITY: ${CARDANO_GRAPHQL_LEGACY_SERVER_LOGGER_MIN_SEVERITY:-info}
+  #     API_PORT: 3100
+  #   entrypoint: >
+  #     /bin/sh -c "
+  #     echo \"Applying patch to provide env vars due to hardcoded values:\" ;
+  #     echo \"   OGMIOS_HOST='${OGMIOS_HOST}'\" ;
+  #     echo \"   OGMIOS_PORT='1337'\" ;
+  #     OGMIOS_HOST=${OGMIOS_HOST} && OGMIOS_PORT=1337 && node index.js;
+  #     " 
+  #   depends_on:
+  #     postgress:
+  #       condition: service_healthy
+  #   # expose:
+  #   #   - ${CARDANO_GRAPHQL_LEGACY_SERVER_PORT:-3100}
+  #   ports:
+  #     - ${CARDANO_GRAPHQL_LEGACY_SERVER_PORT:-3100}:3100
+  #   restart: always
+  #   logging:
+  #     driver: "json-file"
+  #     options:
+  #       max-size: "200k"
+  #       max-file: "10"
 
 #################################
 ####     token registry  ########
 #################################
 
-  cardano-token-registry:
-    #image: cardanofoundation/cf-token-metadata-registry-api:latest            
-    image: ${CARDANO_TOKEN_REGISTRY_IMAGE}
-    hostname: ${CARDANO_TOKEN_REGISTRY_HOSTNAME}
-    ports:
-      - ${CARDANO_TOKEN_REGISTRY_PORT:-8080}:8080
-    environment:
-      TOKEN_METADATA_SYNC_JOB: ${CARDANO_TOKEN_REGISTRY_SYNC_JOB}
-      GITHUB_ORGANIZATION: ${CARDANO_TOKEN_REGISTRY_GITHUB_ORGANIZATION}
-      GITHUB_PROJECT_NAME: ${CARDANO_TOKEN_REGISTRY_GITHUB_PROJECT_NAME}
-      GITHUB_MAPPINGS_FOLDER: ${CARDANO_TOKEN_REGISTRY_GITHUB_MAPPINGS_FOLDER}
-      DB_USERNAME: ${POSTGRES_USER}
-      DB_PASSWORD: ${POSTGRES_PASSWORD}
-      DB_NAME: ${POSTGRES_DB}
-      DB_URL: jdbc:postgresql://${POSTGRES_HOST}:5432/${POSTGRES_DB}?currentSchema=${CARDANO_TOKEN_REGISTRY_SCHEMA}
-    depends_on:
-      postgress:
-        condition: service_healthy      
-    restart: always
+  # cardano-token-registry:
+  #   #image: cardanofoundation/cf-token-metadata-registry-api:latest            
+  #   image: ${CARDANO_TOKEN_REGISTRY_IMAGE}
+  #   hostname: ${CARDANO_TOKEN_REGISTRY_HOSTNAME}
+  #   ports:
+  #     - ${CARDANO_TOKEN_REGISTRY_PORT:-8080}:8080
+  #   environment:
+  #     TOKEN_METADATA_SYNC_JOB: ${CARDANO_TOKEN_REGISTRY_SYNC_JOB}
+  #     GITHUB_ORGANIZATION: ${CARDANO_TOKEN_REGISTRY_GITHUB_ORGANIZATION}
+  #     GITHUB_PROJECT_NAME: ${CARDANO_TOKEN_REGISTRY_GITHUB_PROJECT_NAME}
+  #     GITHUB_MAPPINGS_FOLDER: ${CARDANO_TOKEN_REGISTRY_GITHUB_MAPPINGS_FOLDER}
+  #     DB_USERNAME: ${POSTGRES_USER}
+  #     DB_PASSWORD: ${POSTGRES_PASSWORD}
+  #     DB_NAME: ${POSTGRES_DB}
+  #     DB_URL: jdbc:postgresql://${POSTGRES_HOST}:5432/${POSTGRES_DB}?currentSchema=${CARDANO_TOKEN_REGISTRY_SCHEMA}
+  #   depends_on:
+  #     postgress:
+  #       condition: service_healthy      
+  #   restart: always
 
 #
 #  dbless-cardano-token-registry:
@@ -394,32 +394,32 @@ services:
 ### koios + postgrest + cron  ###
 #################################
 
-  postgrest:
-    image: postgrest/postgrest:v12.0.2
-    hostname: ${POSTGREST_HOST}
-    depends_on:
-      postgress:
-        condition: service_healthy
-    ports:
-      - ${POSTGREST_PORT:-8050}:8050
-    volumes:
-      - ./scripts/:/scripts/
-    environment:
-      # not using exposed ${POSTGRES_PORT} because using internal docker network connection
-      PGRST_DB_URI: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:5432/${POSTGRES_DB}
-      PGRST_DB_ANON_ROLE: ${POSTGREST_DB_ANON_ROLE}
-      PGRST_DB_SCHEMAS: "${POSTGREST_DB_SCHEMAS}" # first one is default
-      PGRST_SERVER_PORT: 8050
-      PGRST_OPENAPI_SERVER_PROXY_URI: http://0.0.0.0:8050
-      PGRST_DB_MAX_ROWS: 1000
-      PGRST_DB_AGGREGATES_ENABLED: true
-      PGRST_DB_EXTRA_SEARCH_PATH: "${POSTGREST_DB_EXTRA_SEARCH_PATH}"
-    restart: always
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "200k"
-        max-file: "10"
+  # postgrest:
+  #   image: postgrest/postgrest:v12.0.2
+  #   hostname: ${POSTGREST_HOST}
+  #   depends_on:
+  #     postgress:
+  #       condition: service_healthy
+  #   ports:
+  #     - ${POSTGREST_PORT:-8050}:8050
+  #   volumes:
+  #     - ./scripts/:/scripts/
+  #   environment:
+  #     # not using exposed ${POSTGRES_PORT} because using internal docker network connection
+  #     PGRST_DB_URI: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:5432/${POSTGRES_DB}
+  #     PGRST_DB_ANON_ROLE: ${POSTGREST_DB_ANON_ROLE}
+  #     PGRST_DB_SCHEMAS: "${POSTGREST_DB_SCHEMAS}" # first one is default
+  #     PGRST_SERVER_PORT: 8050
+  #     PGRST_OPENAPI_SERVER_PROXY_URI: http://0.0.0.0:8050
+  #     PGRST_DB_MAX_ROWS: 1000
+  #     PGRST_DB_AGGREGATES_ENABLED: true
+  #     PGRST_DB_EXTRA_SEARCH_PATH: "${POSTGREST_DB_EXTRA_SEARCH_PATH}"
+  #   restart: always
+  #   logging:
+  #     driver: "json-file"
+  #     options:
+  #       max-size: "200k"
+  #       max-file: "10"
 
   cron:
     build:
@@ -473,117 +473,117 @@ services:
 #### Dandelion PostGREST API#####
 #################################
 
-  dandelion-postgrest:
-    image: postgrest/postgrest:v12.0.2
-    hostname: ${DANDELION_POSTGREST_HOST}
-    depends_on:
-      postgress:
-        condition: service_healthy
-    ports:
-      - ${DANDELION_POSTGREST_PORT:-8050}:8050
-    volumes:
-      - ./scripts/:/scripts/
-    environment:
-      # not using exposed ${POSTGRES_PORT} because using internal docker network connection
-      PGRST_DB_URI: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:5432/${POSTGRES_DB}
-      PGRST_DB_ANON_ROLE: ${DANDELION_POSTGREST_DB_ANON_ROLE}
-      PGRST_DB_SCHEMAS: "${DANDELION_POSTGREST_DB_SCHEMAS}" # first one is default
-      PGRST_SERVER_PORT: 8060
-      PGRST_OPENAPI_SERVER_PROXY_URI: http://0.0.0.0:8060
-      PGRST_DB_MAX_ROWS: 1000
-      PGRST_DB_AGGREGATES_ENABLED: true
-      PGRST_DB_EXTRA_SEARCH_PATH: "${DANDELION_POSTGREST_DB_EXTRA_SEARCH_PATH}"
-    restart: always
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "200k"
-        max-file: "10"
+  # dandelion-postgrest:
+  #   image: postgrest/postgrest:v12.0.2
+  #   hostname: ${DANDELION_POSTGREST_HOST}
+  #   depends_on:
+  #     postgress:
+  #       condition: service_healthy
+  #   ports:
+  #     - ${DANDELION_POSTGREST_PORT:-8050}:8050
+  #   volumes:
+  #     - ./scripts/:/scripts/
+  #   environment:
+  #     # not using exposed ${POSTGRES_PORT} because using internal docker network connection
+  #     PGRST_DB_URI: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:5432/${POSTGRES_DB}
+  #     PGRST_DB_ANON_ROLE: ${DANDELION_POSTGREST_DB_ANON_ROLE}
+  #     PGRST_DB_SCHEMAS: "${DANDELION_POSTGREST_DB_SCHEMAS}" # first one is default
+  #     PGRST_SERVER_PORT: 8060
+  #     PGRST_OPENAPI_SERVER_PROXY_URI: http://0.0.0.0:8060
+  #     PGRST_DB_MAX_ROWS: 1000
+  #     PGRST_DB_AGGREGATES_ENABLED: true
+  #     PGRST_DB_EXTRA_SEARCH_PATH: "${DANDELION_POSTGREST_DB_EXTRA_SEARCH_PATH}"
+  #   restart: always
+  #   logging:
+  #     driver: "json-file"
+  #     options:
+  #       max-size: "200k"
+  #       max-file: "10"
 
 
 #################################
 ### Cardano SQL PostGREST API ###
 #################################
 
-  cardano-sql-postgrest:
-    image: postgrest/postgrest:v12.0.2
-    hostname: ${CARDANO_SQL_POSTGREST_HOST}
-    depends_on:
-      postgress:
-        condition: service_healthy
-    ports:
-      - ${CARDANO_SQL_POSTGREST_PORT:-8050}:8050
-    volumes:
-      - ./scripts/:/scripts/
-    environment:
-      # not using exposed ${POSTGRES_PORT} because using internal docker network connection
-      PGRST_DB_URI: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:5432/${POSTGRES_DB}
-      PGRST_DB_ANON_ROLE: ${CARDANO_SQL_POSTGREST_DB_ANON_ROLE}
-      PGRST_DB_SCHEMAS: "${CARDANO_SQL_POSTGREST_DB_SCHEMAS}" # first one is default
-      PGRST_SERVER_PORT: 8070
-      PGRST_OPENAPI_SERVER_PROXY_URI: http://0.0.0.0:8070
-      PGRST_DB_MAX_ROWS: 1000
-      PGRST_DB_AGGREGATES_ENABLED: true
-      PGRST_DB_EXTRA_SEARCH_PATH: "${CARDANO_SQL_POSTGREST_DB_EXTRA_SEARCH_PATH}"
-    restart: always
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "200k"
-        max-file: "10"
+  # cardano-sql-postgrest:
+  #   image: postgrest/postgrest:v12.0.2
+  #   hostname: ${CARDANO_SQL_POSTGREST_HOST}
+  #   depends_on:
+  #     postgress:
+  #       condition: service_healthy
+  #   ports:
+  #     - ${CARDANO_SQL_POSTGREST_PORT:-8050}:8050
+  #   volumes:
+  #     - ./scripts/:/scripts/
+  #   environment:
+  #     # not using exposed ${POSTGRES_PORT} because using internal docker network connection
+  #     PGRST_DB_URI: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:5432/${POSTGRES_DB}
+  #     PGRST_DB_ANON_ROLE: ${CARDANO_SQL_POSTGREST_DB_ANON_ROLE}
+  #     PGRST_DB_SCHEMAS: "${CARDANO_SQL_POSTGREST_DB_SCHEMAS}" # first one is default
+  #     PGRST_SERVER_PORT: 8070
+  #     PGRST_OPENAPI_SERVER_PROXY_URI: http://0.0.0.0:8070
+  #     PGRST_DB_MAX_ROWS: 1000
+  #     PGRST_DB_AGGREGATES_ENABLED: true
+  #     PGRST_DB_EXTRA_SEARCH_PATH: "${CARDANO_SQL_POSTGREST_DB_EXTRA_SEARCH_PATH}"
+  #   restart: always
+  #   logging:
+  #     driver: "json-file"
+  #     options:
+  #       max-size: "200k"
+  #       max-file: "10"
 
 #################################
 ###    Cardano Submit-API     ###
 #################################
 
-  cardano-submit-api:
-    image: ${CARDANO_SUBMIT_API_IMAGE}
-    environment:
-      - NETWORK=${NETWORK}
-    depends_on:
-      cardano-node-ogmios:
-        condition: service_healthy
-    volumes:
-      - node-ipc:/ipc
-    ports:
-      - ${CARDANO_SUBMIT_API_PORT:-8090}:8090
-    restart: always
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "200k"
-        max-file: "10"
-    # healthcheck:
-    #   test: ["CMD-SHELL", "true &>/dev/null </dev/tcp/127.0.0.1/8090"]
-    #   interval: 10s
-    #   timeout: 10s
-    #   retries: 5
+  # cardano-submit-api:
+  #   image: ${CARDANO_SUBMIT_API_IMAGE}
+  #   environment:
+  #     - NETWORK=${NETWORK}
+  #   depends_on:
+  #     cardano-node-ogmios:
+  #       condition: service_healthy
+  #   volumes:
+  #     - node-ipc:/ipc
+  #   ports:
+  #     - ${CARDANO_SUBMIT_API_PORT:-8090}:8090
+  #   restart: always
+  #   logging:
+  #     driver: "json-file"
+  #     options:
+  #       max-size: "200k"
+  #       max-file: "10"
+  #   # healthcheck:
+  #   #   test: ["CMD-SHELL", "true &>/dev/null </dev/tcp/127.0.0.1/8090"]
+  #   #   interval: 10s
+  #   #   timeout: 10s
+  #   #   retries: 5
 
 #################################
 ###      Blockfrost RYO       ###
 #################################
 
-  blockfrost:
-    image: ${BLOCKFROST_IMAGE:-blockfrost/backend-ryo:v4.1.0}
-    ports:
-      - ${BLOCKFROST_PORT:-8055}:${BLOCKFROST_CONFIG_SERVER_PORT:-8055}
-    depends_on:
-      postgress:
-        condition: service_healthy
-    environment:
-      NODE_ENV: ${BLOCKFROST_NODE_ENV}
-      BLOCKFROST_CONFIG_DBSYNC_PASSWORD: ${BLOCKFROST_CONFIG_DBSYNC_PASSWORD}
-    restart: always
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "200k"
-        max-file: "10"
-    volumes:
-      - ./configs/blockfrost/genesis/:/app/config/genesis
-    configs:
-      - source: blockfrost_config
-        target: "/app/config/${BLOCKFROST_NODE_ENV}.yaml"
+  # blockfrost:
+  #   image: ${BLOCKFROST_IMAGE:-blockfrost/backend-ryo:v4.1.0}
+  #   ports:
+  #     - ${BLOCKFROST_PORT:-8055}:${BLOCKFROST_CONFIG_SERVER_PORT:-8055}
+  #   depends_on:
+  #     postgress:
+  #       condition: service_healthy
+  #   environment:
+  #     NODE_ENV: ${BLOCKFROST_NODE_ENV}
+  #     BLOCKFROST_CONFIG_DBSYNC_PASSWORD: ${BLOCKFROST_CONFIG_DBSYNC_PASSWORD}
+  #   restart: always
+  #   logging:
+  #     driver: "json-file"
+  #     options:
+  #       max-size: "200k"
+  #       max-file: "10"
+  #   volumes:
+  #     - ./configs/blockfrost/genesis/:/app/config/genesis
+  #   configs:
+  #     - source: blockfrost_config
+  #       target: "/app/config/${BLOCKFROST_NODE_ENV}.yaml"
 
 #################################
 #### unimatrix (gundb relay)#####

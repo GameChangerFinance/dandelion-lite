@@ -28,14 +28,24 @@ show_splash_screen(){
   # Clear the screen before displaying UI
   clear
   
-  layout=$(
-  gum style --align=center "
-___  ____ __ _ ___  ____ _    _ ____ __ _
-|__> |--| | \| |__> |=== |___ | [__] | \|                                
-                                  wizard
+  gum style --foreground 121 --border-foreground 121 --align center "$(gum join --vertical \
+    "$(show_splash_screen)" \
+    "$(gum style --align center --width 50 --margin "1 2" --padding "2 2" 'About: ' ' Dandelion Lite Node administration tool. (Based on Koios Lite) ')" \
+    "$(gum style --align center --width 50 'https://github.com/koios-official/Lite-Node')")"
+
+  combined_layout1=$(gum style --foreground 121 --align center "$(cat ./scripts/.logo)")
+
+  combined_layout2=$(gum join --horizontal \
+    "$(gum style --bold --align center "${NODE_NAME:-'???'} | ")" \
+    "$(gum style --faint --foreground 229 --align center "${PROJ_NAME:-'???'}")" \
+    "$(gum style --faint --foreground 121 --align center " | - $NAME v$VERSION")")
+
+  combined_layout=$(gum join --vertical \
+    "$combined_layout1 " \
+    "$combined_layout2")
   
-Name: ${NODE_NAME} | Ticker: ${NODE_TICKER} | Domain: ${FULL_DOMAIN_NAME}
-")
+# Name: ${NODE_NAME} | Ticker: ${NODE_TICKER} | Domain: ${FULL_DOMAIN_NAME}
+# ")
   # Display the combined layout with a border
   gum style \
     --border none \
@@ -49,36 +59,19 @@ Name: ${NODE_NAME} | Ticker: ${NODE_TICKER} | Domain: ${FULL_DOMAIN_NAME}
 
 }
 
-
-show_header () {
-
-clear
-gum style --border=rounded --padding="0 2" --align=center --foreground=212 --border-foreground=99 "
- _    _ _                  _ 
-| |  | (_)                | |
-| |  | |_ ____ _ _  _ _ __| |
-| |/\| | |_  / _\` | '__/ _\` |
-\  /\  / |/ / (_| | | | (_| |
- \/  \/|_/___\__,_|_|  \__,_|
-
-Name: ${NODE_NAME} | Ticker: ${NODE_TICKER} | Domain: ${FULL_DOMAIN_NAME}
-"
-
-}
-
 show_splash_screen
 
 echo 'Please input your ticker and the name you want to use '
 NODE_NAME=$(gum input --prompt "name: " --placeholder "XZibit" --prompt.foreground 99 --cursor.foreground 99 --width 50)
 update_env_var ".env" "NODE_NAME" ${NODE_NAME}
 
-show_header
+show_splash_screen
 
 NODE_TICKER=$(gum input --prompt "ticker: " --placeholder "XYZ" --prompt.foreground 99 --cursor.foreground 99 --width 50)
 update_env_var ".env" "NODE_TICKER" ${NODE_TICKER}
 FULL_DOMAIN_NAME=${NODE_TICKER}-dandelion-node.myaddr.io
 
-show_header
+show_splash_screen
 echo 'Please input your domain. We commonly use a service called myaddr in that case press enter'
 DOMAIN_INPUT=$(gum input --prompt "Domain: " --placeholder "myaddr.io" --prompt.foreground 99 --cursor.foreground 99 --width 50)
 
@@ -88,7 +81,7 @@ if [[ $DOMAIN_INPUT ]]; then
 else
     DOMAIN='myaddr.io'
 
-    show_header
+    show_splash_screen
     echo "Go to the link below and claim this domain: ${NODE_TICKER}-dandelion-node.myadd.io"
     echo ""
     echo "${NODE_TICKER}-dandelion-node"
@@ -101,7 +94,7 @@ else
 fi    
 echo $DOMAIN
 
-show_header
+show_splash_screen
 
 if gum confirm "Generate ssh key?" --default=true --affirmative "Create" --negative "Skip"; then
     docker compose exec -it cron /scripts/cron/myaddrdns/certbot.sh
