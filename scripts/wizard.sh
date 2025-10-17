@@ -24,6 +24,32 @@ update_env_var() {
 
 # Example usage:
 
+show_splash_screen(){
+  # Clear the screen before displaying UI
+  clear
+  
+  layout=$(
+  gum style --align=center "
+___  ____ __ _ ___  ____ _    _ ____ __ _
+|__> |--| | \| |__> |=== |___ | [__] | \|                                
+                                  wizard
+  
+Name: ${NODE_NAME} | Ticker: ${NODE_TICKER} | Domain: ${FULL_DOMAIN_NAME}
+")
+  # Display the combined layout with a border
+  gum style \
+    --border none \
+    --border-foreground 121 \
+    --margin "1" \
+    --padding "1 2" \
+    --background black \
+    --foreground 121 \
+    "$layout"
+
+
+}
+
+
 show_header () {
 
 clear
@@ -35,14 +61,12 @@ gum style --border=rounded --padding="0 2" --align=center --foreground=212 --bor
 \  /\  / |/ / (_| | | | (_| |
  \/  \/|_/___\__,_|_|  \__,_|
 
-Name: ${NODE_NAME}
-Ticker: ${NODE_TICKER}
-Domain: ${FULL_DOMAIN_NAME}
+Name: ${NODE_NAME} | Ticker: ${NODE_TICKER} | Domain: ${FULL_DOMAIN_NAME}
 "
 
 }
 
-show_header
+show_splash_screen
 
 echo 'Please input your ticker and the name you want to use '
 NODE_NAME=$(gum input --prompt "name: " --placeholder "XZibit" --prompt.foreground 99 --cursor.foreground 99 --width 50)
@@ -66,6 +90,9 @@ else
 
     show_header
     echo "Go to the link below and claim this domain: ${NODE_TICKER}-dandelion-node.myadd.io"
+    echo ""
+    echo "${NODE_TICKER}-dandelion-node"
+    echo ""
     echo 'https://myaddr.tools/claim'
     echo 'Copy the token and paste it in the input below'
 
