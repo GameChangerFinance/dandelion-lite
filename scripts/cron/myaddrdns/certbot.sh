@@ -9,11 +9,13 @@
 # Log update attempt
 echo "[UPDATE] $(date -u)"
 
+echo "Node email: ${NODE_EMAIL}"
+
 echo "Setting '${MYADDR_DOMAIN}.myaddr.io'" 
 
-certbot certonly --agree-tos \
+certbot certonly --manual --non-interactive \
+                 --agree-tos \
                  --email ${NODE_EMAIL} \
-                 --manual --non-interactive \
                  --preferred-challenges dns \
                  --manual-auth-hook /scripts/cron/myaddrdns/certbot_authentication_hook.sh \
                  --manual-cleanup-hook /scripts/cron/myaddrdns/certbot_haproxy_hook.sh \

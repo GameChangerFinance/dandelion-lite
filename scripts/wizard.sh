@@ -82,7 +82,7 @@ show_splash_screen
 echo 'Please input your node e-mail'
 NODE_EMAIL=$(gum input --prompt "e-mail: " --placeholder "${NODE_EMAIL}" --prompt.foreground 99 --cursor.foreground 99 --width 50)
 if [[ -n "$NODE_EMAIL" ]]; then
-  update_env_var ".env" "NODE_TICKER" ${NODE_EMAIL}
+  update_env_var ".env" "NODE_EMAIL" ${NODE_EMAIL}
 fi
 
 show_splash_screen
@@ -106,8 +106,10 @@ else
     echo 'https://myaddr.tools/claim'
     echo 'Copy the token and paste it in the input below'
 
-    MYADDR_TOKEN=$(gum input --prompt "MyAddr token: " --placeholder "k1t7gq4wzv9mj2r8n0hxb3sy6cdufp5aoliei7q2trwz8km9vcsxjd4n1pgu0f" --prompt.foreground 99 --cursor.foreground 99 --width 50) 
-    update_env_var ".env" "MYADDR_TOKEN" ${MYADDR_TOKEN}
+    MYADDR_TOKEN=$(gum input --prompt "MyAddr token: " --placeholder "${MYADDR_TOKEN}" --prompt.foreground 99 --cursor.foreground 99 --width 50) 
+    if [[ -n "$MYADDR_TOKEN" ]]; then
+      update_env_var ".env" "MYADDR_TOKEN" ${MYADDR_TOKEN}
+    fi
 fi    
 echo $DOMAIN
 
