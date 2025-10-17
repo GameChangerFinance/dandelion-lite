@@ -28,24 +28,17 @@ show_splash_screen(){
   # Clear the screen before displaying UI
   clear
   
-  gum style --foreground 121 --border-foreground 121 --align center "$(gum join --vertical \
-    "$(show_splash_screen)" \
-    "$(gum style --align center --width 50 --margin "1 2" --padding "2 2" 'About: ' ' Dandelion Lite Node administration tool. (Based on Koios Lite) ')" \
-    "$(gum style --align center --width 50 'https://github.com/koios-official/Lite-Node')")"
-
-  combined_layout1=$(gum style --foreground 121 --align center "$(cat ./scripts/.logo)")
+  combined_layout1=$(gum style --foreground 121 --align center "$(cat ./scripts/.logo_wizard)")
 
   combined_layout2=$(gum join --horizontal \
-    "$(gum style --bold --align center "${NODE_NAME:-'???'} | ")" \
-    "$(gum style --faint --foreground 229 --align center "${PROJ_NAME:-'???'}")" \
-    "$(gum style --faint --foreground 121 --align center " | - $NAME v$VERSION")")
+    "$(gum style --bold --align center "${NODE_NAME} | ")" \
+    "$(gum style --faint --foreground 229 --align center "${NODE_TICKER}")" \
+    "$(gum style --faint --foreground 121 --align center " | ${FULL_DOMAIN_NAME}")")
 
   combined_layout=$(gum join --vertical \
     "$combined_layout1 " \
     "$combined_layout2")
   
-# Name: ${NODE_NAME} | Ticker: ${NODE_TICKER} | Domain: ${FULL_DOMAIN_NAME}
-# ")
   # Display the combined layout with a border
   gum style \
     --border none \
@@ -54,7 +47,7 @@ show_splash_screen(){
     --padding "1 2" \
     --background black \
     --foreground 121 \
-    "$layout"
+    "$combined_layout"
 
 
 }
