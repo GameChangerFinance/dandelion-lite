@@ -1,5 +1,11 @@
 #!/bin/bash
 
+script_dir=$(dirname "$(realpath "${BASH_SOURCE[@]}")")
+# Remove the last folder from the path and rename it to KLITE_HOME
+KLITE_HOME=$(dirname "$script_dir")
+cd "$KLITE_HOME" || exit
+source .env
+
 update_env_var() {
   local file="$1"
   local var="$2"
@@ -54,19 +60,37 @@ show_splash_screen(){
 
 show_splash_screen
 
-echo 'Please input your ticker and the name you want to use '
-NODE_NAME=$(gum input --prompt "name: " --placeholder "XZibit" --prompt.foreground 99 --cursor.foreground 99 --width 50)
-update_env_var ".env" "NODE_NAME" ${NODE_NAME}
+echo 'Please input your node name'
+echo "node name: ${NODE_NAME}"
+NODE_NAME=$(gum input --prompt "name: " --placeholder "${NODE_NAME}" --prompt.foreground 99 --cursor.foreground 99 --width 50)
+
+if [[ -n "$NODE_NAME" ]]; then
+   update_env_var ".env" "NODE_NAME" ${NODE_NAME}
+fi
+
 
 show_splash_screen
 
-NODE_TICKER=$(gum input --prompt "ticker: " --placeholder "XYZ" --prompt.foreground 99 --cursor.foreground 99 --width 50)
-update_env_var ".env" "NODE_TICKER" ${NODE_TICKER}
-FULL_DOMAIN_NAME=${NODE_TICKER}-dandelion-node.myaddr.io
+echo 'Please input your node ticker'
+NODE_TICKER=$(gum input --prompt "ticker: " --placeholder "${NODE_TICKER}" --prompt.foreground 99 --cursor.foreground 99 --width 50)
+if [[ -n "$NODE_TICKER" ]]; then
+  update_env_var ".env" "NODE_TICKER" ${NODE_TICKER}
+fi
 
 show_splash_screen
-echo 'Please input your domain. We commonly use a service called myaddr in that case press enter'
+
+echo 'Please input your node e-mail'
+NODE_EMAIL=$(gum input --prompt "e-mail: " --placeholder "${NODE_EMAIL}" --prompt.foreground 99 --cursor.foreground 99 --width 50)
+if [[ -n "$NODE_EMAIL" ]]; then
+  update_env_var ".env" "NODE_TICKER" ${NODE_EMAIL}
+fi
+
+show_splash_screen
+
+echo 'Press enter to use myaddr (default). If you want to use your own domain enter it'
 DOMAIN_INPUT=$(gum input --prompt "Domain: " --placeholder "myaddr.io" --prompt.foreground 99 --cursor.foreground 99 --width 50)
+
+FULL_DOMAIN_NAME=${NODE_TICKER}-dandelion-node.myaddr.io
 
 if [[ $DOMAIN_INPUT ]]; then
     
