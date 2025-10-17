@@ -61,28 +61,28 @@ show_splash_screen(){
 show_splash_screen
 
 echo 'Please input your node name'
-echo "node name: ${NODE_NAME}"
-NODE_NAME=$(gum input --prompt "name: " --placeholder "${NODE_NAME}" --prompt.foreground 99 --cursor.foreground 99 --width 50)
-
-if [[ -n "$NODE_NAME" ]]; then
-   update_env_var ".env" "NODE_NAME" ${NODE_NAME}
+NODE_NAME_INPUT=$(gum input --prompt "name: " --placeholder "${NODE_NAME}" --prompt.foreground 99 --cursor.foreground 99 --width 50)
+if [[ -n "$NODE_NAME_INPUT" ]]; then
+   update_env_var ".env" "NODE_NAME" ${NODE_NAME_INPUT}
+   NODE_NAME=$NODE_NAME_INPUT
 fi
-
 
 show_splash_screen
 
 echo 'Please input your node ticker'
-NODE_TICKER=$(gum input --prompt "ticker: " --placeholder "${NODE_TICKER}" --prompt.foreground 99 --cursor.foreground 99 --width 50)
-if [[ -n "$NODE_TICKER" ]]; then
-  update_env_var ".env" "NODE_TICKER" ${NODE_TICKER}
+NODE_TICKER_INPUT=$(gum input --prompt "ticker: " --placeholder "${NODE_TICKER}" --prompt.foreground 99 --cursor.foreground 99 --width 50)
+if [[ -n "$NODE_TICKER_INPUT" ]]; then
+  update_env_var ".env" "NODE_TICKER" ${NODE_TICKER_INPUT}
+  NODE_TICKER=${NODE_TICKER_INPUT}
 fi
 
 show_splash_screen
 
 echo 'Please input your node e-mail'
-NODE_EMAIL=$(gum input --prompt "e-mail: " --placeholder "${NODE_EMAIL}" --prompt.foreground 99 --cursor.foreground 99 --width 50)
-if [[ -n "$NODE_EMAIL" ]]; then
+NODE_EMAIL_INPUT=$(gum input --prompt "e-mail: " --placeholder "${NODE_EMAIL}" --prompt.foreground 99 --cursor.foreground 99 --width 50)
+if [[ -n "$NODE_EMAIL_INPUT" ]]; then
   update_env_var ".env" "NODE_EMAIL" ${NODE_EMAIL}
+  NODE_EMAIL=${NODE_EMAIL_INPUT}
 fi
 
 show_splash_screen
@@ -106,9 +106,10 @@ else
     echo 'https://myaddr.tools/claim'
     echo 'Copy the token and paste it in the input below'
 
-    MYADDR_TOKEN=$(gum input --prompt "MyAddr token: " --placeholder "${MYADDR_TOKEN}" --prompt.foreground 99 --cursor.foreground 99 --width 50) 
-    if [[ -n "$MYADDR_TOKEN" ]]; then
-      update_env_var ".env" "MYADDR_TOKEN" ${MYADDR_TOKEN}
+    MYADDR_TOKEN_INPUT=$(gum input --prompt "MyAddr token: " --placeholder "${MYADDR_TOKEN}" --prompt.foreground 99 --cursor.foreground 99 --width 50) 
+    if [[ -n "$MYADDR_TOKEN_INPUT" ]]; then
+      update_env_var ".env" "MYADDR_TOKEN" ${MYADDR_TOKEN_INPUT}
+      MYADDR_TOKEN=${MYADDR_TOKEN_INPUT}
     fi
 fi    
 echo $DOMAIN
@@ -116,6 +117,7 @@ echo $DOMAIN
 show_splash_screen
 
 if gum confirm "Generate ssh key?" --default=true --affirmative "Create" --negative "Skip"; then
+    docker compose up -d 
     docker compose exec -it cron /scripts/cron/myaddrdns/certbot.sh
 fi
 
