@@ -246,7 +246,7 @@ podman_install() {
         ubuntu|debian)
           # Add Docker's official GPG key:
           sudo apt-get update
-          sudo apt-get install -y curl podman podman-docker python3-setuptools
+          sudo apt-get install -y curl podman podman-docker python3-setuptools pv
           gum spin --spinner dot --title "Installing Podman..." -- echo
           curl -LO https://github.com/docker/compose/releases/download/v2.28.1/docker-compose-linux-x86_64
           chmod +x docker-compose-linux-x86_64

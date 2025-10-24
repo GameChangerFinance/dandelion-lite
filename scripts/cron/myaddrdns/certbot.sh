@@ -9,10 +9,9 @@
 [[ -z ${MYADDR_DOMAIN} ]] && echo "MYADDR_DOMAIN variable not set, aborting..." && exit 1
 
 # Log update attempt
-echo "[UPDATE] $(date -u)"
+echo "[SSL CERTIFICATE UPDATE] $(date -u)"
 
 echo "Node email: ${NODE_EMAIL}"
-
 echo "Setting '${MYADDR_DOMAIN}.myaddr.io'" 
 
 certbot certonly --manual --non-interactive \

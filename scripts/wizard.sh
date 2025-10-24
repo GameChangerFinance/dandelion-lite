@@ -61,10 +61,6 @@ KLITE_HOME=$(dirname "$script_dir")
 cd "$KLITE_HOME" || exit
 source .env
 
-print_hallo(){
-  echo "Hallo"
-}
-
 update_env_var() {
   local file="$1"
   local var="$2"
@@ -169,5 +165,45 @@ if gum confirm "Generate ssh key?" --default=true --affirmative "Create" --negat
     docker compose up -d 
     docker compose exec -it cron /scripts/cron/myaddrdns/certbot.sh
 fi
+
+## Download CSnapshot
+
+download_csnapshot() {
+  DB_DATA=$(docker volume inspect ${PROJ_NAME}_node-db | jq -r '.[0].Mountpoint')
+  VOLUME_FOLDER="${DB_DATA%/*}"
+  # /home/maarten/.local/share/containers/storage/volumes/dandosnap-preprod_node-db/_data
+
+  echo ${VOLUME_FOLDER}
+
+  docker compose down
+
+  echo "Network: ${NETWORK}"
+
+  if [[ "${NETWORK}" == "mainnet" ]]; then
+      SNAPSHOT_URL="https://downloads.csnapshots.io/mainnet/$(wget -qO- https://downloads.csnapshots.io/mainnet/mainnet-db-snapshot.json | jq -r '.[].file_name')"
+  else
+      SNAPSHOT_URL="https://downloads.csnapshots.io/testnet/$(wget -qO- https://downloads.csnapshots.io/testnet/testnet-db-snapshot.json | jq -r '.[].file_name')"  
+  fi
+
+  # size=$(curl -sI "$SNAPSHOT_URL" | awk '/content-length/ {print $2}' | tr -d '\r')
+  # curl -L "$SNAPSHOT_URL" | pv -s "$size" | zstd -d -c | tar -x -C "${VOLUME_FOLDER}/"
+
+  size=$(curl -sI "$SNAPSHOT_URL" | awk 'BEGIN{IGNORECASE=1} /Content-Length/ {print $2}' | tr -d '\r')
+  curl -sL "$SNAPSHOT_URL" | pv -s "$size" | zstd -d -c | tar -x -C "${VOLUME_FOLDER}/"
+
+  # wget -c -O - "$SNAPSHOT_URL" | zstd -d -c | tar -x -C "${VOLUME_FOLDER}/"
+
+  cd ${VOLUME_FOLDER} && rm -rf _data 
+  cd ${VOLUME_FOLDER} && mv db _data
+
+}
+
+show_splash_screen
+
+if gum confirm "Download csnapshot?" --default=true --affirmative "Download" --negative "Skip"; then
+    download_csnapshot
+    docker compose up -d
+fi
+
 
 # clear
