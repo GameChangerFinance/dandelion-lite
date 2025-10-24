@@ -157,7 +157,7 @@ else
       MYADDR_TOKEN=${MYADDR_TOKEN_INPUT}
     fi
 fi    
-echo $DOMAIN
+echo ${MYADDR_DOMAIN}
 
 show_splash_screen
 
@@ -165,6 +165,75 @@ if gum confirm "Generate ssh key?" --default=true --affirmative "Create" --negat
     docker compose up -d 
     docker compose exec -it cron /scripts/cron/myaddrdns/certbot.sh
 fi
+
+show_splash_screen
+
+check_local_port() {
+  echo "Checking if port ${HAPROXY_PORT} is listening locally..."
+  if ss -tuln | grep -q ":${HAPROXY_PORT}"; then
+    echo "✅ Port ${HAPROXY_PORT} is active locally."
+  else
+    echo "❌ Port ${HAPROXY_PORT} is not active locally."
+  fi
+}
+
+check_firewall() {
+  echo
+  echo "Checking firewall rules..."
+  if command -v ufw >/dev/null 2>&1; then
+    if sudo ufw status | grep -q "${HAPROXY_PORT}"; then
+      echo "✅ Firewall already allows port ${HAPROXY_PORT}."
+    else
+      echo "❌ Port ${HAPROXY_PORT} is blocked by firewall."
+      if gum confirm "Open port ${HAPROXY_PORT} using ufw?"; then
+        sudo ufw allow ${HAPROXY_PORT}
+      fi
+    fi
+  elif command -v firewall-cmd >/dev/null 2>&1; then
+    if sudo firewall-cmd --list-ports | grep -q "${HAPROXY_PORT}"; then
+      echo "✅ FirewallD allows port ${HAPROXY_PORT}."
+    else
+      echo "❌ Port ${HAPROXY_PORT} not open in FirewallD."
+      if gum confirm "Open port ${HAPROXY_PORT} using firewall-cmd?"; then
+        sudo firewall-cmd --add-port=${HAPROXY_PORT}/tcp --permanent
+        sudo firewall-cmd --reload
+      fi
+    fi
+  else
+    echo "⚠️ No supported firewall manager found."
+  fi
+}
+
+check_external_access() {
+  echo
+  echo "Checking external access to ${MYADDR_DOMAIN}.myaddr.io:${HAPROXY_PORT}..."
+  if curl -s --connect-timeout 5 "http://${MYADDR_DOMAIN}.myaddr.io:${HAPROXY_PORT}" >/dev/null; then
+    echo "✅ Port ${HAPROXY_PORT} is reachable from outside."
+    return 0  # true
+  else
+    echo "❌ Port ${HAPROXY_PORT} not reachable externally."
+    gum style --foreground 99 "You may need to forward port ${HAPROXY_PORT} on your router to this computer."
+    gum style --foreground 99 "Typical guide: https://portforward.com"
+    return 1  # false
+  fi
+}
+
+show_splash_screen
+
+if gum confirm "Check if local port: ${HAPROXY_PORT} is active?" --default=true --affirmative "Check port" --negative "Skip"; then
+  check_local_port
+fi
+
+if gum confirm "Check if firewall port: ${HAPROXY_PORT} is open?" --default=true --affirmative "Check port" --negative "Skip"; then
+  check_firewall
+fi
+
+if gum confirm "Check dando is reachable on: ${HAPROXY_PORT}?" --default=true --affirmative "Check port" --negative "Skip"; then
+  while ! check_external_access; do
+    gum confirm "Continue?" --default=true --affirmative "Retry" --negative "Continue";
+  done
+fi
+
 
 ## Download CSnapshot
 
