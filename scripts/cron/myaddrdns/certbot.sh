@@ -5,6 +5,8 @@
 
 # Validate required token
 [[ -z ${MYADDR_TOKEN} ]] && echo "MYADDR_TOKEN variable not set, aborting..." && exit 1
+[[ -z ${NODE_EMAIL} ]] && echo "NODE_EMAIL variable not set, aborting..." && exit 1
+[[ -z ${MYADDR_DOMAIN} ]] && echo "MYADDR_DOMAIN variable not set, aborting..." && exit 1
 
 # Log update attempt
 echo "[UPDATE] $(date -u)"
