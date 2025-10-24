@@ -1,34 +1,8 @@
 #!/bin/bash
 
-script_dir=$(dirname "$(realpath "${BASH_SOURCE[@]}")")
-# Remove the last folder from the path and rename it to KLITE_HOME
-KLITE_HOME=$(dirname "$script_dir")
-cd "$KLITE_HOME" || exit
-source .env
-
-update_env_var() {
-  local file="$1"
-  local var="$2"
-  local val="$3"
-
-  if [[ ! -f "$file" ]]; then
-    echo "File '$file' does not exist!"
-    return 1
-  fi
-
-  awk -v var="$var" -v val="$val" '
-  BEGIN { updated=0 }
-  $0 ~ "^"var"=" {
-    print var"="val
-    updated=1
-    next
-  }
-  { print }
-  END { if (!updated) print var"="val }
-  ' "$file" > "${file}.tmp" && mv "${file}.tmp" "$file"
-}
-
-# Example usage:
+# Exit script on ctrl-c
+set -e
+trap "exit 130" INT
 
 show_splash_screen(){
   # Clear the screen before displaying UI
@@ -58,6 +32,79 @@ show_splash_screen(){
 
 }
 
+check_env_file() {
+  if [ ! -f ".env" ]; then  # Check if .env does not exist
+	show_splash_screen
+	action=$(gum choose --height 15 --item.foreground 39 --cursor.foreground 121 "Setup a Cardano Mainnet Network Node" "Setup a Cardano Pre-Production Network Node" )
+	case "$action" in
+		"Setup a Cardano Mainnet Network Node")
+			cp .env.example.mainnet .env  # Copy .env.example to .env
+			echo ".env file created from .env.example.mainnet ... please inspect the .env file and adjust variables (e.g. network) accordingly"
+			read -p "Press key to continue.." -n1 -s
+
+		;;
+		"Setup a Cardano Pre-Production Network Node")
+			cp .env.example.preprod .env  # Copy .env.example to .env
+			echo ".env file created from .env.example.preprod ... please inspect the .env file and adjust variables (e.g. network) accordingly"
+			read -p "Press key to continue.." -n1 -s
+		;;
+	esac
+  fi
+}
+
+check_env_file
+
+# Load the environment variables
+script_dir=$(dirname "$(realpath "${BASH_SOURCE[@]}")")
+# Remove the last folder from the path and rename it to KLITE_HOME
+KLITE_HOME=$(dirname "$script_dir")
+cd "$KLITE_HOME" || exit
+source .env
+
+print_hallo(){
+  echo "Hallo"
+}
+
+update_env_var() {
+  local file="$1"
+  local var="$2"
+  local val="$3"
+
+  if [[ ! -f "$file" ]]; then
+    echo "File '$file' does not exist!"
+    return 1
+  fi
+
+  awk -v var="$var" -v val="$val" '
+  BEGIN { updated=0 }
+  $0 ~ "^"var"=" {
+    print var"="val
+    updated=1
+    next
+  }
+  { print }
+  END { if (!updated) print var"="val }
+  ' "$file" > "${file}.tmp" && mv "${file}.tmp" "$file"
+}
+
+show_splash_screen
+
+echo 'When you have other deployments of the same network type. Please input a different project name.'
+PROJ_NAME_INPUT=$(gum input --prompt "name: " --placeholder "${PROJ_NAME}" --prompt.foreground 99 --cursor.foreground 99 --width 50)
+if [[ -n "$PROJ_NAME_INPUT" ]]; then
+   update_env_var ".env" "PROJ_NAME" ${PROJ_NAME_INPUT}
+   PROJ_NAME=$PROJ_NAME_INPUT
+fi
+
+show_splash_screen
+
+echo 'When you have other deployments of the same network type. Please input a different port offset.'
+PORT_OFFSET_INPUT=$(gum input --prompt "name: " --placeholder "${PORT_OFFSET}" --prompt.foreground 99 --cursor.foreground 99 --width 50)
+if [[ -n "$PORT_OFFSET_INPUT" ]]; then
+   update_env_var ".env" "PORT_OFFSET" ${PORT_OFFSET_INPUT}
+   PORT_OFFSET=$PORT_OFFSET_INPUT
+fi
+
 show_splash_screen
 
 echo 'Please input your node name'
@@ -81,7 +128,9 @@ show_splash_screen
 echo 'Please input your node e-mail'
 NODE_EMAIL_INPUT=$(gum input --prompt "e-mail: " --placeholder "${NODE_EMAIL}" --prompt.foreground 99 --cursor.foreground 99 --width 50)
 if [[ -n "$NODE_EMAIL_INPUT" ]]; then
-  update_env_var ".env" "NODE_EMAIL" ${NODE_EMAIL}
+  update_env_var ".env" "NODE_EMAIL" ${NODE_EMAIL_INPUT}
+  # echo "var ${NODE_EMAIL} "
+  # exit
   NODE_EMAIL=${NODE_EMAIL_INPUT}
 fi
 
