@@ -18,8 +18,8 @@ certbot certonly --manual --non-interactive \
                  --email ${NODE_EMAIL} \
                  --preferred-challenges dns \
                  --manual-auth-hook /scripts/cron/myaddrdns/certbot_authentication_hook.sh \
-                #  --manual-cleanup-hook /scripts/cron/myaddrdns/certbot_haproxy_hook.sh \
                  -d ${MYADDR_DOMAIN}.myaddr.io
+                 #  --manual-cleanup-hook /scripts/cron/myaddrdns/certbot_haproxy_hook.sh \
 
 /scripts/cron/myaddrdns/certbot_haproxy_hook.sh
 
