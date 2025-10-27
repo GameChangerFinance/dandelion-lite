@@ -91,7 +91,7 @@ update_env_var() {
 show_splash_screen
 
 echo 'When you have other deployments of the same network type. Please input a different project name.'
-PROJ_NAME_INPUT=$(gum input --prompt "name: " --placeholder "${PROJ_NAME}" --prompt.foreground 99 --cursor.foreground 99 --width 50)
+PROJ_NAME_INPUT=$(gum input --prompt "Project name: " --placeholder "${PROJ_NAME}" --prompt.foreground 99 --cursor.foreground 99 --width 50)
 if [[ -n "$PROJ_NAME_INPUT" ]]; then
    update_env_var ".env" "PROJ_NAME" ${PROJ_NAME_INPUT}
    PROJ_NAME=$PROJ_NAME_INPUT
@@ -100,7 +100,7 @@ fi
 show_splash_screen
 
 echo 'When you have other deployments of the same network type. Please input a different port offset.'
-PORT_OFFSET_INPUT=$(gum input --prompt "name: " --placeholder "${PORT_OFFSET}" --prompt.foreground 99 --cursor.foreground 99 --width 50)
+PORT_OFFSET_INPUT=$(gum input --prompt "Port offset: " --placeholder "${PORT_OFFSET}" --prompt.foreground 99 --cursor.foreground 99 --width 50)
 if [[ -n "$PORT_OFFSET_INPUT" ]]; then
    update_env_var ".env" "PORT_OFFSET" ${PORT_OFFSET_INPUT}
    PORT_OFFSET=$PORT_OFFSET_INPUT
@@ -109,7 +109,7 @@ fi
 show_splash_screen
 
 echo 'Please input your node name'
-NODE_NAME_INPUT=$(gum input --prompt "name: " --placeholder "${NODE_NAME}" --prompt.foreground 99 --cursor.foreground 99 --width 50)
+NODE_NAME_INPUT=$(gum input --prompt "Node name: " --placeholder "${NODE_NAME}" --prompt.foreground 99 --cursor.foreground 99 --width 50)
 if [[ -n "$NODE_NAME_INPUT" ]]; then
    update_env_var ".env" "NODE_NAME" ${NODE_NAME_INPUT}
    NODE_NAME=$NODE_NAME_INPUT
@@ -118,7 +118,7 @@ fi
 show_splash_screen
 
 echo 'Please input your node ticker'
-NODE_TICKER_INPUT=$(gum input --prompt "ticker: " --placeholder "${NODE_TICKER}" --prompt.foreground 99 --cursor.foreground 99 --width 50)
+NODE_TICKER_INPUT=$(gum input --prompt "Ticker: " --placeholder "${NODE_TICKER}" --prompt.foreground 99 --cursor.foreground 99 --width 50)
 if [[ -n "$NODE_TICKER_INPUT" ]]; then
   update_env_var ".env" "NODE_TICKER" ${NODE_TICKER_INPUT}
   NODE_TICKER=${NODE_TICKER_INPUT}
@@ -127,7 +127,7 @@ fi
 show_splash_screen
 
 echo 'Please input your node e-mail'
-NODE_EMAIL_INPUT=$(gum input --prompt "e-mail: " --placeholder "${NODE_EMAIL}" --prompt.foreground 99 --cursor.foreground 99 --width 50)
+NODE_EMAIL_INPUT=$(gum input --prompt "E-mail: " --placeholder "${NODE_EMAIL}" --prompt.foreground 99 --cursor.foreground 99 --width 50)
 if [[ -n "$NODE_EMAIL_INPUT" ]]; then
   update_env_var ".env" "NODE_EMAIL" ${NODE_EMAIL_INPUT}
   # echo "var ${NODE_EMAIL} "
@@ -138,16 +138,18 @@ fi
 show_splash_screen
 
 if gum confirm "Generate new postgres db password?" --default=true --affirmative "Generate" --negative "Skip"; then
-    POSTGRES_PASSWORD_GEN=`tr -dc 'A-Za-z0-9!@#$%&*()-_=+[]{}:;,.?/' </dev/urandom | fold -w 16 | head -n1`
+    POSTGRES_PASSWORD_GEN=`tr -dc 'A-Za-z0-9' </dev/urandom | fold -w 16 | head -n1`
     update_env_var ".env" "POSTGRES_PASSWORD" ${POSTGRES_PASSWORD_GEN}
 fi
 
 show_splash_screen
 
+source_env
+
 echo 'Press enter to use myaddr (default). If you want to use your own domain enter it'
 DOMAIN_INPUT=$(gum input --prompt "Domain: " --placeholder "myaddr.io" --prompt.foreground 99 --cursor.foreground 99 --width 50)
 
-FULL_DOMAIN_NAME=${NODE_TICKER}-dandelion-node.myaddr.io
+FULL_DOMAIN_NAME=${NODE_TICKER}-${PROJ_NAME}.myaddr.io
 
 if [[ $DOMAIN_INPUT ]]; then
     
@@ -156,9 +158,9 @@ else
     DOMAIN='myaddr.io'
 
     show_splash_screen
-    echo "Go to the link below and claim this domain: ${NODE_TICKER}-dandelion-node.myadd.io"
+    echo "Go to the link below and claim this domain: ${NODE_TICKER}-${PROJ_NAME}.myaddr.io"
     echo ""
-    echo "${NODE_TICKER}-dandelion-node"
+    echo "${NODE_TICKER}-${PROJ_NAME}"
     echo ""
     echo 'https://myaddr.tools/claim'
     echo 'Copy the token and paste it in the input below'
@@ -248,7 +250,6 @@ if gum confirm "Check dando is reachable on: ${HAPROXY_PORT}?" --default=true --
   done
 fi
 
-
 ## Download CSnapshot
 
 download_csnapshot() {
@@ -270,8 +271,8 @@ download_csnapshot() {
 
   # size=$(curl -sI "$SNAPSHOT_URL" | awk '/content-length/ {print $2}' | tr -d '\r')
   # curl -L "$SNAPSHOT_URL" | pv -s "$size" | zstd -d -c | tar -x -C "${VOLUME_FOLDER}/"
-
-  size=$(curl -sI "$SNAPSHOT_URL" | awk 'BEGIN{IGNORECASE=1} /Content-Length/ {print $2}' | tr -d '\r')
+  echo "Snapshot URL: ${SNAPSHOT_URL}"
+  size=$(curl -sI "$SNAPSHOT_URL" | awk 'BEGIN{IGNORECASE=1} /^content-length:/ {print $2}' | tr -d '\r')
   curl -sL "$SNAPSHOT_URL" | pv -s "$size" | zstd -d -c | tar -x -C "${VOLUME_FOLDER}/"
 
   # wget -c -O - "$SNAPSHOT_URL" | zstd -d -c | tar -x -C "${VOLUME_FOLDER}/"
@@ -279,6 +280,7 @@ download_csnapshot() {
   cd ${VOLUME_FOLDER} && rm -rf _data 
   cd ${VOLUME_FOLDER} && mv db _data
 
+  cd "$KLITE_HOME" || exit
 }
 
 show_splash_screen
@@ -287,6 +289,7 @@ if gum confirm "Download csnapshot?" --default=true --affirmative "Download" --n
     download_csnapshot
     docker compose up -d
 fi
+
 
 
 # clear
