@@ -4,6 +4,11 @@
 set -e
 trap "exit 130" INT
 
+# Load the environment variables
+script_dir=$(dirname "$(realpath "${BASH_SOURCE[@]}")")
+# Remove the last folder from the path and rename it to KLITE_HOME
+KLITE_HOME=$(dirname "$script_dir")
+
 show_splash_screen(){
   # Clear the screen before displaying UI
   clear
@@ -55,10 +60,6 @@ check_env_file() {
 check_env_file
 
 source_env() {
-  # Load the environment variables
-  script_dir=$(dirname "$(realpath "${BASH_SOURCE[@]}")")
-  # Remove the last folder from the path and rename it to KLITE_HOME
-  KLITE_HOME=$(dirname "$script_dir")
   cd "$KLITE_HOME" || exit
   source .env
 }
