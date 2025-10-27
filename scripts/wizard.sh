@@ -54,12 +54,16 @@ check_env_file() {
 
 check_env_file
 
-# Load the environment variables
-script_dir=$(dirname "$(realpath "${BASH_SOURCE[@]}")")
-# Remove the last folder from the path and rename it to KLITE_HOME
-KLITE_HOME=$(dirname "$script_dir")
-cd "$KLITE_HOME" || exit
-source .env
+source_env() {
+  # Load the environment variables
+  script_dir=$(dirname "$(realpath "${BASH_SOURCE[@]}")")
+  # Remove the last folder from the path and rename it to KLITE_HOME
+  KLITE_HOME=$(dirname "$script_dir")
+  cd "$KLITE_HOME" || exit
+  source .env
+}
+
+source_env
 
 update_env_var() {
   local file="$1"
@@ -167,6 +171,8 @@ if gum confirm "Generate ssh key?" --default=true --affirmative "Create" --negat
 fi
 
 show_splash_screen
+
+source_env
 
 check_local_port() {
   echo "Checking if port ${HAPROXY_PORT} is listening locally..."
