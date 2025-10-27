@@ -136,6 +136,13 @@ fi
 
 show_splash_screen
 
+if gum confirm "Generate new postgres db password?" --default=true --affirmative "Generate" --negative "Skip"; then
+    POSTGRES_PASSWORD_GEN=`tr -dc 'A-Za-z0-9!@#$%&*()-_=+[]{}:;,.?/' </dev/urandom | fold -w 16 | head -n1`
+    update_env_var ".env" "POSTGRES_PASSWORD" ${POSTGRES_PASSWORD_GEN}
+fi
+
+show_splash_screen
+
 echo 'Press enter to use myaddr (default). If you want to use your own domain enter it'
 DOMAIN_INPUT=$(gum input --prompt "Domain: " --placeholder "myaddr.io" --prompt.foreground 99 --cursor.foreground 99 --width 50)
 
