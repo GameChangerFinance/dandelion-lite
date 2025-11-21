@@ -1,11 +1,27 @@
 #!/usr/bin/env python3
 
+
+
 from __future__ import annotations
+
+import os
+from dotenv import dotenv_values
+
+
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+print(SCRIPT_DIR)
+
+config = dotenv_values(SCRIPT_DIR + "/../../.env")
+print(SCRIPT_DIR + "../../.env")
+print(config["NODE_NAME"])
+
+
 import typing
 import urwid
 
 if typing.TYPE_CHECKING:
     from collections.abc import Callable, Hashable, Iterable
+
 
 class MenuButton(urwid.Button):
     def __init__(
@@ -20,6 +36,7 @@ class MenuButton(urwid.Button):
             "selected",
         )
 
+
 class InputField(urwid.Edit):
     def __init__(
         self,
@@ -28,15 +45,17 @@ class InputField(urwid.Edit):
         callback: typing.Callable[[str], typing.Any] | None = None,
     ) -> None:
         caption = " " + caption.ljust(15) + ": "
+        super().__init__(caption, edit_text)
+
+
+class TextField(urwid.Text):
+    def __init__(
+        self,
+        caption: str ,       
+    ) -> None:
         super().__init__(caption)
         
         
-        # self._w = urwid.AttrMap(
-        #     urwid.SelectableIcon(["  \N{BULLET} ", caption], 2),
-        #     None,
-        #     "selected",
-        # )
-
 class SubMenu(urwid.WidgetWrap[MenuButton]):
     def __init__(
         self,
@@ -111,11 +130,11 @@ menu_top = SubMenu(
         Form(
             "User info",
             [              
-                InputField("Project name"),
-                InputField("Port offset"),
-                InputField("Node name"),
-                InputField("Ticker"),
-                InputField("E-mail (Cert)"),
+                InputField("Project name", edit_text=config["PROJ_NAME"]),
+                InputField("Port offset", edit_text=config["PORT_OFFSET"]),
+                InputField("Node name", edit_text=config["NODE_NAME"] ),
+                InputField("Ticker", edit_text=config["NODE_TICKER"]),
+                InputField("E-mail (Cert)", edit_text=config["NODE_EMAIL"]),
             ],
         ),
         SubMenu(
@@ -127,10 +146,16 @@ menu_top = SubMenu(
         Form(
             "Domain setup",
             [
-                InputField("MyAddr token"),
-                Choice("Generate ssh key"),
+                TextField("Go to the link below and claim this domain: \n" +  config["NODE_TICKER"] +"-" + config["PROJ_NAME"] + ".myaddr.io,"),
+                InputField("MyAddr token")
             ],
         ),
+        Form(
+            "SSL Certificate",
+            [
+                Choice("Generate ssh key"),
+            ],
+        ),        
         SubMenu(
             "Check access",
             [
@@ -214,14 +239,24 @@ title = r"""
                                           wizard
 
 """
-mainScreen = [urwid.Text(("title", title), align="center"), urwid.Divider()]
 
+
+mainScreen = [
+    urwid.Text(("title", title), align="center"),
+    urwid.Divider()
+]
 
 top = HorizontalBoxes()
 top.open_box(menu_top.menu)
 
-mainScreen.append(urwid.Filler(top, "middle", 10))    
+# Add padding left/right around the filler
+padded_top = urwid.Padding(
+    urwid.Filler(top, "middle", height=10),
+    left=5,          # padding on the left
+    right=5          # padding on the right
+)
+
+mainScreen.append(padded_top)
+
 body = urwid.ListBox(urwid.SimpleFocusListWalker(mainScreen))
-
-
 urwid.MainLoop(body, palette).run()
