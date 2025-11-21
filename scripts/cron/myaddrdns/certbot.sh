@@ -5,7 +5,7 @@
 
 # Validate required token
 [[ -z ${MYADDR_TOKEN} ]] && echo "MYADDR_TOKEN variable not set, aborting..." && exit 1
-[[ -z ${NODE_EMAIL} ]] && echo "NODE_EMAIL variable not set, aborting..." && exit 1
+# [[ -z ${NODE_EMAIL} ]] && echo "NODE_EMAIL variable not set, aborting..." && exit 1
 [[ -z ${MYADDR_DOMAIN} ]] && echo "MYADDR_DOMAIN variable not set, aborting..." && exit 1
 
 # Log update attempt
@@ -14,13 +14,21 @@ echo "[SSL CERTIFICATE UPDATE] $(date -u)"
 echo "Node email: ${NODE_EMAIL}"
 echo "Setting '${MYADDR_DOMAIN}.myaddr.io'" 
 
-certbot certonly --manual --non-interactive \
-                 --agree-tos \
-                 --email ${NODE_EMAIL} \
-                 --preferred-challenges dns \
-                 --manual-auth-hook /scripts/cron/myaddrdns/certbot_authentication_hook.sh \
-                 -d ${MYADDR_DOMAIN}.myaddr.io
-                 #  --manual-cleanup-hook /scripts/cron/myaddrdns/certbot_haproxy_hook.sh \
+if [ -z "${NODE_EMAIL}" ]; then
+    certbot certonly --manual --non-interactive \
+        --agree-tos \
+        --register-unsafely-without-email \
+        --preferred-challenges dns \
+        --manual-auth-hook /scripts/cron/myaddrdns/certbot_authentication_hook.sh \
+        -d "${MYADDR_DOMAIN}.myaddr.io"
+else
+    certbot certonly --manual --non-interactive \
+        --agree-tos \
+        --email "${NODE_EMAIL}" \
+        --preferred-challenges dns \
+        --manual-auth-hook /scripts/cron/myaddrdns/certbot_authentication_hook.sh \
+        -d "${MYADDR_DOMAIN}.myaddr.io"
+fi              
 
 /scripts/cron/myaddrdns/certbot_haproxy_hook.sh
 
