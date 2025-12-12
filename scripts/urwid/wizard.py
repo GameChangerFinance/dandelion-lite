@@ -7,15 +7,19 @@ import subprocess
 import urwid
 from python_on_whales import docker  
 import podman
-import yaml
+# import yaml
 import json
+import aria2p
+from pathlib import Path
 
-composeFilePath = w.SCRIPT_DIR + "/../../docker-compose.yml"
+# composeFilePath = w.SCRIPT_DIR + "/../../docker-compose.yml"
 
-with open(composeFilePath) as f:
-    compose_data = yaml.safe_load(f)
+# with open(composeFilePath) as f:
+#     compose_data = yaml.safe_load(f)
 
 w.setup_logger()
+
+aria_process = w.start_aria_service()
 
 def get_docker_status():
 
@@ -65,6 +69,22 @@ def get_docker_status():
     # print(docker_status)
     return docker_status               
 
+
+def list_podman_volumes():
+    with podman.PodmanClient() as client:
+        if not client.ping():
+            return {"error": {"status": "down", "health": "unknown"}}
+
+        volumes = client.volumes.list()
+    
+        volume_list = []
+
+        for v in volumes:
+             volume_list.append(v.name)
+
+    return volume_list
+
+
 def generate_password(key):
     result = subprocess.run(["bash", w.SCRIPT_DIR + "/generate_password.sh"], check=True, capture_output=True, text=True,)
     
@@ -72,6 +92,7 @@ def generate_password(key):
     w.set_env_value("POSTGRES_PASSWORD", password)
 
     w.logger.debug("Result: %s", password)
+
 
 def get_docker_port(name):
     
@@ -85,6 +106,7 @@ def get_docker_port(name):
             host_port = mapping[0]["HostPort"]
     
     return host_port
+
 
 def open_firewall_port(password):
     
@@ -102,6 +124,7 @@ def open_firewall_port(password):
     print(proc.stdout)
     print(proc.stderr)
 
+
 def generate_ssh_certificate(key):
 
     result = subprocess.run(["bash", "docker", "compose", "down", "cron" ], check=True, capture_output=True, text=True,)
@@ -115,7 +138,8 @@ def generate_ssh_certificate(key):
     
     w.logger.debug("Generating certificate")
 
-def build_status_display(data):
+
+def build_status_display_podman(data):
     lines = []
 
     for name, info in data.items():
@@ -139,20 +163,78 @@ def build_status_display(data):
     # Return a single Text widget
     return text_content
 
+
+def build_status_display_aria(downloads):
+    lines = []
+
+    # for item in data.items():
+    w.logger.debug(downloads)
+    
+    for d in downloads:
+
+        w.logger.debug(f"Name: {d.name}")
+        # print(f"Status: {d.status}")
+        # print(f"Progress: {d.progress_string()}")
+        # print(f"Download speed: {d.download_speed_string()}")
+        # print(d.error_code)
+        # print(d.error_message)
+        # print(d.dir)
+        # print(d.root_files_paths)
+        # # print(d.files[0].uris)
+        # print("---")
+        # aria2.remove([d], force=True, files=True, clean=True)
+
+        lines.append(f"{d.name.ljust(45)}  {d.status.ljust(10)}  {"{:.1f}".format(d.progress).rjust(15)} {"  "} {d.download_speed_string().ljust(15)}")
+
+    if not lines:
+        lines.append("No downloads")
+    else:
+        header = f"{"Volume".ljust(45)}  {"Status".ljust(10)}  {"Progress (%)".rjust(15)}  {""}  {"Speed".ljust(15)} "
+        lines.insert(0, header )
+
+    # # Join lines with newlines
+    text_content = "\n".join(lines)
+
+    # # Return a single Text widget
+    # text_content = "bla"
+
+    return text_content
+
+
+def add_downloads(key):
+    volumes = list_podman_volumes()
+    
+    for v in volumes:
+        project, service = v.split("_")
+
+        w.logger.debug(service)
+        filename = service + ".tar.gz"
+        remoteBackupURL =  "https://dando-snapshot.m2tec.nl/backups/preprod/"
+        backupDir = str(Path("~/Downloads/dandobak/").expanduser())
+        remoteBackupUser = "dando"
+        remoteBackupPassword = "backup4DNOs"
+        w.add_aria_download(filename, remoteBackupURL, backupDir, remoteBackupUser, remoteBackupPassword)
+
+        # w.logger.debug()
+
+
 def refresh(loop, data):
     """Update the UI every 2 seconds."""
 
-    container_data = get_docker_status()
-    lines = build_status_display(container_data)
+    aria_data = w.get_aria_downloads()
+    lines = build_status_display_aria(aria_data)
 
     status_widget.set_text(("Status",lines))
 
-    w.logger.debug("Refresh - %s", lines)
+    # w.logger.debug("Refresh - %s", lines)
 
     loop.set_alarm_in(2, refresh)
 
+
 def exit_program(key):
+    aria_process.terminate()
     raise urwid.ExitMainLoop()
+    
 
 menu_top = w.SubMenu(
     "Main Menu",
@@ -194,9 +276,14 @@ menu_top = w.SubMenu(
         w.Form(
             "Firewall",
             [
-                w.EditField("  Password: ", ''),
+                w.TextField("To allow connecting to all services from"),
+                w.TextField("the outside a port needs to be opened"),
+                w.TextField("Run this command in the terminal:"),
                 w.TextField(""),
-                w.Choice("Add HA-proxy to Firewall rules", open_firewall_port("test")),
+                w.TextField("sudo ufw allow " + get_docker_port("dandolite-preprod-haproxy-1") ),
+                # w.EditField("  Password: ", ''),
+                # w.TextField(""),
+                # w.Choice("Add HA-proxy to Firewall rules", open_firewall_port("test")),
             ],
         ),
         w.Form(
@@ -205,7 +292,7 @@ menu_top = w.SubMenu(
                 w.SubMenu(
                     "Download backup",
                     [
-                        w.Choice("Sunflower MK2"),
+                        w.Choice("Sunflower MK2", add_downloads),
                         w.Choice("AR3 mainnet"),
                     ],
                 ),

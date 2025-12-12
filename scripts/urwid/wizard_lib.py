@@ -8,6 +8,9 @@ import os
 from dotenv import dotenv_values, load_dotenv
 import re
 from pathlib import Path
+import time
+import subprocess
+import aria2p
 
 if typing.TYPE_CHECKING:
     from collections.abc import Callable, Hashable, Iterable
@@ -22,6 +25,74 @@ def save_user_info(key, value):
     logger.debug("Save - key: %s, value: %s", key, value)
     set_env_value(key,value)
 
+
+def start_aria_service():
+    cmd = [
+    "aria2c",
+    "--enable-rpc",
+    "--rpc-listen-all=true",
+    "--rpc-allow-origin-all",
+    "--dir=/home/maarten/Downloads",
+    "--continue=true",
+    "--max-connection-per-server=16",
+    "--split=16",
+    "--min-split-size=1M",
+    "--check-certificate=false"
+    ]
+
+    # Start aria2c in the background
+    # stdout and stderr can be redirected to avoid blocking
+    with open(os.devnull, "w") as fnull:
+        process = subprocess.Popen(cmd, stdout=fnull, stderr=fnull)
+
+    print("aria2c started in the background with PID:", process.pid)
+
+    time.sleep(2)
+
+    return process
+
+
+def add_aria_download(filename, remoteBackupURL, backupDir, remoteBackupUser, remoteBackupPassword):
+    
+    # Connect to the running aria2c RPC server
+    aria2 = aria2p.API(
+        aria2p.Client(
+            host="http://localhost",
+            port=6800,
+            secret=""   # Fill in if you set --rpc-secret
+        )
+    )
+
+    url = remoteBackupURL + filename
+
+    options = {
+        "continue": "true",
+        "max-connection-per-server": "16",
+        "split": "16",
+        "min-split-size": "1M",
+        "check-certificate": "false",
+        "http-user": remoteBackupUser,
+        "http-passwd": remoteBackupPassword,
+        "out": filename,
+        "dir": backupDir,  # expand of ~/Downloads
+    }
+
+    aria2.add_uris([url], options=options)
+
+
+def get_aria_downloads():
+    # Connect to the running aria2c RPC server
+    aria2 = aria2p.API(
+        aria2p.Client(
+            host="http://localhost",
+            port=6800,
+            secret=""   # Fill in if you set --rpc-secret
+        )
+    )
+
+    downloads = aria2.get_downloads()
+    
+    return downloads
 
 class MenuButton(urwid.Button):
     def __init__(
