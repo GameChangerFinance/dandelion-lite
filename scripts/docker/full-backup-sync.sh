@@ -1,6 +1,6 @@
 #!/bin/bash
 # Example usage: ./full-backup-sync.sh "https://your-dando-node/backups/" myproject_ /tmp/backups/ backup mysecurepass
-
+set -x
 remoteBackupURL=$1
 projectName=$2
 backupDir=$3
@@ -43,18 +43,31 @@ for volumeName in $volumeNames; do
  
     # Important: remove -k to block non HTTPS URLs
     if [[ $use_auth -eq 1 ]]; then
-      curl -k --fail -# --show-error --location \
-           --continue-at - \
-           --user "$remoteBackupUser:$remoteBackupPassword" \
-           --output "$outputFile" "$url"
+      aria2c \
+        --continue=true \
+        --max-connection-per-server=16 \
+        --split=16 \
+        --min-split-size=1M \
+        --check-certificate=false \
+        --http-user="$remoteBackupUser" \
+        --http-passwd="$remoteBackupPassword" \
+        --out="${fileName}.tar.gz" \
+        --dir="$backupDir" \
+        "$url"
     else
-      curl -k --fail -# --show-error --location \
-           --continue-at - \
-           --output "$outputFile" "$url"
+      aria2c \
+        --continue=true \
+        --max-connection-per-server=16 \
+        --split=16 \
+        --min-split-size=1M \
+        --check-certificate=false \
+        --out="$fileName" \
+        --dir="$backupDir" \
+        "$url"
     fi
 
     echo "✅ Downloaded $fileName.tar.gz"
-
+    exit
   fi
 done
 
