@@ -15,6 +15,10 @@ import aria2p
 if typing.TYPE_CHECKING:
     from collections.abc import Callable, Hashable, Iterable
 
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+print(SCRIPT_DIR)
+envFilePath = SCRIPT_DIR + "/../../.env"
+
 focus_map = {"heading": "focus heading", "options": "focus options", "line": "focus line"}
 
 def exit_program(key):
@@ -52,7 +56,7 @@ def start_aria_service():
     return process
 
 
-def add_aria_download(filename, remoteBackupURL, backupDir, remoteBackupUser, remoteBackupPassword):
+def add_aria_download(filename, remoteBackupURL, backupDir, remoteBackupUser = "", remoteBackupPassword = ""):
     
     # Connect to the running aria2c RPC server
     aria2 = aria2p.API(
@@ -71,6 +75,7 @@ def add_aria_download(filename, remoteBackupURL, backupDir, remoteBackupUser, re
         "split": "16",
         "min-split-size": "1M",
         "check-certificate": "false",
+        "disable-ipv6": "true",        
         "http-user": remoteBackupUser,
         "http-passwd": remoteBackupPassword,
         "out": filename,
@@ -93,6 +98,7 @@ def get_aria_downloads():
     downloads = aria2.get_downloads()
     
     return downloads
+
 
 class MenuButton(urwid.Button):
     def __init__(
@@ -241,7 +247,7 @@ class HorizontalBoxes(urwid.Columns):
         self.contents.append(
             (
                 urwid.AttrMap(box, "options", focus_map),
-                self.options(urwid.GIVEN, 50),
+                self.options(urwid.GIVEN, 70),
             )
         )
 
@@ -267,14 +273,12 @@ def setup_logger():
 
     logger.addHandler(fh)
 
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-print(SCRIPT_DIR)
-
-envFilePath = SCRIPT_DIR + "/../../.env"
-config = dotenv_values(envFilePath)
-config2 = load_dotenv(envFilePath)
+def load_dot_env():
+    config = dotenv_values(envFilePath)
+    return config
 
 def get_env_value(key: str) -> None:
+
 
     with open(envFilePath) as f:
         for line in f:
@@ -302,7 +306,6 @@ def set_env_value(key: str, value: str) -> None:
         lines.append(f"{key}={value}")
 
     env_path.write_text("\n".join(lines) + "\n")
-
 
 top = HorizontalBoxes() 
 

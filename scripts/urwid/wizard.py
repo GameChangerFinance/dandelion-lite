@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import requests
 import wizard_lib as w
 import subprocess
 import urwid
@@ -18,6 +19,8 @@ from pathlib import Path
 #     compose_data = yaml.safe_load(f)
 
 w.setup_logger()
+
+config = w.load_dot_env()
 
 aria_process = w.start_aria_service()
 
@@ -86,6 +89,7 @@ def list_podman_volumes():
 
 
 def generate_password(key):
+
     result = subprocess.run(["bash", w.SCRIPT_DIR + "/generate_password.sh"], check=True, capture_output=True, text=True,)
     
     password = result.stdout.strip()
@@ -201,7 +205,7 @@ def build_status_display_aria(downloads):
     return text_content
 
 
-def add_downloads(key):
+def add_downloads_backups(key):
     volumes = list_podman_volumes()
     
     for v in volumes:
@@ -209,25 +213,113 @@ def add_downloads(key):
 
         w.logger.debug(service)
         filename = service + ".tar.gz"
-        remoteBackupURL =  "https://dando-snapshot.m2tec.nl/backups/preprod/"
-        backupDir = str(Path("~/Downloads/dandobak/").expanduser())
-        remoteBackupUser = "dando"
-        remoteBackupPassword = "backup4DNOs"
+        
+        # backupDir = str(Path("~/Downloads/dandobak/").expanduser())
+
+        # Use dot env for environment variable expansion
+        config = w.load_dot_env()
+        # print(config)
+
+        remoteBackupURL =  config["REMOTE_BACKUP_URL"]
+        backupDir = config["BACKUP_DIR"]
+
+        remoteBackupUser = w.get_env_value("REMOTE_BACKUP_USER")
+        remoteBackupPassword = w.get_env_value("REMOTE_BACKUP_PASSWORD")
         w.add_aria_download(filename, remoteBackupURL, backupDir, remoteBackupUser, remoteBackupPassword)
 
         # w.logger.debug()
 
 
+def add_downloads_csnapshot(key):
+    w.logger.debug("CSnapshot")
+    NETWORK = "preprod"  # or "testnet"
+
+    if NETWORK == "mainnet":
+        remoteBackupURL = "https://downloads.csnapshots.io/mainnet/"
+        json_url = remoteBackupURL + "mainnet-db-snapshot.json"
+    else:
+        remoteBackupURL = "https://downloads.csnapshots.io/testnet/"
+        json_url = remoteBackupURL + "testnet-db-snapshot.json"
+
+    # Fetch the JSON
+    response = requests.get(json_url)
+    response.raise_for_status()  # raise error if request failed
+    data = response.json()
+
+    # Extract the file_name from the JSON and build the full URL
+    # assuming the JSON structure is a list of objects as in your jq example
+    filename = data[0]['file_name']
+
+    config = w.load_dot_env()
+    backupDir = config["BACKUP_DIR"]
+
+    w.logger.debug("Filename: %s", filename)
+    w.add_aria_download(filename, remoteBackupURL, backupDir)
+ 
+
+def restore_backup():
+    result = subprocess.run(["bash", w.SCRIPT_DIR + "scripts/docker/full-restore.sh",  ], check=True, capture_output=True, text=True,)
+    
+
+def restore_csnapshot():
+    # result = subprocess.run(["bash", w.SCRIPT_DIR + "scripts/docker/full-restore.sh",  ], check=True, capture_output=True, text=True,)
+    print("restore csnapshot")
+
+
+def pause_downloads(key):
+    print("delete")
+    aria2 = aria2p.API(
+        aria2p.Client(
+            host="http://localhost",
+            port=6800,
+            secret=""   # Fill in if you set --rpc-secret
+        )
+    )
+
+    downloads = aria2.get_downloads()  
+    for d in downloads:
+        aria2.pause([d], force=True)
+
+def start_downloads(key):
+    print("delete")
+    aria2 = aria2p.API(
+        aria2p.Client(
+            host="http://localhost",
+            port=6800,
+            secret=""   # Fill in if you set --rpc-secret
+        )
+    )
+
+    downloads = aria2.get_downloads()  
+    for d in downloads:
+        aria2.resume([d])
+
+def delete_downloads(key):
+    print("delete")
+    aria2 = aria2p.API(
+        aria2p.Client(
+            host="http://localhost",
+            port=6800,
+            secret=""   # Fill in if you set --rpc-secret
+        )
+    )
+
+    downloads = aria2.get_downloads()  
+    for d in downloads:
+        aria2.remove([d], force=True, files=True, clean=True)
+
 def refresh(loop, data):
     """Update the UI every 2 seconds."""
+    podman_data = get_docker_status()
+    lines_podman = build_status_display_podman(podman_data)
 
     aria_data = w.get_aria_downloads()
-    lines = build_status_display_aria(aria_data)
+    lines_aria = build_status_display_aria(aria_data)
 
-    status_widget.set_text(("Status",lines))
+    lines = lines_podman + "\n\n" + lines_aria
 
-    # w.logger.debug("Refresh - %s", lines)
-
+    w.logger.debug("L: %s", lines)
+    status_widget.set_text(("Status", lines))
     loop.set_alarm_in(2, refresh)
 
 
@@ -235,6 +327,9 @@ def exit_program(key):
     aria_process.terminate()
     raise urwid.ExitMainLoop()
     
+
+def full_restore():
+    print("Full restore")
 
 menu_top = w.SubMenu(
     "Main Menu",
@@ -247,6 +342,12 @@ menu_top = w.SubMenu(
                 w.InputField("Node name", envKey="NODE_NAME"),
                 w.InputField("Ticker", envKey="NODE_TICKER"),
                 w.InputField("E-mail (Cert)", envKey="NODE_EMAIL"),
+                w.TextField(""),
+                w.InputField("Backup folder", envKey="BACKUP_DIR"),
+                w.InputField("Backup URL", envKey="REMOTE_BACKUP_URL"),
+                w.InputField("Backup user", envKey="REMOTE_BACKUP_USER"),
+                w.InputField("Backup password", envKey="REMOTE_BACKUP_PASSWORD"),
+                
             ],
         ),
         w.SubMenu(
@@ -259,7 +360,7 @@ menu_top = w.SubMenu(
             "Domain setup",
             [
                 w.TextField("Go to the link below and claim this domain:"),
-                w.EditField("  ", w.config["NODE_TICKER"] +"-" + w.config["PROJ_NAME"]),
+                w.EditField("  ", config["NODE_TICKER"] +"-" + config["PROJ_NAME"]),
                 w.TextField(""),
                 w.EditField("  ", 'https://myaddr.tools/claim'),
                 w.TextField('Copy the token and paste it in the input below'),
@@ -289,16 +390,20 @@ menu_top = w.SubMenu(
         w.Form(
             "Sync node",
             [
-                w.SubMenu(
-                    "Download backup",
-                    [
-                        w.Choice("Sunflower MK2", add_downloads),
-                        w.Choice("AR3 mainnet"),
-                    ],
-                ),
-                w.Choice("Download CSnapshot")
+                w.Choice("Download backup", add_downloads_backups),
+                w.Choice("Restore backup", restore_backup),
+                w.TextField(""),
+                w.Choice("Download CSnapshot", add_downloads_csnapshot),
+                w.Choice("Restore CSnapshot", restore_csnapshot),
+                w.TextField(""),
+                w.Choice("Stop downloads", pause_downloads),
+                w.Choice("Start downloads", start_downloads),
+                w.Choice("Delete downloads", delete_downloads)
+                
             ],
         ),
+        w.TextField(""),
+        w.Choice("Exit", exit_program)
 
     ],
 )
