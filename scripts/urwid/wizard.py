@@ -32,48 +32,50 @@ def get_docker_status():
         if not client.ping():
             return {"error": {"status": "down", "health": "unknown"}}
 
+        config = w.load_dot_env()
+        project_name = config["PROJ_NAME"]
+
         running_containers = client.containers.list()  # default: running only
 
         for c in running_containers:
-            container_status = c.inspect()
+            
+                container_status = c.inspect()
 
-            name = container_status["Name"]
-            status = container_status["State"]["Status"]
-            health = (
-                container_status["State"].get("Health", {}).get("Status", "none")
-            )
-
-            match name:
-                case "dandolite-preprod-cardano-node-ogmios-1":
+                name = container_status["Name"]
+                status = container_status["State"]["Status"]
+                health = (
+                    container_status["State"].get("Health", {}).get("Status", "none")
+                )
+       
+                if name == project_name + "-cardano-node-ogmios-1":
                     try:
-                        healthLog = (
-                            container_status["State"].get("Health", {}).get("Log", "none")[-1].get("Output", "none").split(" - ")[1]
-                        )
+                        logs = container_status["State"].get("Health", {}).get("Log", [])
+                        healthLog = logs[-1].get("Output", "").split(" - ")[1] if logs else ""
                     except IndexError:
                         healthLog = ""
-
-                case "dandolite-preprod-cardano-db-sync-1":
-                    try: 
-                        healthLog = (
-                            container_status["State"].get("Health", {}).get("Log", "none")[-1].get("Output", "none").split("\n")[1]
-                        )
+                elif name == project_name +  "-cardano-db-sync-1":
+                    try:
+                        logs = container_status["State"].get("Health", {}).get("Log", [])
+                        healthLog = logs[-1].get("Output", "").split("\n")[1] if logs else ""
                     except IndexError:
                         healthLog = ""
-                case _:
+                else:
                     healthLog = ""
 
-            try:
-                port = get_docker_port(name)
-            except UnboundLocalError:
-                port = ""                    
+                try:
+                    port = get_docker_port(name)
+                except UnboundLocalError:
+                    port = ""                    
 
-            docker_status[name] = { 'status': status, 'health': health, 'health_log': healthLog, 'port': port }
+                if name.startswith(project_name):
+                    docker_status[name] = { 'status': status, 'health': health, 'health_log': healthLog, 'port': port }
 
     # print(docker_status)
-    return docker_status               
+    return docker_status  
 
 
 def list_podman_volumes():
+    
     with podman.PodmanClient() as client:
         if not client.ping():
             return {"error": {"status": "down", "health": "unknown"}}
@@ -83,7 +85,10 @@ def list_podman_volumes():
         volume_list = []
 
         for v in volumes:
-             volume_list.append(v.name)
+             config = w.load_dot_env()
+             
+             if v.name.startswith(config["PROJ_NAME"]):
+                volume_list.append(v.name)
 
     return volume_list
 
@@ -366,7 +371,7 @@ menu_top = w.SubMenu(
         w.Form(
             "SSL Certificate",
             [
-                w.Choice("Generate ssh key", generate_ssh_certificate),
+                w.Choice("Generate ssl certificate", generate_ssh_certificate),
             ],
         ),        
         w.Form(
