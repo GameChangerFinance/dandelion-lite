@@ -1,4 +1,4 @@
-#!/usr/bin/env ../../.venv/bin/python3
+#!/usr/bin/env .venv/bin/python3
 
 from __future__ import annotations
 
@@ -95,8 +95,6 @@ def generate_password(key):
     password = result.stdout.strip()
     w.set_env_value("POSTGRES_PASSWORD", password)
 
-    w.logger.debug("Result: %s", password)
-
 
 def get_docker_port(name):
     
@@ -112,14 +110,13 @@ def get_docker_port(name):
     return host_port
 
 
-def open_firewall_port(password):
+def open_firewall_port(key):
     
-    port = get_docker_port("dandolite-preprod-haproxy-1")
+    config = w.load_dot_env()
 
-    cmd = ["sudo", "-S", "ufw", "allow", port]
+    cmd = ["pkexec", "ufw", "allow", config["HAPROXY_PORT"]]
     proc = subprocess.run(
         cmd,
-        input=password + "\n",
         text=True,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE
@@ -170,13 +167,9 @@ def build_status_display_podman(data):
 
 def build_status_display_aria(downloads):
     lines = []
-
-    # for item in data.items():
-    w.logger.debug(downloads)
-    
+   
     for d in downloads:
 
-        w.logger.debug(f"Name: {d.name}")
         # print(f"Status: {d.status}")
         # print(f"Progress: {d.progress_string()}")
         # print(f"Download speed: {d.download_speed_string()}")
@@ -280,6 +273,7 @@ def pause_downloads(key):
     for d in downloads:
         aria2.pause([d], force=True)
 
+
 def start_downloads(key):
     print("delete")
     aria2 = aria2p.API(
@@ -293,6 +287,7 @@ def start_downloads(key):
     downloads = aria2.get_downloads()  
     for d in downloads:
         aria2.resume([d])
+
 
 def delete_downloads(key):
     print("delete")
@@ -308,6 +303,7 @@ def delete_downloads(key):
     for d in downloads:
         aria2.remove([d], force=True, files=True, clean=True)
 
+
 def refresh(loop, data):
     """Update the UI every 2 seconds."""
     podman_data = get_docker_status()
@@ -318,7 +314,6 @@ def refresh(loop, data):
 
     lines = lines_podman + "\n\n" + lines_aria
 
-    w.logger.debug("L: %s", lines)
     status_widget.set_text(("Status", lines))
     loop.set_alarm_in(2, refresh)
 
@@ -328,8 +323,9 @@ def exit_program(key):
     raise urwid.ExitMainLoop()
     
 
-def full_restore():
+def full_restore(key):
     print("Full restore")
+
 
 menu_top = w.SubMenu(
     "Main Menu",
@@ -346,8 +342,7 @@ menu_top = w.SubMenu(
                 w.InputField("Backup folder", envKey="BACKUP_DIR"),
                 w.InputField("Backup URL", envKey="REMOTE_BACKUP_URL"),
                 w.InputField("Backup user", envKey="REMOTE_BACKUP_USER"),
-                w.InputField("Backup password", envKey="REMOTE_BACKUP_PASSWORD"),
-                
+                w.InputField("Backup password", envKey="REMOTE_BACKUP_PASSWORD"),                
             ],
         ),
         w.SubMenu(
@@ -360,7 +355,7 @@ menu_top = w.SubMenu(
             "Domain setup",
             [
                 w.TextField("Go to the link below and claim this domain:"),
-                w.EditField("  ", config["NODE_TICKER"] +"-" + config["PROJ_NAME"]),
+                w.EditField("  ", w.get_domain(), ref="domain"),
                 w.TextField(""),
                 w.EditField("  ", 'https://myaddr.tools/claim'),
                 w.TextField('Copy the token and paste it in the input below'),
@@ -381,7 +376,9 @@ menu_top = w.SubMenu(
                 w.TextField("the outside a port needs to be opened"),
                 w.TextField("Run this command in the terminal:"),
                 w.TextField(""),
-                w.TextField("sudo ufw allow " + get_docker_port("dandolite-preprod-haproxy-1") ),
+                w.Choice("Open port", open_firewall_port),
+                w.TextField("\n  or run the following command in a seperate terminal\n"),
+                w.EditField("  ", "sudo ufw allow " + config["HAPROXY_PORT"], ref="proxy_port" ),
                 # w.EditField("  Password: ", ''),
                 # w.TextField(""),
                 # w.Choice("Add HA-proxy to Firewall rules", open_firewall_port("test")),
@@ -391,10 +388,10 @@ menu_top = w.SubMenu(
             "Sync node",
             [
                 w.Choice("Download backup", add_downloads_backups),
-                w.Choice("Restore backup", restore_backup),
+                w.Choice("Restore from backup", restore_backup),
                 w.TextField(""),
                 w.Choice("Download CSnapshot", add_downloads_csnapshot),
-                w.Choice("Restore CSnapshot", restore_csnapshot),
+                w.Choice("Restore from CSnapshot", restore_csnapshot),
                 w.TextField(""),
                 w.Choice("Stop downloads", pause_downloads),
                 w.Choice("Start downloads", start_downloads),
@@ -435,6 +432,8 @@ title = r"""
 
 w.top.open_box(menu_top.menu)
 
+# domain_widget = w.top.base_widget.base_widget.focus.base_widget._body[5].menu._original_widget._body[4]
+
 node_status = "Loading..."
 
 status_widget = urwid.Text(("Status", node_status))
@@ -444,7 +443,7 @@ padded_status = urwid.Filler(status_widget, "middle", height=10)
 mainScreen = urwid.Pile([
     urwid.Text(("title", title), align="center"),
     urwid.Divider(),
-    urwid.Filler(w.top, "middle", height=15),
+    urwid.Filler(w.top, "middle", height=20),
     urwid.Divider(top=3),
     status_widget
 ])

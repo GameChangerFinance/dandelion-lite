@@ -11,6 +11,7 @@ from pathlib import Path
 import time
 import subprocess
 import aria2p
+import pyperclip
 
 if typing.TYPE_CHECKING:
     from collections.abc import Callable, Hashable, Iterable
@@ -25,9 +26,27 @@ def exit_program(key):
     raise urwid.ExitMainLoop()     
 
 
+def get_domain():
+    config = load_dot_env()
+    
+    domain = config["NODE_TICKER"] +"-" + config["PROJ_NAME"]
+    # w.logger.debug(type(domain))
+    # logger.debug(domain)
+    return domain
+
+
+def update_interface(key):
+
+    config = load_dot_env()
+    # logger.debug(get_domain())
+    top.widget_refs["domain"].set_edit_text(get_domain())
+    top.widget_refs["proxy_port"].set_edit_text("sudo ufw allow " + config["HAPROXY_PORT"])
+
+
 def save_user_info(key, value):
     logger.debug("Save - key: %s, value: %s", key, value)
     set_env_value(key,value)
+    update_interface(key)
 
 
 def start_aria_service():
@@ -127,29 +146,57 @@ class InputField(urwid.Edit):
         self.envKey = envKey
 
     def keypress(self, size, key):
-        if key == "enter" and self.callback:
-            self.callback(self.envKey, self.edit_text)  # Call callback with current text
-        return super().keypress(size, key)
+        key = super().keypress(size, key)
+
+        # logger.debug("Key: %s", key)
+        # logger.debug("Edit: %s", self.edit_text)
+
+        if self.callback:
+            self.callback(self.envKey, self.edit_text)
+
+        return key
 
 
 class EditField(urwid.Edit):
     def __init__(
         self,
         caption: str ,
-        edit_text: str
+        edit_text: str,
+        ref: str | None = None
     ) -> None:
         # caption = "  " + caption.ljust(15) + ": "
         super().__init__(caption, edit_text=edit_text)
                         
-    
+        if ref:
+            top.widget_refs[ref] = self
+
+    def keypress(self, size, key):
+        key = super().keypress(size, key)
+
+        # if key == 'enter':  # or any key you like
+        pyperclip.copy(self.edit_text)
+        logger.debug("Copied to clipboard: %s", self.edit_text)
+
+        # logger.debug("Key: %s", key)
+        # logger.debug("Edit: %s", self.edit_text)
+        return key
+
+
 class TextField(urwid.Text):
     def __init__(
         self,
-        caption: str ,       
+        caption: str ,  
+        ref: str | None = None     
     ) -> None:
         super().__init__("  " + caption)
         
-        
+        # Add a named reference of this widget to the top level object,
+        # for easy access. Otherwise you have to walk the tower of 
+        # babel list.
+        if ref:
+            top.widget_refs[ref] = self
+
+
 class SubMenu(urwid.WidgetWrap[MenuButton]):
     def __init__(
         self,
@@ -218,21 +265,28 @@ class Form(urwid.WidgetWrap[MenuButton]):
         )
         self.menu = urwid.AttrMap(listbox, "options")
 
+    def update_choices(self, new_choices: list[urwid.Widget]) -> None:
+        # Remove old choices (assuming header + line + divider = first 3)
+        self.walker[3:-1] = new_choices
+        self.choices = new_choices
+
     def open_menu(self, button: MenuButton) -> None:
         top.open_form(self.menu)
 
 
 class HorizontalBoxes(urwid.Columns):
-    def __init__(self) -> None:
+    def __init__(self,) -> None:
         super().__init__([], dividechars=1)
-
+        self.widget_refs: dict[str, urwid.Widget] = {}
 
     def open_box(self, box: urwid.Widget) -> None:
+        # logger.debug("open_box")
         if self.contents:
             del self.contents[self.focus_position + 1 :]
 
         self.contents.append(
             (
+
                 urwid.AttrMap(box, "options", focus_map),
                 self.options(urwid.GIVEN, 25),
             )
@@ -241,9 +295,12 @@ class HorizontalBoxes(urwid.Columns):
         self.focus_position = len(self.contents) - 1
 
     def open_form(self, box: urwid.Widget) -> None:
+        # logger.debug("open_form %s", self)
+
         if self.contents:
             del self.contents[self.focus_position + 1 :]
 
+        # logger.debug("Append %s", box)
         self.contents.append(
             (
                 urwid.AttrMap(box, "options", focus_map),
@@ -275,6 +332,7 @@ def setup_logger():
 
 def load_dot_env():
     config = dotenv_values(envFilePath)
+
     return config
 
 def get_env_value(key: str) -> None:
