@@ -17,9 +17,10 @@ echo "[UPDATE] $(date -u)"
 
 echo "IPv6: ${IP_V6_ENABLED}"
 
-if [[ -n ${IP_V6_ENABLED} ]]; then
-  CURRENT_IP=`cat /scripts/cron/myaddrdns/my_ip_v6.txt`
-  IP_TO_USE=${CURRENT_IP}
+if [[ "${IP_V6_ENABLED}" == true ]]; then
+  CURRENT_IP=""
+  # CURRENT_IP=`cat /scripts/cron/myaddrdns/my_ip_v6.txt`
+  # IP_TO_USE=${CURRENT_IP}
   UPDATE_URL="https://ipv6.myaddr.io/update"
 else
   CURRENT_IP=$(curl -s https://api.ipify.org)

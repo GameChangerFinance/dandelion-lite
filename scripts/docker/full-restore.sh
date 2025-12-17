@@ -1,10 +1,16 @@
-#/bin/sh
+#!/bin/bash
+
+# Load the environment variables
+script_dir=$(dirname "$(realpath "${BASH_SOURCE[@]}")")
+# Remove the last folder from the path and rename it to KLITE_HOME
+DLITE_HOME=$(dirname "$(dirname -- "$script_dir")")
+
+cd "$DLITE_HOME" || exit
 source .env
 
-projectName=$1
-backupDir=$2
+projectName=${1:-"$PROJ_NAME"}
+backupDir=${2:-"$BACKUP_DIR"}
 postgresService="postgress"
-
 
 [[ -z $projectName ]] && echo "Missing docker compose project name (actually only a prefix is required)" && exit 1
 [[ -z $backupDir ]] && echo "Missing directory path with the stored backup files (with last slash)" && exit 1
@@ -18,9 +24,10 @@ echo "About to try restoring all these volumes with these backup files (${backup
 
 for volumeName in $volumeNames; do
     if [[ $volumeName == "$projectName"* ]]; then   # True if $volumeName starts with $projectName.
-        fileName=$(echo $volumeName | sed "s/^${projectName}//")
-	echo "${volumeName}: ${fileName}.tar.gz"
-	ls -alh "${backupDir}${fileName}.tar.gz" | awk '{print $5, $9}'
+        fileName=$(echo $volumeName | sed "s/^${projectName}_//")
+		echo $fileName
+		echo "${volumeName}: ${fileName}.tar.gz"
+		ls -alh "${backupDir}${fileName}.tar.gz" | awk '{print $5, $9}'
     fi
 done
 echo
@@ -35,7 +42,7 @@ docker compose down
 echo
 for volumeName in $volumeNames; do
     if [[ $volumeName == "$projectName"* ]]; then   # True if $volumeName starts with $projectName.
-	fileName=$(echo $volumeName | sed "s/^${projectName}//")
+	fileName=$(echo $volumeName | sed "s/^${projectName}_//")
 	echo $fileName
     	./scripts/docker/restore-volume.sh "${volumeName}" "${fileName}" "${backupDir}">> full-restore.log 2>&1
 	ls -alh "${backupDir}${fileName}.tar.gz" | awk '{print $5, $9}'

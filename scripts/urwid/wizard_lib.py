@@ -12,6 +12,7 @@ import time
 import subprocess
 import aria2p
 import pyperclip
+import dns.resolver
 
 if typing.TYPE_CHECKING:
     from collections.abc import Callable, Hashable, Iterable
@@ -117,6 +118,40 @@ def get_aria_downloads():
     downloads = aria2.get_downloads()
     
     return downloads
+
+
+def resolve_domain(domain: str) -> dict:
+    """
+    Resolve a domain to its IPv4 and IPv6 addresses.
+    
+    Args:
+        domain (str): The domain name to resolve.
+    
+    Returns:
+        dict: {'ipv4': [...], 'ipv6': [...]}
+    """
+    resolver = dns.resolver.Resolver()
+    result = {'ipv4': [], 'ipv6': []}
+
+    # Resolve IPv4
+    try:
+        answers = resolver.resolve(domain, 'A')
+        result['ipv4'] = [rdata.address for rdata in answers]
+    except dns.resolver.NoAnswer:
+        pass
+    except dns.resolver.NXDOMAIN:
+        pass
+
+    # Resolve IPv6
+    try:
+        answers = resolver.resolve(domain, 'AAAA')
+        result['ipv6'] = [rdata.address for rdata in answers]
+    except dns.resolver.NoAnswer:
+        pass
+    except dns.resolver.NXDOMAIN:
+        pass
+
+    return result
 
 
 class MenuButton(urwid.Button):

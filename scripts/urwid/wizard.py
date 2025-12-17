@@ -14,17 +14,16 @@ import aria2p
 from pathlib import Path
 import secrets
 import string
-
-# composeFilePath = w.SCRIPT_DIR + "/../../docker-compose.yml"
-
-# with open(composeFilePath) as f:
-#     compose_data = yaml.safe_load(f)
+import psutil
+from collections import deque
+from podman.errors import NotFound
 
 w.setup_logger()
 
 config = w.load_dot_env()
 
 aria_process = w.start_aria_service()
+
 
 def get_docker_status():
 
@@ -102,7 +101,7 @@ def generate_password(key):
     
     # result = subprocess.run(["bash", w.SCRIPT_DIR + "/generate_password.sh"], check=True, capture_output=True, text=True,)
     # password = result.stdout.strip()
-    
+
     w.set_env_value("POSTGRES_PASSWORD", password)
 
 
@@ -118,6 +117,57 @@ def get_docker_port(name):
             host_port = mapping[0]["HostPort"]
     
     return host_port
+
+
+def check_port_status(port):
+    port_status = ""
+
+    for conn in psutil.net_connections(kind='inet'):
+        if conn.laddr.port == int(port) and conn.status == 'LISTEN':
+            laddr = f"{conn.laddr.ip}:{conn.laddr.port}" if conn.laddr else ""
+            raddr = f"{conn.raddr.ip}:{conn.raddr.port}" if conn.raddr else ""
+            port_status = f"{conn.type.name:4} {conn.family.name:6} {laddr:22} {raddr:22} {conn.status}"
+    
+    if len(port_status) > 0:
+        return "Listening"
+    else:
+        return ""
+
+
+def check_domain_access(url) -> bool:
+    # url = f"http://{domain}.myaddr.io:{port}"
+    # print(f"\nChecking external access to {url}...")
+    
+    w.logger.debug("Url: %s", url)
+
+    status = ""
+
+    try:
+        response = requests.get(url, timeout=5)
+        if response.status_code < 400:
+            status = f"Reachable from outside."
+            return status
+        else:
+            status = f"Responded with status {response.status_code}."
+            return status
+    except requests.RequestException:
+        status = f"Not reachable externally."
+        # print(f"\033[38;5;99mYou may need to forward port {port} on your router to this computer.\033[0m")
+        # print("\033[38;5;99mTypical guide: https://portforward.com\033[0m")
+        return status
+
+
+def get_log_end(file_path, offset=1):
+    """
+    Get a line from the bottom of a file.
+    
+    offset=1  -> last line
+    offset=2  -> second-to-last line
+    offset=3  -> third-to-last line, etc.
+    """
+    with open(file_path, "r") as f:
+        last_lines = deque(f, maxlen=offset)
+    return last_lines[0].rstrip("\n")  # first element is the requested line
 
 
 def open_firewall_port(key):
@@ -136,18 +186,31 @@ def open_firewall_port(key):
     print(proc.stderr)
 
 
-def generate_ssh_certificate(key):
-
-    result = subprocess.run(["bash", "docker", "compose", "down", "cron" ], check=True, capture_output=True, text=True,)
-    print(result)
-
-    result = subprocess.run(["bash", "docker", "compose", "exec", "-it", "cron", "/scripts/cron/myaddrdns/certbot.sh" ], check=True, capture_output=True, text=True,)
-    print(result)
-
-    result = subprocess.run(["bash", "docker", "compose", "up", "cron", "-d" ], check=True, capture_output=True, text=True,)
-    print(result)
-    
+def generate_ssl_certificate(key):
     w.logger.debug("Generating certificate")
+
+    config = w.load_dot_env()
+    
+    restart_service_cron("x")
+
+    with podman.PodmanClient() as client:
+        if not client.ping():
+            return {"error": {"status": "down", "health": "unknown"}}
+
+        cron_container_name = config["PROJ_NAME"] + "-cron-1"
+        # cmd = ["/bin/bash", "/scripts/cron/myaddrdns/certbot.sh", ">>", "/var/log/myaddrdns_certbot.log", "2>&1"]
+        cmd = ["/bin/bash", "/scripts/cron/myaddrdns/certbot_log.sh"]
+        try:
+            w.logger.debug("try cert")
+            container = client.containers.get(cron_container_name)
+            container.exec_run(cmd, stdout=True, stderr=True)
+            # w.logger.debug("Exit code:", result)
+            # w.logger.debug("Output:\n", result.output.decode())
+        except NotFound:
+            w.logger.debug("except cert")
+            # subprocess.run(["bash", "docker", "compose", "up", "cron", "-d" ], check=True, capture_output=True, text=True,)
+
+    restart_service_haproxy("x")
 
 
 def build_status_display_podman(data):
@@ -206,6 +269,75 @@ def build_status_display_aria(downloads):
     # text_content = "bla"
 
     return text_content
+
+
+def build_status_display_access():
+    config = w.load_dot_env()
+  
+    port_status = ("HA-proxy port " + config["HAPROXY_PORT"] + ": ").ljust(20) + check_port_status(config["HAPROXY_PORT"])
+    
+    my_domain = "https://" + w.get_domain() + ".myaddr.io:" + config["HAPROXY_PORT"]
+
+    dns_status = "Domain:".ljust(20) + check_domain_access(my_domain)
+    
+    logFilePath = w.SCRIPT_DIR + "/../../logs/cron/myaddrdns_update.log"
+
+    myaddr_log_status = get_log_end(logFilePath, offset=2)
+    myaddr_status = "Myaddr status:".ljust(20) + myaddr_log_status
+
+    logFilePath = w.SCRIPT_DIR + "/../../logs/cron/myaddrdns_certbot.log"
+
+    certbot_log_status = get_log_end(logFilePath, offset=2)
+    certbot_status = "Certbot status:".ljust(20) + certbot_log_status
+
+    addresses = w.resolve_domain(w.get_domain() + ".myaddr.io")
+    address_status = "IPv4:".ljust(20) + str(addresses["ipv4"]) + "\n" + "IPv6:".ljust(20) + str(addresses["ipv6"])
+
+
+    status = my_domain + "\n\n" +  port_status + "\n" + dns_status + "\n" + myaddr_status + "\n" + certbot_status + "\n" + address_status
+    w.logger.debug("Stat: %s", status)
+
+    return status
+
+
+def restart_service_cron(key):
+    w.logger.debug("Restarting cron")
+    config = w.load_dot_env()
+   
+    with podman.PodmanClient() as client:
+        if not client.ping():
+            return {"error": {"status": "down", "health": "unknown"}}
+
+        cron_container_name = config["PROJ_NAME"] + "-cron-1"
+
+        # Restart the container
+        try:
+            w.logger.debug("try cron")
+            container = client.containers.get(cron_container_name)
+            container.restart()
+        except NotFound:
+            w.logger.debug("except")
+            subprocess.run(["bash", "docker", "compose", "up", "cron", "-d" ], check=True, capture_output=True, text=True,)
+
+
+def restart_service_haproxy(key):
+    w.logger.debug("Restarting haproxy")
+    config = w.load_dot_env()
+   
+    with podman.PodmanClient() as client:
+        if not client.ping():
+            return {"error": {"status": "down", "health": "unknown"}}
+
+        cron_container_name = config["PROJ_NAME"] + "-haproxy-1"
+
+        # Restart the container
+        try:
+            w.logger.debug("try ha")
+            container = client.containers.get(cron_container_name)
+            container.restart()
+        except NotFound:
+            w.logger.debug("except ha")
+            # subprocess.run(["bash", "docker", "compose", "up", "cron", "-d" ], check=True, capture_output=True, text=True,)
 
 
 def add_downloads_backups(key):
@@ -313,13 +445,15 @@ def delete_downloads(key):
 
 def refresh(loop, data):
     """Update the UI every 2 seconds."""
+    lines_access = build_status_display_access()
+
     podman_data = get_docker_status()
     lines_podman = build_status_display_podman(podman_data)
 
     aria_data = w.get_aria_downloads()
     lines_aria = build_status_display_aria(aria_data)
 
-    lines = lines_podman + "\n\n" + lines_aria
+    lines = lines_access + "\n\n" + lines_podman + "\n\n" + lines_aria
 
     status_widget.set_text(("Status", lines))
     loop.set_alarm_in(5, refresh)
@@ -346,6 +480,8 @@ menu_top = w.SubMenu(
                 w.InputField("Ticker", envKey="NODE_TICKER"),
                 w.InputField("E-mail (Cert)", envKey="NODE_EMAIL"),
                 w.TextField(""),
+                w.InputField("IPv6 Enable", envKey="IP_V6_ENABLED"),
+                w.TextField(""),
                 w.InputField("Backup folder", envKey="BACKUP_DIR"),
                 w.InputField("Backup URL", envKey="REMOTE_BACKUP_URL"),
                 w.InputField("Backup user", envKey="REMOTE_BACKUP_USER"),
@@ -367,13 +503,15 @@ menu_top = w.SubMenu(
                 w.EditField("  ", 'https://myaddr.tools/claim'),
                 w.TextField('Copy the token and paste it in the input below'),
                 w.TextField(""),
-                w.InputField("MyAddr token", envKey="MYADDR_TOKEN")
+                w.InputField("MyAddr token", envKey="MYADDR_TOKEN"),
+                w.TextField(""),
+                w.Choice("Restart cron", restart_service_cron),
             ],
         ),
         w.Form(
             "SSL Certificate",
             [
-                w.Choice("Generate ssl certificate", generate_ssh_certificate),
+                w.Choice("Generate", generate_ssl_certificate),
             ],
         ),        
         w.Form(
@@ -386,19 +524,18 @@ menu_top = w.SubMenu(
                 w.Choice("Open port", open_firewall_port),
                 w.TextField("\n  or run the following command in a seperate terminal\n"),
                 w.EditField("  ", "sudo ufw allow " + config["HAPROXY_PORT"], ref="proxy_port" ),
-                # w.EditField("  Password: ", ''),
-                # w.TextField(""),
-                # w.Choice("Add HA-proxy to Firewall rules", open_firewall_port("test")),
             ],
         ),
         w.Form(
             "Sync node",
             [
                 w.Choice("Download backup", add_downloads_backups),
-                w.Choice("Restore from backup", restore_backup),
+                w.TextField("Run this command to restore from backups"),
+                w.EditField(" ", "./scripts/docker/full-restore.sh"),
+                # w.Choice("Restore from backup", restore_backup),
                 w.TextField(""),
                 w.Choice("Download CSnapshot", add_downloads_csnapshot),
-                w.Choice("Restore from CSnapshot", restore_csnapshot),
+                # w.Choice("Restore from CSnapshot", restore_csnapshot),
                 w.TextField(""),
                 w.Choice("Stop downloads", pause_downloads),
                 w.Choice("Start downloads", start_downloads),
@@ -412,6 +549,7 @@ menu_top = w.SubMenu(
     ],
 )
 
+
 palette = [
     (None, "light gray", "black"),
     ("title", "light green", "black"),
@@ -423,6 +561,7 @@ palette = [
     ("focus options", "black", "light gray"),
     ("selected", "white", "dark magenta"),
 ]
+
 
 w.logger.debug("Start")
 
@@ -455,11 +594,13 @@ mainScreen = urwid.Pile([
     status_widget
 ])
 
+
 filler = urwid.Padding(
     urwid.Filler(mainScreen, valign='top'),
     left=5,          # padding on the left
     right=5          # padding on the right
 )
+
 
 # loop = urwid.MainLoop(filler,palette).run()
 loop = urwid.MainLoop(filler,palette)
