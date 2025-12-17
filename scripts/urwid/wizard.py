@@ -12,6 +12,8 @@ import podman
 import json
 import aria2p
 from pathlib import Path
+import secrets
+import string
 
 # composeFilePath = w.SCRIPT_DIR + "/../../docker-compose.yml"
 
@@ -95,9 +97,12 @@ def list_podman_volumes():
 
 def generate_password(key):
 
-    result = subprocess.run(["bash", w.SCRIPT_DIR + "/generate_password.sh"], check=True, capture_output=True, text=True,)
+    alphabet = string.ascii_letters + string.digits
+    password = ''.join(secrets.choice(alphabet) for i in range(20))
     
-    password = result.stdout.strip()
+    # result = subprocess.run(["bash", w.SCRIPT_DIR + "/generate_password.sh"], check=True, capture_output=True, text=True,)
+    # password = result.stdout.strip()
+    
     w.set_env_value("POSTGRES_PASSWORD", password)
 
 
@@ -265,7 +270,6 @@ def restore_csnapshot():
 
 
 def pause_downloads(key):
-    print("delete")
     aria2 = aria2p.API(
         aria2p.Client(
             host="http://localhost",
@@ -280,7 +284,6 @@ def pause_downloads(key):
 
 
 def start_downloads(key):
-    print("delete")
     aria2 = aria2p.API(
         aria2p.Client(
             host="http://localhost",
@@ -295,7 +298,6 @@ def start_downloads(key):
 
 
 def delete_downloads(key):
-    print("delete")
     aria2 = aria2p.API(
         aria2p.Client(
             host="http://localhost",
@@ -320,7 +322,7 @@ def refresh(loop, data):
     lines = lines_podman + "\n\n" + lines_aria
 
     status_widget.set_text(("Status", lines))
-    loop.set_alarm_in(2, refresh)
+    loop.set_alarm_in(5, refresh)
 
 
 def exit_program(key):

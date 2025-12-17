@@ -158,6 +158,8 @@ class InputField(urwid.Edit):
 
 
 class EditField(urwid.Edit):
+    ARROW_KEYS = {'up', 'down', 'left', 'right', 'page up', 'page down', 'home', 'end'}
+
     def __init__(
         self,
         caption: str ,
@@ -171,15 +173,16 @@ class EditField(urwid.Edit):
             top.widget_refs[ref] = self
 
     def keypress(self, size, key):
-        key = super().keypress(size, key)
-
+        
         # if key == 'enter':  # or any key you like
-        pyperclip.copy(self.edit_text)
-        logger.debug("Copied to clipboard: %s", self.edit_text)
-
+        if key not in self.ARROW_KEYS:
+            pyperclip.copy(self.edit_text)
+            logger.debug("Copied to clipboard: %s", self.edit_text)
+        
+        key_pressed = super().keypress(size, key)
         # logger.debug("Key: %s", key)
         # logger.debug("Edit: %s", self.edit_text)
-        return key
+        return key_pressed
 
 
 class TextField(urwid.Text):
