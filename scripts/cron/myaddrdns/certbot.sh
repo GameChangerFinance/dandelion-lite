@@ -12,7 +12,7 @@
 echo "[SSL CERTIFICATE UPDATE] $(date -u)"
 
 echo "Node email: ${NODE_EMAIL}"
-echo "Setting '${MYADDR_DOMAIN}.myaddr.io'" 
+echo "Setting '${MYADDR_DOMAIN}.myaddr.io'"
 
 if [ -z "${NODE_EMAIL}" ]; then
     certbot certonly --manual --non-interactive \
@@ -28,7 +28,7 @@ else
         --preferred-challenges dns \
         --manual-auth-hook /scripts/cron/myaddrdns/certbot_authentication_hook.sh \
         -d "${MYADDR_DOMAIN}.myaddr.io"
-fi              
+fi
 
 /scripts/cron/myaddrdns/certbot_haproxy_hook.sh
 
