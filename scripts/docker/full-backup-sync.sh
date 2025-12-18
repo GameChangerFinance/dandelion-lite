@@ -1,6 +1,6 @@
 #!/bin/bash
 # Example usage: ./full-backup-sync.sh "https://your-dando-node/backups/" myproject_ /tmp/backups/ backup mysecurepass
-set -x
+
 remoteBackupURL=$1
 projectName=$2
 backupDir=$3
