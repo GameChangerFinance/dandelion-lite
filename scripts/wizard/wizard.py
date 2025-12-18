@@ -16,6 +16,7 @@ import string
 import psutil
 from collections import deque
 from podman.errors import NotFound
+import shutil
 
 w.setup_logger()
 
@@ -173,7 +174,6 @@ def get_log_end(file_path, offset=1):
         last_lines = ""
 
     return last_lines
-
 
 
 def open_firewall_port(key):
@@ -474,9 +474,29 @@ def full_restore(key):
     print("Full restore")
 
 
+def copy_env_file(example_file):
+    """Copy example env file to .env"""
+    shutil.copy(w.SCRIPT_DIR + "/../../" + example_file, w.SCRIPT_DIR + "/../../.env")
+
+
+def enable_mainnet(key):
+    copy_env_file(".env.example.mainnet")
+
+    
+def enable_preprod(key):
+    copy_env_file(".env.example.preprod")
+    
+
 menu_top = w.SubMenu(
     "Main Menu",
     [
+        w.SubMenu(
+            "Network",
+            [              
+                w.Choice("Preprod", enable_mainnet),
+                w.Choice("Mainnet", enable_preprod),              
+            ],
+        ),        
         w.Form(
             "User info",
             [              

@@ -369,12 +369,24 @@ def setup_logger():
     logger.addHandler(fh)
 
 def load_dot_env():
+    
+    envFilePath = SCRIPT_DIR + "/../../.env"
+
+    if not os.path.exists(envFilePath):
+        logger.debug(".env not found")
+        envFilePath = SCRIPT_DIR + "/../../.env.example.preprod"
+
     config = dotenv_values(envFilePath)
 
     return config
 
 def get_env_value(key: str) -> None:
 
+    envFilePath = SCRIPT_DIR + "/../../.env"
+    
+    if not os.path.exists(envFilePath):
+        logger.debug(".env not found")
+        envFilePath = SCRIPT_DIR + "/../../.env.example.preprod"
 
     with open(envFilePath) as f:
         for line in f:
