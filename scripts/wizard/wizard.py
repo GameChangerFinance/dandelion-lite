@@ -6,7 +6,6 @@ import requests
 import wizard_lib as w
 import subprocess
 import urwid
-from python_on_whales import docker  
 import podman
 # import yaml
 import json
@@ -165,9 +164,16 @@ def get_log_end(file_path, offset=1):
     offset=2  -> second-to-last line
     offset=3  -> third-to-last line, etc.
     """
-    with open(file_path, "r") as f:
-        last_lines = deque(f, maxlen=offset)
-    return last_lines[0].rstrip("\n")  # first element is the requested line
+    try: 
+        with open(file_path, "r") as f:
+            last_lines = deque(f, maxlen=offset)
+            last_lines[0].rstrip("\n")  # first element is the requested line
+    except FileNotFoundError:
+        w.logger.debug("File not found: %s", file_path)
+        last_lines = ""
+
+    return last_lines
+
 
 
 def open_firewall_port(key):
