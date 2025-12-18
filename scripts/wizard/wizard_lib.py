@@ -30,7 +30,10 @@ def exit_program(key):
 def get_domain():
     config = load_dot_env()
     
-    domain = config["NODE_TICKER"] +"-" + config["PROJ_NAME"]
+    try:
+        domain = config["NODE_TICKER"] +"-" + config["PROJ_NAME"]
+    except KeyError:
+        domain = ""        
     # w.logger.debug(type(domain))
     # logger.debug(domain)
     return domain
