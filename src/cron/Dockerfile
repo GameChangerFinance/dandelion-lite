@@ -4,7 +4,7 @@ FROM alpine:latest
 ARG CARDANO_NODE_VERSION=10.1.4
 
 # Install jq, curl, PostgreSQL client, and gawk b2sum (coreutils)
-RUN apk add --no-cache jq curl postgresql-client gawk git bash coreutils
+RUN apk add --no-cache jq curl postgresql-client gawk git bash coreutils certbot
 
 # Set up the cron job environment
 # Create a directory for cron jobs
