@@ -144,6 +144,8 @@ def resolve_domain(domain: str) -> dict:
         pass
     except dns.resolver.NXDOMAIN:
         pass
+    except dns.resolver.LifetimeTimeout:
+        pass
 
     # Resolve IPv6
     try:
@@ -152,6 +154,8 @@ def resolve_domain(domain: str) -> dict:
     except dns.resolver.NoAnswer:
         pass
     except dns.resolver.NXDOMAIN:
+        pass
+    except dns.resolver.LifetimeTimeout:
         pass
 
     return result
