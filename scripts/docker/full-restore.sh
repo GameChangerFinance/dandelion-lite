@@ -2,7 +2,7 @@
 
 # Load the environment variables
 script_dir=$(dirname "$(realpath "${BASH_SOURCE[@]}")")
-# Remove the last folder from the path and rename it to KLITE_HOME
+# Remove the last 2 folders from the path and rename it to DLITE_HOME
 DLITE_HOME=$(dirname "$(dirname -- "$script_dir")")
 
 cd "$DLITE_HOME" || exit
@@ -25,9 +25,8 @@ echo "About to try restoring all these volumes with these backup files (${backup
 for volumeName in $volumeNames; do
     if [[ $volumeName == "$projectName"* ]]; then   # True if $volumeName starts with $projectName.
         fileName=$(echo $volumeName | sed "s/^${projectName}_//")
-		echo $fileName
-		echo "${volumeName}: ${fileName}.tar.gz"
-		ls -alh "${backupDir}${fileName}.tar.gz" | awk '{print $5, $9}'
+        echo "${volumeName}: ${fileName}.tar.gz"
+        ls -alh "${backupDir}${fileName}.tar.gz" | awk '{print $5, $9}'
     fi
 done
 echo
