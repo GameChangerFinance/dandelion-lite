@@ -1,8 +1,15 @@
-#/bin/sh
+#!/bin/bash
+
+# Load the environment variables
+script_dir=$(dirname "$(realpath "${BASH_SOURCE[@]}")")
+# Remove the last 2 folders from the path and rename it to DLITE_HOME
+DLITE_HOME=$(dirname "$(dirname -- "$script_dir")")
+
+cd "$DLITE_HOME" || exit
 source .env
 
-projectName=$1
-backupDir=$2
+projectName=${1:-"$PROJ_NAME"}
+backupDir=${2:-"$BACKUP_DIR"}
 postgresService="postgress"
 
 
