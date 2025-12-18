@@ -2,7 +2,9 @@
 
 set -e
 
-CERT_DIR="/etc/letsencrypt/live/${MYADDR_DOMAIN}.myaddr.io"
+MYADDR_DOMAIN_LOWER=$(echo "${MYADDR_DOMAIN}" | tr '[:upper:]' '[:lower:]')
+CERT_DIR="/etc/letsencrypt/live/${MYADDR_DOMAIN_LOWER}.myaddr.io"
+
 PEM_OUTPUT="/data/ssl/server.pem"
 
 echo "Setting up Haproxy keys for ${MYADDR_DOMAIN}.myaddr.io"
