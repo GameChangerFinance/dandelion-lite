@@ -165,13 +165,15 @@ def get_log_end(file_path, offset=1):
     offset=2  -> second-to-last line
     offset=3  -> third-to-last line, etc.
     """
-    try: 
-        with open(file_path, "r") as f:
-            last_lines = deque(f, maxlen=offset)
-            last_lines[0].rstrip("\n")  # first element is the requested line
-    except FileNotFoundError:
-        w.logger.debug("File not found: %s", file_path)
-        last_lines = ""
+    # try: 
+    #     with open(file_path, "r") as f:
+    #         last_lines = deque(f, maxlen=offset)
+    #         last_lines[0].rstrip("\n")  # first element is the requested line
+    # except FileNotFoundError:
+    #     w.logger.debug("File not found: %s", file_path)
+    #     last_lines = ""
+
+    last_lines = ""
 
     return last_lines
 
@@ -482,7 +484,7 @@ def copy_env_file(example_file):
 def enable_mainnet(key):
     copy_env_file(".env.example.mainnet")
 
-    
+
 def enable_preprod(key):
     copy_env_file(".env.example.preprod")
     
