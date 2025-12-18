@@ -92,8 +92,8 @@ services:
         max-file: "10"
     ports:
       - ${OGMIOS_PORT:-1337}:1337
-      #Exposes node for relay connections- comment to disable
-      - ${CARDANO_NODE_RELAY_PORT:-3000}:3000 
+      #Exposes node for relay connections - uncomment to enable
+      #- ${CARDANO_NODE_RELAY_PORT:-3000}:3000 
     environment:
       NETWORK: ${NETWORK}
       #SOCKET: "${CARDANO_NODE_HOME}/ipc/node.socket" 
@@ -103,8 +103,9 @@ services:
       #- node-db:/db
       #- node-ipc:/ipc 
       # Uncomment if you want to use your own config files or the provided ones.
+      # To enable your node as a relay node for example. 
       # Current configs are also available at: https://book.world.dev.cardano.org/
-      - ./configs/cardano/config/network/${NETWORK}:/config
+      #- ./configs/cardano/config/network/${NETWORK}:/config
       - node-db:${CARDANO_NODE_HOME}/db
       - node-ipc:${CARDANO_NODE_HOME}/ipc
       - ./scripts/cardano-node-ogmios/:/scripts/

@@ -1,0 +1,43 @@
+{
+  "bootstrapPeers": [
+    {
+      "address": "backbone.cardano.iog.io",
+      "port": 3001
+    },
+    {
+      "address": "backbone.mainnet.emurgornd.com",
+      "port": 3001
+    },
+    {
+      "address": "backbone.mainnet.cardanofoundation.org",
+      "port": 3001
+    }
+  ],
+  "localRoots": [
+    {
+      "accessPoints": [
+        {
+          "address": "block-producer-ip_address",
+          "port": 6000,
+          "name": "block-producer"
+        }
+      ],
+      "advertise": false,
+      "trustable": true,
+      "valency": 1
+    }
+  ],
+  "publicRoots": [
+    {
+      "accessPoints": [
+        {
+          "address": "relay-ip_address",
+          "port": 6000,
+          "name": "relay"
+        }
+      ],
+      "advertise": true
+    }
+  ],
+  "useLedgerAfterSlot": 128908821
+}
