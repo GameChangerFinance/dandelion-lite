@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 import requests
 import wizard_lib as w
 import subprocess
@@ -14,11 +15,17 @@ from pathlib import Path
 import secrets
 import string
 import psutil
-from collections import deque
 from podman.errors import NotFound
 import shutil
 
-w.setup_logger()
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+DLITE_DIR = w.go_up(SCRIPT_DIR, 2)
+envFilePath = DLITE_DIR + "/.env"
+print("script: " + SCRIPT_DIR)
+print("compose: " + DLITE_DIR)
+print(".env: " + envFilePath)
+
+w.setup_logger(DLITE_DIR)
 
 config = w.load_dot_env()
 
@@ -157,27 +164,6 @@ def check_domain_access(url) -> bool:
         return status
 
 
-def get_log_end(file_path, offset=1):
-    """
-    Get a line from the bottom of a file.
-    
-    offset=1  -> last line
-    offset=2  -> second-to-last line
-    offset=3  -> third-to-last line, etc.
-    """
-    # try: 
-    #     with open(file_path, "r") as f:
-    #         last_lines = deque(f, maxlen=offset)
-    #         last_lines[0].rstrip("\n")  # first element is the requested line
-    # except FileNotFoundError:
-    #     w.logger.debug("File not found: %s", file_path)
-    #     last_lines = ""
-
-    last_lines = ""
-
-    return last_lines
-
-
 def open_firewall_port(key):
     
     config = w.load_dot_env()
@@ -288,14 +274,14 @@ def build_status_display_access():
 
     dns_status = "Domain:".ljust(20) + check_domain_access(my_domain)
     
-    logFilePath = w.SCRIPT_DIR + "/../../logs/cron/myaddrdns_update.log"
+    logFilePath = SCRIPT_DIR + "/../../logs/cron/myaddrdns_update.log"
 
-    myaddr_log_status = get_log_end(logFilePath, offset=2)
+    myaddr_log_status = w.get_log_end(logFilePath, offset=2)
     myaddr_status = "Myaddr status:".ljust(20) + myaddr_log_status
 
-    logFilePath = w.SCRIPT_DIR + "/../../logs/cron/myaddrdns_certbot.log"
+    logFilePath = SCRIPT_DIR + "/../../logs/cron/myaddrdns_certbot.log"
 
-    certbot_log_status = get_log_end(logFilePath, offset=2)
+    certbot_log_status = w.get_log_end(logFilePath, offset=2)
     certbot_status = "Certbot status:".ljust(20) + certbot_log_status
 
     addresses = w.resolve_domain(w.get_domain() + ".myaddr.io")
@@ -487,8 +473,21 @@ def enable_mainnet(key):
 
 def enable_preprod(key):
     copy_env_file(".env.example.preprod")
-    
 
+def apply_config_changes(key):
+
+    for ref in w.top.widget_refs:
+        w.logger.debug("Ref: %s", ref)
+        w.logger.debug(w.top.widget_refs[ref].edit_text)
+
+        w.top.config[ref] = w.top.widget_refs[ref].edit_text
+        
+    # y = w.top.widget_refs
+    # x = w.top.widget_list
+    print("apply")
+
+config = w.get_user_env()    
+# print(str(config))
 menu_top = w.SubMenu(
     "Main Menu",
     [
@@ -502,18 +501,20 @@ menu_top = w.SubMenu(
         w.Form(
             "User info",
             [              
-                w.InputField("Project name", envKey="PROJ_NAME"),
-                w.InputField("Port offset", envKey="PORT_OFFSET"),
-                w.InputField("Node name", envKey="NODE_NAME"),
-                w.InputField("Ticker", envKey="NODE_TICKER"),
-                w.InputField("E-mail (Cert)", envKey="NODE_EMAIL"),
+                w.InputField("Project name", config, ref="PROJ_NAME"),
+                w.InputField("Port offset", config, ref="PORT_OFFSET"),
+                w.InputField("Node name", config, ref="NODE_NAME"),
+                w.InputField("Ticker", config, ref="NODE_TICKER"),
+                w.InputField("E-mail (Cert)", config, ref="NODE_EMAIL"),
                 w.TextField(""),
-                w.InputField("IPv6 Enable", envKey="IP_V6_ENABLED"),
+                w.InputField("IPv6 Enable", config, ref="IP_V6_ENABLED"),
                 w.TextField(""),
-                w.InputField("Backup folder", envKey="BACKUP_DIR"),
-                w.InputField("Backup URL", envKey="REMOTE_BACKUP_URL"),
-                w.InputField("Backup user", envKey="REMOTE_BACKUP_USER"),
-                w.InputField("Backup password", envKey="REMOTE_BACKUP_PASSWORD"),                
+                w.InputField("Backup folder", config, ref="BACKUP_DIR"),
+                w.InputField("Backup URL", config, ref="REMOTE_BACKUP_URL"),
+                w.InputField("Backup user", config, ref="REMOTE_BACKUP_USER"),
+                w.InputField("Backup password", config, ref="REMOTE_BACKUP_PASSWORD"),                
+                w.TextField(""),
+                w.Choice("Apply", apply_config_changes),
             ],
         ),
         w.SubMenu(
@@ -531,7 +532,7 @@ menu_top = w.SubMenu(
                 w.EditField("  ", 'https://myaddr.tools/claim'),
                 w.TextField('Copy the token and paste it in the input below'),
                 w.TextField(""),
-                w.InputField("MyAddr token", envKey="MYADDR_TOKEN"),
+                w.InputField("MyAddr token", config, ref="MYADDR_TOKEN"),
                 w.TextField(""),
                 w.Choice("Restart cron", restart_service_cron),
             ],
@@ -551,7 +552,7 @@ menu_top = w.SubMenu(
                 w.TextField(""),
                 w.Choice("Open port", open_firewall_port),
                 w.TextField("\n  or run the following command in a seperate terminal\n"),
-                w.EditField("  ", "sudo ufw allow " + config["HAPROXY_PORT"], ref="proxy_port" ),
+                w.EditField("  ", "sudo ufw allow 308" + config["PORT_OFFSET"], ref="proxy_port" ),
             ],
         ),
         w.Form(

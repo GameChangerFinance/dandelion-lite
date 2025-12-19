@@ -13,13 +13,16 @@ import subprocess
 import aria2p
 import pyperclip
 import dns.resolver
+from collections import deque
 
 if typing.TYPE_CHECKING:
     from collections.abc import Callable, Hashable, Iterable
 
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-print(SCRIPT_DIR)
-envFilePath = SCRIPT_DIR + "/../../.env"
+
+def go_up(path, levels=1):
+    for _ in range(levels):
+        path = os.path.dirname(path)
+    return path
 
 focus_map = {"heading": "focus heading", "options": "focus options", "line": "focus line"}
 
@@ -179,13 +182,18 @@ class InputField(urwid.Edit):
     def __init__(
         self,
         caption: str ,
-        callback: typing.Callable[[str], typing.Any] | None = save_user_info,
-        envKey: str = ""
+        # callback: typing.Callable[[str], typing.Any] | None = save_user_info,
+        config: dict = {},
+        ref: str | None = None
     ) -> None:
         caption = "  " + caption.ljust(15) + ": "
-        super().__init__(caption, edit_text=get_env_value(envKey))
-        self.callback = callback
-        self.envKey = envKey
+        super().__init__(caption, edit_text=config[ref])
+        # super().__init__(caption, edit_text=self.config[envKey])
+        # self.callback = callback
+        self.envKey = ref
+
+        if ref:
+            top.widget_refs[ref] = self
 
     def keypress(self, size, key):
         key = super().keypress(size, key)
@@ -193,8 +201,8 @@ class InputField(urwid.Edit):
         # logger.debug("Key: %s", key)
         # logger.debug("Edit: %s", self.edit_text)
 
-        if self.callback:
-            self.callback(self.envKey, self.edit_text)
+        # if self.callback:
+        #     self.callback(self.envKey, self.edit_text)
 
         return key
 
@@ -309,6 +317,7 @@ class Form(urwid.WidgetWrap[MenuButton]):
             )
         )
         self.menu = urwid.AttrMap(listbox, "options")
+        self.config = get_env_file()
 
     def update_choices(self, new_choices: list[urwid.Widget]) -> None:
         # Remove old choices (assuming header + line + divider = first 3)
@@ -320,9 +329,18 @@ class Form(urwid.WidgetWrap[MenuButton]):
 
 
 class HorizontalBoxes(urwid.Columns):
-    def __init__(self,) -> None:
+    def __init__(self, config=None) -> None:
         super().__init__([], dividechars=1)
         self.widget_refs: dict[str, urwid.Widget] = {}
+        self.config = {}
+
+        # SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+        # DLITE_DIR = go_up(SCRIPT_DIR, 2)
+        # envFilePath = DLITE_DIR + "/.env"
+
+        # self.config = get_user_env(envFilePath) if envFilePath else {}
+        # self.envFilePath = envFilePath
+
 
     def open_box(self, box: urwid.Widget) -> None:
         # logger.debug("open_box")
@@ -355,14 +373,21 @@ class HorizontalBoxes(urwid.Columns):
 
         self.focus_position = len(self.contents) - 1
 
+    # def update_config(self, **kwargs):
+    #     """Update config values"""
+    #     self.config = get_user_env(self.envFilePath) if envFilePath else {}
+
+
+
 logger = logging.getLogger("mypassword")
 
-def setup_logger():
+
+def setup_logger(DLITE_DIR):
     # Create a dedicated logger
     logger.setLevel(logging.DEBUG)  # Only messages DEBUG or higher
 
     # Create a file handler
-    fh = logging.FileHandler(SCRIPT_DIR + "/debug.log", mode="w")  # 'w' overwrites each run
+    fh = logging.FileHandler(DLITE_DIR + "/wizard-debug.log", mode="w")  # 'w' overwrites each run
     fh.setLevel(logging.DEBUG)
 
     # Optional: format messages
@@ -375,34 +400,100 @@ def setup_logger():
 
     logger.addHandler(fh)
 
-def load_dot_env():
+
+def get_log_end(file_path, offset=1):
+    """
+    Get a line from the bottom of a file.
     
-    envFilePath = SCRIPT_DIR + "/../../.env"
+    offset=1  -> last line
+    offset=2  -> second-to-last line
+    offset=3  -> third-to-last line, etc.
+    """
+
+    last_lines = ""
+
+    try: 
+        with open(file_path, "r") as f:
+            last_lines = list(deque(f, maxlen=offset))[0].rstrip("\n")
+    except FileNotFoundError:
+        logger.debug("Log file not found: %s", file_path)
+        last_lines = ""
+    except IndexError:
+        logger.debug("Log index error")
+        last_lines = ""
+
+    return last_lines
+
+def get_env_file():
+    SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+    DLITE_DIR = go_up(SCRIPT_DIR, 2)
+    envFilePath = DLITE_DIR + "/.env"
+
+    return envFilePath
+
+
+def load_dot_env():
+
+    envFilePath = get_env_file() 
 
     if not os.path.exists(envFilePath):
         logger.debug(".env not found")
-        envFilePath = SCRIPT_DIR + "/../../.env.example.preprod"
+        envFilePath = envFilePath + ".example.preprod"
 
     config = dotenv_values(envFilePath)
 
     return config
 
+
 def get_env_value(key: str) -> None:
 
-    envFilePath = SCRIPT_DIR + "/../../.env"
-    
-    if not os.path.exists(envFilePath):
-        logger.debug(".env not found")
-        envFilePath = SCRIPT_DIR + "/../../.env.example.preprod"
+    envFilePath = get_env_file()
+
+    value = ""
+    # envFilePath = SCRIPT_DIR + "/../../.env"
+    marker = "####        ADVANCED        #####"
 
     with open(envFilePath) as f:
         for line in f:
+            if marker in line:
+                break
             if line.startswith(key):
                 key, value = line.strip().split("=", 1)
     
     return value
 
-def set_env_value(key: str, value: str) -> None:
+def get_user_env() -> dict:
+    config = {}
+    envFilePath = get_env_file()
+    marker = "####        ADVANCED        #####"
+
+    with open(envFilePath) as f:
+        for line in f:
+            line = line.strip()
+
+            # stop at marker
+            if marker in line:
+                break
+
+            # skip empty lines + comments
+            if not line or line.startswith("#"):
+                continue
+
+            # must contain '=' to be valid
+            if "=" not in line:
+                continue
+
+            # split key=value
+            key, value = line.split("=", 1)
+            key = key.strip()
+            value = value.strip()
+
+            config[key] = value
+
+    return config
+
+
+def set_env_value(key: str, value: str, envFilePath) -> None:
     env_path = Path(envFilePath)
     key_re = re.compile(rf"^\s*{re.escape(key)}\s*=")
 
