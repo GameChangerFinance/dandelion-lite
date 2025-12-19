@@ -30,24 +30,23 @@ def exit_program(key):
     raise urwid.ExitMainLoop()     
 
 
-def get_domain():
-    config = load_dot_env()
+def get_domain(config):
     
-    try:
-        domain = config["NODE_TICKER"] +"-" + config["PROJ_NAME"]
-    except KeyError:
-        domain = ""        
-    # w.logger.debug(type(domain))
+    project_name = config["PROJ_NAME"].replace("${NETWORK}", config["NETWORK"])
+    # config = load_dot_env()
+    domain = config["NODE_TICKER"] +"-" + project_name
+    # try:
+    #     domain = config["NODE_TICKER"] +"-" + config["PROJ_NAME"]
+    # except KeyError:
+    #     domain = ""        
+    # # w.logger.debug(type(domain))
     # logger.debug(domain)
     return domain
 
 
-def update_interface(key):
-
-    config = load_dot_env()
-    # logger.debug(get_domain())
+def update_interface():
     top.widget_refs["domain"].set_edit_text(get_domain())
-    top.widget_refs["proxy_port"].set_edit_text("sudo ufw allow " + config["HAPROXY_PORT"])
+    top.widget_refs["proxy_port"].set_edit_text("sudo ufw allow 308" + top.config["PORT_OFFSET"])
 
 
 def save_user_info(key, value):
@@ -333,16 +332,10 @@ class HorizontalBoxes(urwid.Columns):
         super().__init__([], dividechars=1)
         self.widget_refs: dict[str, urwid.Widget] = {}
         self.config = {}
-
-        # SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-        # DLITE_DIR = go_up(SCRIPT_DIR, 2)
-        # envFilePath = DLITE_DIR + "/.env"
-
-        # self.config = get_user_env(envFilePath) if envFilePath else {}
-        # self.envFilePath = envFilePath
-
-
+        self.status = ""
+    
     def open_box(self, box: urwid.Widget) -> None:
+
         # logger.debug("open_box")
         if self.contents:
             del self.contents[self.focus_position + 1 :]
@@ -358,12 +351,9 @@ class HorizontalBoxes(urwid.Columns):
         self.focus_position = len(self.contents) - 1
 
     def open_form(self, box: urwid.Widget) -> None:
-        # logger.debug("open_form %s", self)
-
         if self.contents:
             del self.contents[self.focus_position + 1 :]
 
-        # logger.debug("Append %s", box)
         self.contents.append(
             (
                 urwid.AttrMap(box, "options", focus_map),
@@ -372,11 +362,6 @@ class HorizontalBoxes(urwid.Columns):
         )
 
         self.focus_position = len(self.contents) - 1
-
-    # def update_config(self, **kwargs):
-    #     """Update config values"""
-    #     self.config = get_user_env(self.envFilePath) if envFilePath else {}
-
 
 
 logger = logging.getLogger("mypassword")
@@ -424,6 +409,7 @@ def get_log_end(file_path, offset=1):
 
     return last_lines
 
+
 def get_env_file():
     SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
     DLITE_DIR = go_up(SCRIPT_DIR, 2)
@@ -462,6 +448,7 @@ def get_env_value(key: str) -> None:
     
     return value
 
+
 def get_user_env() -> dict:
     config = {}
     envFilePath = get_env_file()
@@ -493,7 +480,8 @@ def get_user_env() -> dict:
     return config
 
 
-def set_env_value(key: str, value: str, envFilePath) -> None:
+def set_env_value(key: str, value: str) -> None:
+    envFilePath = get_env_file()
     env_path = Path(envFilePath)
     key_re = re.compile(rf"^\s*{re.escape(key)}\s*=")
 

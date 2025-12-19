@@ -17,6 +17,8 @@ import string
 import psutil
 from podman.errors import NotFound
 import shutil
+import threading
+import time
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 DLITE_DIR = w.go_up(SCRIPT_DIR, 2)
@@ -106,9 +108,6 @@ def generate_password(key):
     alphabet = string.ascii_letters + string.digits
     password = ''.join(secrets.choice(alphabet) for i in range(20))
     
-    # result = subprocess.run(["bash", w.SCRIPT_DIR + "/generate_password.sh"], check=True, capture_output=True, text=True,)
-    # password = result.stdout.strip()
-
     w.set_env_value("POSTGRES_PASSWORD", password)
 
 
@@ -268,9 +267,12 @@ def build_status_display_aria(downloads):
 def build_status_display_access():
     config = w.load_dot_env()
   
-    port_status = ("HA-proxy port " + config["HAPROXY_PORT"] + ": ").ljust(20) + check_port_status(config["HAPROXY_PORT"])
+    sub_domain = w.get_domain(config)
+
+    haproxy_port = "308" + w.top.config["PORT_OFFSET"]
+    port_status = ("HA-proxy port " + haproxy_port + ": ").ljust(20) + check_port_status(haproxy_port)
     
-    my_domain = "https://" + w.get_domain() + ".myaddr.io:" + config["HAPROXY_PORT"]
+    my_domain = "https://" + sub_domain + ".myaddr.io:" + config["HAPROXY_PORT"]
 
     dns_status = "Domain:".ljust(20) + check_domain_access(my_domain)
     
@@ -284,7 +286,7 @@ def build_status_display_access():
     certbot_log_status = w.get_log_end(logFilePath, offset=2)
     certbot_status = "Certbot status:".ljust(20) + certbot_log_status
 
-    addresses = w.resolve_domain(w.get_domain() + ".myaddr.io")
+    addresses = w.resolve_domain(sub_domain + ".myaddr.io")
     address_status = "IPv4:".ljust(20) + str(addresses["ipv4"]) + "\n" + "IPv6:".ljust(20) + str(addresses["ipv6"])
 
 
@@ -294,7 +296,20 @@ def build_status_display_access():
     return status
 
 
-def restart_service_cron(key):
+def build_status_display():
+    lines_access = build_status_display_access()
+
+    podman_data = get_docker_status()
+    lines_podman = build_status_display_podman(podman_data)
+
+    aria_data = w.get_aria_downloads()
+    lines_aria = build_status_display_aria(aria_data)
+
+    lines = lines_access + "\n\n" + lines_podman + "\n\n" + lines_aria
+
+    return lines
+
+def restart_service_cron():
     w.logger.debug("Restarting cron")
     config = w.load_dot_env()
    
@@ -438,18 +453,9 @@ def delete_downloads(key):
 
 
 def refresh(loop, data):
-    """Update the UI every 2 seconds."""
-    lines_access = build_status_display_access()
+    """Update the UI every 5 seconds."""
 
-    podman_data = get_docker_status()
-    lines_podman = build_status_display_podman(podman_data)
-
-    aria_data = w.get_aria_downloads()
-    lines_aria = build_status_display_aria(aria_data)
-
-    lines = lines_access + "\n\n" + lines_podman + "\n\n" + lines_aria
-
-    status_widget.set_text(("Status", lines))
+    status_widget.set_text(("Status", w.top.status))
     loop.set_alarm_in(5, refresh)
 
 
@@ -477,17 +483,23 @@ def enable_preprod(key):
 def apply_config_changes(key):
 
     for ref in w.top.widget_refs:
-        w.logger.debug("Ref: %s", ref)
-        w.logger.debug(w.top.widget_refs[ref].edit_text)
+        if ref[0].isupper():
+            value = w.top.widget_refs[ref].edit_text
+            w.logger.debug("Ref: %s %s", ref.ljust(25), str(value))
+            
+            # Save the edited text to the config object
+            w.top.config[ref] = value
+            w.set_env_value(ref, value)
+    
+    w.update_interface()
 
-        w.top.config[ref] = w.top.widget_refs[ref].edit_text
-        
-    # y = w.top.widget_refs
-    # x = w.top.widget_list
-    print("apply")
 
-config = w.get_user_env()    
-# print(str(config))
+def apply_domain_setup(key):
+    apply_config_changes("x")
+    restart_service_cron()
+
+config = w.get_user_env()
+
 menu_top = w.SubMenu(
     "Main Menu",
     [
@@ -527,14 +539,14 @@ menu_top = w.SubMenu(
             "Domain setup",
             [
                 w.TextField("Go to the link below and claim this domain:"),
-                w.EditField("  ", w.get_domain(), ref="domain"),
+                w.EditField("  ", w.get_domain(config), ref="domain"),
                 w.TextField(""),
                 w.EditField("  ", 'https://myaddr.tools/claim'),
                 w.TextField('Copy the token and paste it in the input below'),
                 w.TextField(""),
                 w.InputField("MyAddr token", config, ref="MYADDR_TOKEN"),
                 w.TextField(""),
-                w.Choice("Restart cron", restart_service_cron),
+                w.Choice("Apply", apply_domain_setup),
             ],
         ),
         w.Form(
@@ -606,6 +618,9 @@ title = r"""
 """
 
 w.top.open_box(menu_top.menu)
+
+w.top.config = config
+w.top.status = build_status_display()
 
 # domain_widget = w.top.base_widget.base_widget.focus.base_widget._body[5].menu._original_widget._body[4]
 
