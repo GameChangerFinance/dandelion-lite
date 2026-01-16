@@ -29,7 +29,7 @@ install_dependencies() {
       source /etc/os-release
       case "${ID}" in
         ubuntu|debian)
-          if ! sudo apt update && sudo apt install -y gpg curl gawk; then return 1; fi
+          if ! sudo apt update && sudo apt install -y gpg curl gawk aria2; then return 1; fi
           if ! sudo mkdir -p /etc/apt/keyrings; then return 1; fi
           if [[ ! -f /etc/apt/keyrings/charm.gpg ]] && ! curl -fsSL https://repo.charm.sh/apt/gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/charm.gpg; then return 1; fi
           if ! echo "deb [signed-by=/etc/apt/keyrings/charm.gpg] https://repo.charm.sh/apt/ * *" | sudo tee /etc/apt/sources.list.d/charm.list; then return 1; fi
