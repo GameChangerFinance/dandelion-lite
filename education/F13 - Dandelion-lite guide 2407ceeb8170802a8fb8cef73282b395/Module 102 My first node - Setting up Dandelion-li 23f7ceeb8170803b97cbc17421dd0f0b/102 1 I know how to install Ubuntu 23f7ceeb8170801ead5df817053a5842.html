@@ -1,0 +1,682 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>102.1 I know how to install Ubuntu</title><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 3px;
+	padding: 1rem;
+}
+
+figure {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.column-list {
+	display: flex;
+	justify-content: space-between;
+}
+
+.column {
+	padding: 0 1em;
+}
+
+.column:first-child {
+	padding-left: 0;
+}
+
+.column:last-child {
+	padding-right: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding: 0.125rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+	border-collapse: collapse;
+}
+
+table {
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+	margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-block;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	transform: scale(1.5);
+	margin-right: 0.6em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1.25em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(50, 48, 44, 1);
+}
+.highlight-gray {
+	color: rgba(115, 114, 110, 1);
+	fill: rgba(115, 114, 110, 1);
+}
+.highlight-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.highlight-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.highlight-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.highlight-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.highlight-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(205, 60, 58, 1);
+	fill: rgba(205, 60, 58, 1);
+}
+.highlight-default_background {
+	color: rgba(50, 48, 44, 1);
+}
+.highlight-gray_background {
+	background: rgba(248, 248, 247, 1);
+}
+.highlight-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.highlight-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.highlight-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.highlight-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.highlight-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.highlight-purple_background {
+	background: rgba(248, 243, 252, 1);
+}
+.highlight-pink_background {
+	background: rgba(252, 241, 246, 1);
+}
+.highlight-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(115, 114, 110, 1);
+	fill: rgba(115, 114, 110, 1);
+}
+.block-color-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.block-color-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.block-color-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.block-color-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.block-color-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(205, 60, 58, 1);
+	fill: rgba(205, 60, 58, 1);
+}
+.block-color-default_background {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray_background {
+	background: rgba(248, 248, 247, 1);
+}
+.block-color-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.block-color-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.block-color-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.block-color-purple_background {
+	background: rgba(248, 243, 252, 1);
+}
+.block-color-pink_background {
+	background: rgba(252, 241, 246, 1);
+}
+.block-color-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.select-value-color-default { background-color: rgba(84, 72, 49, 0.08); }
+.select-value-color-gray { background-color: rgba(84, 72, 49, 0.15); }
+.select-value-color-brown { background-color: rgba(210, 162, 141, 0.35); }
+.select-value-color-orange { background-color: rgba(224, 124, 57, 0.27); }
+.select-value-color-yellow { background-color: rgba(236, 191, 66, 0.39); }
+.select-value-color-green { background-color: rgba(123, 183, 129, 0.27); }
+.select-value-color-blue { background-color: rgba(93, 165, 206, 0.27); }
+.select-value-color-purple { background-color: rgba(168, 129, 197, 0.27); }
+.select-value-color-pink { background-color: rgba(225, 136, 179, 0.27); }
+.select-value-color-red { background-color: rgba(244, 171, 159, 0.4); }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style></head><body><article id="23f7ceeb-8170-801e-ad5d-f817053a5842" class="page sans"><header><h1 class="page-title">102.1 I know how to install Ubuntu</h1><p class="page-description"></p></header><div class="page-body"><p id="23f7ceeb-8170-80cb-9b82-c331e99539ff" class=""><br/>This guide will walk you through installing <br/><strong>Ubuntu 24.04 LTS (Noble Numbat)</strong> on your computer using a USB stick.</p><h2 id="23f7ceeb-8170-80e5-bec6-daf267508017" class="">Requirements</h2><ul id="23f7ceeb-8170-8089-9854-d6ba69de3993" class="bulleted-list"><li style="list-style-type:disc">A computer with at least:<ul id="23f7ceeb-8170-8056-ba49-cd340befed62" class="bulleted-list"><li style="list-style-type:circle">4 GB RAM</li></ul><ul id="23f7ceeb-8170-80a4-8163-f72748211fdd" class="bulleted-list"><li style="list-style-type:circle">25 GB free disk space</li></ul></li></ul><ul id="23f7ceeb-8170-8042-9eea-c7df07676129" class="bulleted-list"><li style="list-style-type:disc">A USB stick (≥ 4 GB)</li></ul><ul id="23f7ceeb-8170-80bb-b74a-c27b3408b5ff" class="bulleted-list"><li style="list-style-type:disc">Ubuntu 24.04 LTS ISO<br/><br/><table id="2407ceeb-8170-8022-9e60-ff5667f80d67" class="simple-table"><thead class="simple-table-header"><tr id="2407ceeb-8170-8050-a1ff-c7e77bd9b3e1"><th id="GEkV" class="simple-table-header-color simple-table-header"><strong>LINUX TYPE</strong></th><th id="Sd:M" class="simple-table-header-color simple-table-header"><strong>VERSION</strong></th><th id="iQU{" class="simple-table-header-color simple-table-header"><strong>LINK</strong></th><th id="EhH:" class="simple-table-header-color simple-table-header"><strong>DATE</strong></th></tr></thead><tbody><tr id="2407ceeb-8170-80a6-946e-e88060e00ac1"><td id="GEkV" class="">Server [LTS]</td><td id="Sd:M" class="">24.04</td><td id="iQU{" class=""><a href="https://ubuntu.com/download/server/thank-you?version=24.04.2&amp;architecture=amd64&amp;lts=true">click here</a></td><td id="EhH:" class="">12 April 2025</td></tr><tr id="2407ceeb-8170-8052-88ba-da37314bd412"><td id="GEkV" class="">Desktop [LTS]</td><td id="Sd:M" class="">24.04</td><td id="iQU{" class=""><a href="https://ubuntu.com/download/desktop/thank-you?version=24.04.2&amp;architecture=amd64&amp;lts=true">click here</a></td><td id="EhH:" class="">12 April 2025</td></tr></tbody></table></li></ul><ul id="23f7ceeb-8170-80f9-8027-ed290476709f" class="bulleted-list"><li style="list-style-type:disc">A tool to write the ISO to USB (e.g., <a href="https://rufus.ie/">Rufus</a>, <a href="https://www.balena.io/etcher/">balenaEtcher</a>, or GNOME Disks)</li></ul><hr id="23f7ceeb-8170-8073-90da-eaa8f678ced7"/><h2 id="23f7ceeb-8170-80e6-a05a-ff86ecf2bce9" class="">1. <strong>Create a bootable drive</strong></h2><p id="2407ceeb-8170-8088-a035-dae9e827fde8" class="">You can use a thumb-drive, usb-drive, external harddrive, SD-card or even a disc if your server and support system both have disc drives.<div class="indented"><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="2407ceeb-8170-8001-ac0c-f8c2997b5503" class="code"><code class="language-Plain Text" style="white-space:pre-wrap;word-break:break-all">***NOTE***
+Any data on the media being used for this process will be wiped of data</code></pre><ul id="2407ceeb-8170-80bb-828d-e35427a681be" class="bulleted-list"><li style="list-style-type:disc"><code>MacOS:</code> install <a href="https://etcher.balena.io/">balenaEtcher</a> and follow instructions</li></ul><ul id="2407ceeb-8170-80e7-9544-e017a646373e" class="bulleted-list"><li style="list-style-type:disc"><code>Windows:</code> install <a href="https://unetbootin.github.io/">UNetbootin</a> and follow instructions</li></ul><ul id="2407ceeb-8170-80a3-8527-d54307ee9bf4" class="bulleted-list"><li style="list-style-type:disc"><code>Linux:</code> install <a href="https://unetbootin.github.io/">UNetbootin</a> and follow instructions</li></ul></div></p><hr id="23f7ceeb-8170-8038-a075-dcbf267debbf"/><h2 id="23f7ceeb-8170-8061-aaf3-d9e7396456e3" class="">2. Boot from USB</h2><ol type="1" id="23f7ceeb-8170-80ca-89f2-d13d30a5eaff" class="numbered-list" start="1"><li>Insert the USB stick into your computer</li></ol><ol type="1" id="23f7ceeb-8170-809d-8614-f5d41e9d43dc" class="numbered-list" start="2"><li>Reboot and enter your BIOS/UEFI settings (usually by pressing <code>F2</code>, <code>F10</code>, <code>F12</code>, or <code>DEL</code>)</li></ol><ol type="1" id="23f7ceeb-8170-80e4-b670-dfc28fb1c5b0" class="numbered-list" start="3"><li>Change the boot order to boot from USB first</li></ol><ol type="1" id="23f7ceeb-8170-800f-81c6-c711eda45300" class="numbered-list" start="4"><li>Save and exit</li></ol><p id="23f7ceeb-8170-80b1-83d7-f705c0b49945" class="">Your machine should now boot into the Ubuntu installer.</p><hr id="23f7ceeb-8170-80bf-9566-dc1acf5cc1b3"/><h2 id="23f7ceeb-8170-80e6-9ac5-c9fcb20d6457" class="">3. Install Ubuntu 24.04 LTS</h2><p id="23f7ceeb-8170-80bb-a268-c65ec2190c49" class="">After booting into the installer:</p><h3 id="23f7ceeb-8170-8041-8919-d02d40c58a14" class="">Step 1: Choose Language</h3><p id="23f7ceeb-8170-803e-8e08-f567c849fb61" class="">Select your preferred language and click <strong>Try or Install Ubuntu</strong>.</p><h3 id="23f7ceeb-8170-80ad-9235-f8e3f21962f8" class="">Step 2: Keyboard Layout</h3><p id="23f7ceeb-8170-8099-9293-dcafeb2a3335" class="">Choose your keyboard layout and continue.</p><h3 id="23f7ceeb-8170-8048-ab77-d1eb5f84ec32" class="">Step 3: Network (Optional)</h3><p id="23f7ceeb-8170-8064-aab4-e24748a64e2b" class="">Connect to Wi-Fi (optional — updates can be installed later).</p><h3 id="23f7ceeb-8170-80da-8db9-c658e1e827df" class="">Step 4: Installation Type</h3><p id="23f7ceeb-8170-8061-8e62-eff71f89be9b" class="">Choose one of the following:</p><ul id="23f7ceeb-8170-80ab-8e1c-e4b068e18521" class="bulleted-list"><li style="list-style-type:disc"><strong>Erase disk and install Ubuntu</strong> – wipes the entire disk</li></ul><ul id="23f7ceeb-8170-80c8-a789-e22892723711" class="bulleted-list"><li style="list-style-type:disc"><strong>Install alongside another OS</strong> – dual-boot setup</li></ul><ul id="23f7ceeb-8170-8079-986a-d57fd6dfc273" class="bulleted-list"><li style="list-style-type:disc"><strong>Something else</strong> – manual partitioning</li></ul><blockquote id="23f7ceeb-8170-80d0-bfc7-ec745195751e" class="">⚠️ Back up your data before selecting Erase disk!</blockquote><h3 id="23f7ceeb-8170-8013-ad92-ebe2da107101" class="">Step 5: Choose Installation Options</h3><ul id="23f7ceeb-8170-804c-9309-fb14551f72eb" class="bulleted-list"><li style="list-style-type:disc">Select <strong>Normal</strong> or <strong>Minimal installation</strong></li></ul><ul id="23f7ceeb-8170-80d1-9275-ca96e68fc6be" class="bulleted-list"><li style="list-style-type:disc">Enable <strong>Download updates</strong> and <strong>Install third-party software</strong> if needed</li></ul><h3 id="23f7ceeb-8170-800b-bcb1-fdb878f2946c" class="">Step 6: Timezone</h3><p id="23f7ceeb-8170-80e8-baf3-eaff05c35675" class="">Select your location on the map to set your timezone.</p><h3 id="23f7ceeb-8170-8096-aa81-dd7603c566d4" class="">Step 7: Create a User</h3><p id="23f7ceeb-8170-8034-992d-f9654d0b25ff" class="">Fill in your name, username, password, and computer name.</p><hr id="23f7ceeb-8170-80cf-9375-e5645499d38e"/><h2 id="23f7ceeb-8170-807f-b992-f8093765bb48" class="">4. Finish Installation</h2><ul id="23f7ceeb-8170-80e8-83ad-da470bcdd5c8" class="bulleted-list"><li style="list-style-type:disc">Ubuntu will copy files and install the system</li></ul><ul id="23f7ceeb-8170-804c-8cac-d3fed241a2c2" class="bulleted-list"><li style="list-style-type:disc">Once done, <strong>remove the USB</strong> when prompted</li></ul><ul id="23f7ceeb-8170-8073-ace2-ee6a2c547678" class="bulleted-list"><li style="list-style-type:disc">Click <strong>Restart Now</strong></li></ul><h2 id="23f7ceeb-8170-8047-9f66-c783a6ae098c" class="">5. First Boot</h2><p id="23f7ceeb-8170-8071-b855-d3683f7eac44" class="">Log into your new Ubuntu 24.04 LTS system using the credentials you created. You’re now ready to begin using Ubuntu!</p><h2 id="2407ceeb-8170-8026-bf3b-f979374e12e9" class="">6. Install SSH</h2><p id="2407ceeb-8170-8016-b4c3-d1c3cf68bca2" class="">Install <strong>OpenSSH</strong> server to allow for remote system administration.</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="2407ceeb-8170-80f1-9dcb-c1a621d4623b" class="code"><code class="language-Bash">sudo apt install openssh-server</code></pre><ol type="1" id="2407ceeb-8170-8069-9dfc-ec585cb217fa" class="numbered-list" start="1"><li>When install is completed do <code>ip -br a</code> to get the ip address of your newly installed server</li></ol><ol type="1" id="2407ceeb-8170-8036-aed3-fd3416f88a39" class="numbered-list" start="2"><li>From you local system. So not on your server do <code>ssh-copy-id USER_NAME@SERVER_IP</code> This will copy your ssh keys to the server to allow easy login</li></ol><ol type="1" id="2407ceeb-8170-80c2-abdc-c6e68c1d9b77" class="numbered-list" start="3"><li>Do <code>ssh USER_NAME@SERVER_IP</code></li></ol><ol type="1" id="2407ceeb-8170-8068-ac08-d4f2b2cdb9da" class="numbered-list" start="4"><li>It is also possible to create a shorthand for ssh login. This is done in the ~/.ssh/config file. And looks like this.<p id="2407ceeb-8170-80da-acd7-d0e9f69f316e" class=""><code>Host dev<br/>    HostName dev.example.com<br/>    User john<br/>    Port 2322<br/></code></p><p id="2407ceeb-8170-8005-8ccf-c58f620e6ae9" class="">Now when you type <code>ssh dev</code>, the ssh client will read the configuration file and use the connection details that are specified for the <code>dev</code> host:</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="2407ceeb-8170-8081-9701-c5f703e90eef" class="code"><code class="language-Plain Text" style="white-space:pre-wrap;word-break:break-all">ssh dev</code></pre></li></ol><h2 id="23f7ceeb-8170-80e5-9152-f1d38c72515a" class="">Troubleshooting</h2><ul id="23f7ceeb-8170-807c-a63f-f415045e354c" class="bulleted-list"><li style="list-style-type:disc"><strong>No boot option appears?</strong><ul id="23f7ceeb-8170-80c9-a3fa-d71bbb5c80ff" class="bulleted-list"><li style="list-style-type:circle">Make sure Secure Boot is disabled in UEFI</li></ul><ul id="23f7ceeb-8170-80b5-b957-e3a4f89d96d5" class="bulleted-list"><li style="list-style-type:circle">Double-check the USB boot order</li></ul></li></ul><ul id="23f7ceeb-8170-8092-81f2-fa0cfd2ad5e8" class="bulleted-list"><li style="list-style-type:disc"><strong>The Ubuntu installer crashed. </strong><ul id="23f7ceeb-8170-809d-890d-d5cdd4c68556" class="bulleted-list"><li style="list-style-type:circle">Boot the live image into: Ubuntu (safe graphics)</li></ul></li></ul><hr id="23f7ceeb-8170-80c0-84cf-e7a35f1f284a"/><p id="2407ceeb-8170-8010-96e0-dd764e681908" class="">
+</p></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>

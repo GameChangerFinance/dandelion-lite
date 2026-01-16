@@ -1,0 +1,711 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>102.2 I know how to setup our node server</title><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 3px;
+	padding: 1rem;
+}
+
+figure {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.column-list {
+	display: flex;
+	justify-content: space-between;
+}
+
+.column {
+	padding: 0 1em;
+}
+
+.column:first-child {
+	padding-left: 0;
+}
+
+.column:last-child {
+	padding-right: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding: 0.125rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+	border-collapse: collapse;
+}
+
+table {
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+	margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-block;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	transform: scale(1.5);
+	margin-right: 0.6em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1.25em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(50, 48, 44, 1);
+}
+.highlight-gray {
+	color: rgba(115, 114, 110, 1);
+	fill: rgba(115, 114, 110, 1);
+}
+.highlight-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.highlight-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.highlight-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.highlight-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.highlight-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(205, 60, 58, 1);
+	fill: rgba(205, 60, 58, 1);
+}
+.highlight-default_background {
+	color: rgba(50, 48, 44, 1);
+}
+.highlight-gray_background {
+	background: rgba(248, 248, 247, 1);
+}
+.highlight-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.highlight-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.highlight-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.highlight-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.highlight-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.highlight-purple_background {
+	background: rgba(248, 243, 252, 1);
+}
+.highlight-pink_background {
+	background: rgba(252, 241, 246, 1);
+}
+.highlight-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(115, 114, 110, 1);
+	fill: rgba(115, 114, 110, 1);
+}
+.block-color-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.block-color-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.block-color-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.block-color-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.block-color-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(205, 60, 58, 1);
+	fill: rgba(205, 60, 58, 1);
+}
+.block-color-default_background {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray_background {
+	background: rgba(248, 248, 247, 1);
+}
+.block-color-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.block-color-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.block-color-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.block-color-purple_background {
+	background: rgba(248, 243, 252, 1);
+}
+.block-color-pink_background {
+	background: rgba(252, 241, 246, 1);
+}
+.block-color-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.select-value-color-default { background-color: rgba(84, 72, 49, 0.08); }
+.select-value-color-gray { background-color: rgba(84, 72, 49, 0.15); }
+.select-value-color-brown { background-color: rgba(210, 162, 141, 0.35); }
+.select-value-color-orange { background-color: rgba(224, 124, 57, 0.27); }
+.select-value-color-yellow { background-color: rgba(236, 191, 66, 0.39); }
+.select-value-color-green { background-color: rgba(123, 183, 129, 0.27); }
+.select-value-color-blue { background-color: rgba(93, 165, 206, 0.27); }
+.select-value-color-purple { background-color: rgba(168, 129, 197, 0.27); }
+.select-value-color-pink { background-color: rgba(225, 136, 179, 0.27); }
+.select-value-color-red { background-color: rgba(244, 171, 159, 0.4); }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style></head><body><article id="23f7ceeb-8170-80c3-81e3-fb0ecb46948c" class="page sans"><header><h1 class="page-title">102.2 I know how to setup our node server</h1><p class="page-description"></p></header><div class="page-body"><p id="23f7ceeb-8170-804f-8692-ccbc1693354f" class="">Great you have installed your operating system. You are now ready to install your first dandelion nodes. Let’s start with Cardano preprod. </p><h2 id="2407ceeb-8170-805d-a2e5-cfced69fa2fe" class="">1. Change swap file size</h2><p id="2407ceeb-8170-8078-94bc-dd0df08a51b2" class="">The server is running bigger RAM than most machines. Check your swap space. You will need more swap space if you have more RAM. In the case of Ubuntu Desktop we change from default (8GB) to 40G<div class="indented"><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="2407ceeb-8170-80f3-976f-dbaf3b2a2f59" class="code"><code class="language-Plain Text" style="white-space:pre-wrap;word-break:break-all">swapon --show
+sudo swapoff -v /swap.img
+sudo rm -rf /swap.img
+sudo fallocate -l 40G /swap.img
+sudo chmod 0600 /swap.img
+sudo mkswap /swap.img
+sudo swapon
+sudo reboot now</code></pre></div></p><h2 id="2407ceeb-8170-8014-b98b-e73e6d5ec936" class=""><strong>2. Network &amp; firewall</strong></h2><ul id="2407ceeb-8170-804c-b324-f537097791e0" class="bulleted-list"><li style="list-style-type:disc">This section is mostly for Desktop variants of Linux</li></ul><ul id="2407ceeb-8170-80f9-bda8-d5b90b8e9749" class="bulleted-list"><li style="list-style-type:disc">For Server variant commands and setup see pg.2 <a href="https://github.com/st8tikratio/Uselessness/blob/main/node-operations/pdfs/Ubuntu-Server-CLI_cheat-sheet-2024-v6.pdf">HERE</a></li></ul><p id="2407ceeb-8170-806d-9540-fd1d897edd9f" class=""><strong>Setup firewall</strong></p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="2407ceeb-8170-807d-a627-c0beed325f7f" class="code"><code class="language-Plain Text" style="white-space:pre-wrap;word-break:break-all">This install uses UFW, uncomplicated firewall
+You may use any firewall you are comfortable with.
+
+*** NOTE ***
+Your system could possibly become a target for hackers. It is important that you take all seurity precautions.
+The guides within these pages are just that, guides, with no warranty implied or written.
+Use at your own risk.</code></pre><p id="2407ceeb-8170-80fe-83ad-dd1c2b1096c3" class=""><strong>Install GUFW - </strong><code><strong>graphical uncomplicated firewall</strong></code></p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="2407ceeb-8170-80d4-a52d-f0a53509976f" class="code"><code class="language-Bash" style="white-space:pre-wrap;word-break:break-all">sudo apt install gufw</code></pre><ul id="2407ceeb-8170-8083-878b-e72e85899e39" class="bulleted-list"><li style="list-style-type:disc">there should be a shield icon in programs or on desktop menu (Ubuntu Desktop only)<ol type="1" id="2407ceeb-8170-80ce-8c65-f69f54c9b76d" class="numbered-list" start="1"><li>Double-click UFW icon (shield with diagnol stripe)</li></ol><ol type="1" id="2407ceeb-8170-80e5-b1b7-fd9058e10b03" class="numbered-list" start="2"><li>Turn firewall on, click slider</li></ol><ol type="1" id="2407ceeb-8170-80d1-aa7c-cd6230b09cea" class="numbered-list" start="3"><li>Click on Rules</li></ol><ol type="1" id="2407ceeb-8170-80b7-ab2c-e27f6353b990" class="numbered-list" start="4"><li>Click on Simple</li></ol><ol type="1" id="2407ceeb-8170-8011-a50f-ce52f24d6656" class="numbered-list" start="5"><li>Name: create a name for this rule, i.e. c-node</li></ol><ol type="1" id="2407ceeb-8170-8079-bcb9-db361f7383b2" class="numbered-list" start="6"><li>Policy: Allow</li></ol><ol type="1" id="2407ceeb-8170-80e3-9d04-f8c8ed817dc2" class="numbered-list" start="7"><li>Direction: In</li></ol><ol type="1" id="2407ceeb-8170-8049-80b5-e819cb1282ca" class="numbered-list" start="8"><li>Protocol: TCP</li></ol><ol type="1" id="2407ceeb-8170-8026-884a-e4c87c92b715" class="numbered-list" start="9"><li>Port or Service: 3001</li></ol><ol type="1" id="2407ceeb-8170-8023-bc3f-fe9262e440c6" class="numbered-list" start="10"><li>Click on Add</li></ol></li></ul><ul id="2407ceeb-8170-8048-a448-f9ed966960a4" class="bulleted-list"><li style="list-style-type:disc">REPEAT ABOVE for Haproxy on port 8053</li></ul><p id="2407ceeb-8170-80aa-aaf7-fb040b7950b5" class=""><strong>Terminal commands</strong></p><ul id="2407ceeb-8170-8077-b1c3-f30cac41f50a" class="bulleted-list"><li style="list-style-type:disc">allows [port] for TCP<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="2407ceeb-8170-80c5-85da-fb6c543567a9" class="code"><code class="language-Plain Text" style="white-space:pre-wrap;word-break:break-all"> sudo ufw allow &lt;port&gt;/tcp
+</code></pre></li></ul><ul id="2407ceeb-8170-80c5-a0ee-d40be696ba6e" class="bulleted-list"><li style="list-style-type:disc">for more UFW commands go to the manual <a href="https://manpages.ubuntu.com/manpages/xenial/man8/ufw.8.html">HERE</a></li></ul><p id="2407ceeb-8170-8010-b9f2-eb07eaed33be" class=""><strong>communication ports</strong></p><table id="2407ceeb-8170-80c8-85a8-c25748f5297e" class="simple-table"><thead class="simple-table-header"><tr id="2407ceeb-8170-803e-a9d9-c1bb6d799e81"><th id="GKw_" class="simple-table-header-color simple-table-header" style="width:164.0166778564453px"><strong>SERVICE</strong></th><th id="ohPx" class="simple-table-header-color simple-table-header" style="width:71px"><strong>PORT</strong></th><th id="cES@" class="simple-table-header-color simple-table-header" style="width:101px"><strong>STANDARD</strong></th><th id="JQGn" class="simple-table-header-color simple-table-header"><strong>DIRECTION</strong></th><th id="TalV" class="simple-table-header-color simple-table-header"><strong>SETTING LOCATION</strong></th></tr></thead><tbody><tr id="2407ceeb-8170-8019-87be-ca6115cd29ad"><td id="GKw_" class="" style="width:164.0166778564453px">Mainnet - Haproxy</td><td id="ohPx" class="" style="width:71px">3080</td><td id="cES@" class="" style="width:101px">TCP</td><td id="JQGn" class="">Inbound</td><td id="TalV" class="">Router/Gateway</td></tr><tr id="2407ceeb-8170-8002-866b-edc45ab36a4a"><td id="GKw_" class="" style="width:164.0166778564453px">Preprod - Haproxy</td><td id="ohPx" class="" style="width:71px">3081</td><td id="cES@" class="" style="width:101px">TCP</td><td id="JQGn" class="">Inbound</td><td id="TalV" class="">Router/Gateway</td></tr></tbody></table><h2 id="2407ceeb-8170-8070-9514-d25ba2458da2" class="">3. Configuring reboots for security updates</h2><p id="2407ceeb-8170-803f-8344-cc622d07c176" class="">If for some reason the package is not present, it can be installed with the following command:</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="2407ceeb-8170-8052-ad35-da47306a462a" class="code"><code class="language-Shell">sudo apt install unattended-upgrades</code></pre><p id="2407ceeb-8170-8095-aa96-c5a553596350" class="">The server is always running. In some cases a reboot is required for updates to take effect. Because Dandelion-lite is a group of servers, it is generally safe to do this automatically. </p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="2407ceeb-8170-80cf-8771-d50f5bd38478" class="code"><code class="language-Shell">sudo nano /etc/apt/apt.conf.d/50unattended-upgrades</code></pre><p id="2407ceeb-8170-8075-b9bf-e90ce9644e71" class="">Change the following lines</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="2407ceeb-8170-80cf-8da6-e8a70ea7bccd" class="code"><code class="language-Shell">// Automatically reboot WITHOUT CONFIRMATION if
+//  the file /var/run/reboot-required is found after the upgrade
+Unattended-Upgrade::Automatic-Reboot &quot;True&quot;;
+
+// Automatically reboot even if there are users currently logged in
+// when Unattended-Upgrade::Automatic-Reboot is set to true
+//Unattended-Upgrade::Automatic-Reboot-WithUsers &quot;true&quot;;
+
+// If automatic reboot is enabled and needed, reboot at the specific
+// time instead of immediately
+//  Default: &quot;now&quot;
+Unattended-Upgrade::Automatic-Reboot-Time &quot;02:00&quot;;</code></pre><p id="2407ceeb-8170-80f8-8930-d651a3693fb5" class="">In this case when needed the server will reboot at 2 o’clock at night. </p><h2 id="2407ceeb-8170-802d-a4f7-d27e4cecbb49" class="">4. Cloning Dandelion-lite github</h2><p id="2407ceeb-8170-8039-a0bd-ca869a3cf3d5" class="">Cardano can be configured to connect to different networks for example testing. Dandelion-lite comes with two configurations out of the box. Preprod and Mainnet. </p><p id="23f7ceeb-8170-80be-8163-c30fbeb4ce82" class="">Let’s use git to clone the Dandelion-lite repository. Every network requires it’s own docker compose project. So this is a separate git clone. Clone into a folder you put your projects. For example ~/src ( ~ is shorthand for your home folder)</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="23f7ceeb-8170-8028-bbf2-c216a627b526" class="code"><code class="language-Shell">git clone https://github.com/GameChangerFinance/dandelion-lite.git dandelion-preprod</code></pre><p id="23f7ceeb-8170-80ca-9376-c666437435a9" class="">Here we clone the Dandelion-lite repo into the dandelion-preprod folder. </p><h2 id="2407ceeb-8170-80a6-9ea1-d02ae42b58dd" class=""><strong>5. Helpful terminal commands (CLI)</strong></h2><p id="2407ceeb-8170-80e5-aca5-d1ff700ebe6a" class=""><strong>updates &amp; package management</strong></p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="2407ceeb-8170-808b-96b5-d95b7af5b7dd" class="code"><code class="language-Plain Text" style="white-space:pre-wrap;word-break:break-all">Requires root privilege - `sudo` - for full usage
+
+EXAMPLE: sudo apt search sensors
+</code></pre><table id="2407ceeb-8170-8094-bc23-ec71d4542f8f" class="simple-table"><thead class="simple-table-header"><tr id="2407ceeb-8170-80dc-958f-d1c9e27c524e"><th id=":aHS" class="simple-table-header-color simple-table-header"><strong>COMMAND</strong></th><th id="z[`b" class="simple-table-header-color simple-table-header"><strong>ACTION</strong></th><th id="j;HD" class="simple-table-header-color simple-table-header"><strong>OUTPUT</strong></th></tr></thead><tbody><tr id="2407ceeb-8170-8029-ae2c-fb97ef37a1b4"><td id=":aHS" class=""><code>apt update</code></td><td id="z[`b" class="">see which systems &amp; apps need updating</td><td id="j;HD" class="">provides list of updateable items</td></tr><tr id="2407ceeb-8170-800e-9230-ff7a29626de0"><td id=":aHS" class=""><code>apt upgrade</code></td><td id="z[`b" class="">upgrades upgradeable systems &amp; apps</td><td id="j;HD" class=""><strong>note:</strong> may need to press &#x27;Y&#x27;  shows upgrade progress</td></tr><tr id="2407ceeb-8170-8023-b2bb-c12d52977693"><td id=":aHS" class=""><code>apt search [pkg name]</code></td><td id="z[`b" class="">search apt packages for specific app by text</td><td id="j;HD" class="">provides list of matches if found</td></tr><tr id="2407ceeb-8170-806b-ae8e-fd0e34475110"><td id=":aHS" class=""><code>apt info [pkg name]</code></td><td id="z[`b" class="">get information on a package</td><td id="j;HD" class="">limited output, 10-20 lines of info</td></tr><tr id="2407ceeb-8170-80cf-9e6c-ec9f86efb95b"><td id=":aHS" class=""><code>apt remove [pkg name]</code></td><td id="z[`b" class="">remove packages</td><td id="j;HD" class="">may request input  returns to prompt</td></tr></tbody></table><p id="2407ceeb-8170-8088-a627-de65b8bc85b9" class=""><strong>general</strong></p><table id="2407ceeb-8170-8080-9c40-cff4ab6502c1" class="simple-table"><thead class="simple-table-header"><tr id="2407ceeb-8170-8038-a362-e4c787777268"><th id="m|WC" class="simple-table-header-color simple-table-header"><strong>COMMAND</strong></th><th id="iji}" class="simple-table-header-color simple-table-header"><strong>ACTION</strong></th><th id="nmEY" class="simple-table-header-color simple-table-header"><strong>EXAMPLES</strong></th><th id="|y_R" class="simple-table-header-color simple-table-header"><strong>OUTPUT</strong></th></tr></thead><tbody><tr id="2407ceeb-8170-8062-ae66-c9634c67c708"><td id="m|WC" class=""><code>pwd</code></td><td id="iji}" class="">see present working directory (folder)</td><td id="nmEY" class=""></td><td id="|y_R" class=""></td></tr><tr id="2407ceeb-8170-8046-8da0-e81cdf81f84a"><td id="m|WC" class=""><code>ls</code></td><td id="iji}" class="">show files within current directory</td><td id="nmEY" class=""></td><td id="|y_R" class=""></td></tr><tr id="2407ceeb-8170-8054-a879-f76c0f00a99f"><td id="m|WC" class=""><code>cd [namme-of-directory</code></td><td id="iji}" class="">change directory</td><td id="nmEY" class=""><code>cd home/dev</code></td><td id="|y_R" class=""></td></tr><tr id="2407ceeb-8170-80d8-bc3e-f46aa68a5424"><td id="m|WC" class=""><code>cd ..</code></td><td id="iji}" class="">go back one directory level</td><td id="nmEY" class=""></td><td id="|y_R" class=""></td></tr><tr id="2407ceeb-8170-80de-8446-cd521ee14256"><td id="m|WC" class=""><code>cd</code></td><td id="iji}" class="">go back to home directory</td><td id="nmEY" class=""></td><td id="|y_R" class=""></td></tr><tr id="2407ceeb-8170-8030-bb9a-f7b4b6c8aebf"><td id="m|WC" class=""><code>lshw</code></td><td id="iji}" class="">list hardware</td><td id="nmEY" class=""><code>lshw --short</code></td><td id="|y_R" class=""></td></tr><tr id="2407ceeb-8170-8022-9bd6-d404dd51f73e"><td id="m|WC" class=""><code>which</code></td><td id="iji}" class="">which [package name]</td><td id="nmEY" class=""><code>which nano</code></td><td id="|y_R" class="">shows path</td></tr></tbody></table><p id="2407ceeb-8170-80e5-a20e-c0550996e02c" class=""><strong>command flags</strong></p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="2407ceeb-8170-8051-912d-f544f6595697" class="code"><code class="language-Plain Text" style="white-space:pre-wrap;word-break:break-all">Flags can be different between the operating system (Linux) and applications. The flags below are general Linux flags
+
+NOTE: For python use `--version`
+</code></pre><table id="2407ceeb-8170-806e-be0c-cc96096a84d3" class="simple-table"><thead class="simple-table-header"><tr id="2407ceeb-8170-8096-b6ca-f443605d5d1e"><th id="afJj" class="simple-table-header-color simple-table-header"><strong>FLAG</strong></th><th id="~X&gt;K" class="simple-table-header-color simple-table-header"><strong>ACTION</strong></th><th id="Pqi{" class="simple-table-header-color simple-table-header"><strong>EXAMPLES</strong></th><th id="f[t{" class="simple-table-header-color simple-table-header"><strong>OUTPUT</strong>  <strong>EXPLANATION</strong></th></tr></thead><tbody><tr id="2407ceeb-8170-805d-b432-d0fdf499298a"><td id="afJj" class=""><code>-help</code>  <code>-h</code></td><td id="~X&gt;K" class="">help</td><td id="Pqi{" class=""><code>python3 -h</code></td><td id="f[t{" class="">provides usage and options</td></tr><tr id="2407ceeb-8170-8085-b203-f11f15e4129d"><td id="afJj" class=""><code>-version</code>  <code>-v</code></td><td id="~X&gt;K" class="">version</td><td id="Pqi{" class=""><code>python3 --version</code></td><td id="f[t{" class=""><code>Python 3.12.3</code></td></tr><tr id="2407ceeb-8170-8045-9f1c-f402ef54b5de"><td id="afJj" class=""><code>-p</code></td><td id="~X&gt;K" class="">permissions</td><td id="Pqi{" class="">cp -p [filename] [destination]</td><td id="f[t{" class="">copy file &amp; permissions to destination</td></tr></tbody></table></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>

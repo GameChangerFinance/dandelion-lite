@@ -3,8 +3,8 @@ FROM alpine:latest
 
 ARG CARDANO_NODE_VERSION=10.1.4
 
-# Install jq, curl, PostgreSQL client, and gawk b2sum (coreutils)
-RUN apk add --no-cache jq curl postgresql-client gawk git bash coreutils certbot
+# Install jq, curl, PostgreSQL client, and gawk b2sum (coreutils) and tini
+RUN apk add --no-cache jq curl postgresql-client gawk git bash coreutils tini
 
 # Set up the cron job environment
 # Create a directory for cron jobs
@@ -32,6 +32,9 @@ RUN apk add --no-cache ca-certificates curl tar gzip \
      && chmod +x /usr/local/bin/cardano-cli 
 
 # curl tar gzip are used by cron job scripts, do not remove.
+
+# tini as PID 1 to reap orphaned children, otherwise this saturate OS with zombie processes
+ENTRYPOINT ["/sbin/tini", "--"]
 
 # Run the command on container startup
 CMD ["/scripts/cron/entrypoint.sh"]
