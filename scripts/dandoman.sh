@@ -36,7 +36,7 @@ install_dependencies() {
           if ! sudo apt-get update || ! sudo apt install -y gum; then return 1; fi
           ;;
         fedora|rhel)
-          if ! sudo dnf install curl awk;  then return 1; fi
+          if ! sudo dnf install curl awk aria2;  then return 1; fi
           arch=$(uname -m)
           if [ "$arch" = "x86_64" ]; then
             if ! curl -L https://github.com/charmbracelet/gum/releases/download/v0.13.0/gum-0.13.0-1.x86_64.rpm -o gum.rpm || ! sudo dnf install -y ./gum.rpm; then return 1; fi
@@ -49,10 +49,10 @@ install_dependencies() {
           fi
           ;;
         arch|manjaro)
-          if ! sudo pacman -Syu curl awk gum; then return 1; fi
+          if ! sudo pacman -Syu curl awk gum aria2; then return 1; fi
           ;;
         alpine)
-          if ! sudo apk add curl awk gum; then return 1; fi
+          if ! sudo apk add curl awk gum aria2; then return 1; fi
           ;;
         *)
           echo "Unsupported Linux distribution for automatic installation."
@@ -61,10 +61,10 @@ install_dependencies() {
       esac
       ;;
     Darwin*)
-      if ! brew install curl awk gum; then return 1; fi
+      if ! brew install curl awk gum aria2; then return 1; fi
       ;;
     MINGW*|MSYS*|CYGWIN*)
-      if ! winget install curl awk gum; then return 1; fi
+      if ! winget install curl awk gum aria2; then return 1; fi
       ;;
     *)
       echo "Unsupported operating system."

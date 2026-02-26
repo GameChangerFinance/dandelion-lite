@@ -124,7 +124,7 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      RESTORE_SNAPSHOT: ${CARDANO_DB_SYNC_RESTORE_SNAPSHOT:-}
+      RESTORE_SNAPSHOT: ${CARDANO_DB_SYNC_RESTORE_SNAPSHOT:-} # Now, if set, will read the file mounted on /snapshots/db-sync-bootstrap.tgz
       RESTORE_RECREATE_DB: N
       #EXTRA_DB_SYNC_ARGS: ${CARDANO_DB_SYNC_ARGS:-}
     healthcheck:
@@ -140,10 +140,11 @@ services:
       postgress:
         condition: service_started
     volumes:
-      - ./configs/cardano/config/network/${NETWORK}:/config
+      - ./configs/cardano/config/network/${NETWORK}:/config:ro
       - db-sync-data:/var/lib/cexplorer
       - node-ipc:/node-ipc
       - ./scripts/:/scripts/
+      - ${BACKUP_DIR}:/snapshots:ro
     restart: always
     stop_signal: SIGINT
     logging:
@@ -158,7 +159,8 @@ services:
     build:
       context: ./src/postgres
     volumes:
-      - postgresdb:/var/lib/postgresql/data
+      # - postgresdb:/var/lib/postgresql/data # DEPRECATED in v18
+      - postgresdb:/var/lib/postgresql
       - ./scripts/:/scripts/
       #- ./src/postgres/init_scripts:/docker-entrypoint-initdb.d
     ports:
