@@ -80,9 +80,13 @@ ON public.multi_asset ((encode(policy::bytea, 'hex')));
 CREATE INDEX IF NOT EXISTS idx_multi_asset_name_hex
 ON public.multi_asset ((encode(name::bytea, 'hex')));
 
--- Index on combined assetId (policy || name)
-CREATE UNIQUE INDEX IF NOT EXISTS idx_multi_asset_assetId
-ON public.multi_asset ((encode(policy::bytea || name::bytea, 'hex')));
+-- Most relevant one, used on relations and common assetId based lookups
+CREATE UNIQUE INDEX IF NOT EXISTS idx_multi_asset_assetid_bytea
+ON public.multi_asset ((policy::bytea || name::bytea));
+
+-- -- (Used in blockfrost, not here) Index on hex encoded combined assetId (policy || name)
+-- CREATE UNIQUE INDEX IF NOT EXISTS idx_multi_asset_assetId
+-- ON public.multi_asset ((encode(policy::bytea || name::bytea, 'hex')));
 
 CREATE UNIQUE INDEX IF NOT EXISTS idx_multi_asset_fingerprint
 ON public.multi_asset (fingerprint);
@@ -136,12 +140,26 @@ DROP INDEX IF EXISTS tx_out_address_txid_index_idx;
 --------------------------------------------------------------------------
 
 -- light & generic, helps many address-lookup queries
-CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_tx_in_txoutid_index
+CREATE INDEX IF NOT EXISTS idx_tx_in_txoutid_index
 ON public.tx_in (tx_out_id, tx_out_index);
 
 -- symmetry (only if you query these often):
-CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_ref_in_txoutid_index
+CREATE INDEX IF NOT EXISTS idx_ref_in_txoutid_index
 ON public.reference_tx_in (tx_out_id, tx_out_index);
 
-CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_col_in_txoutid_index
+CREATE INDEX IF NOT EXISTS idx_col_in_txoutid_index
 ON public.collateral_tx_in (tx_out_id, tx_out_index);
+
+
+
+-- 1) Index for address-based lookups in tx_out
+CREATE INDEX IF NOT EXISTS idx_tx_out_address
+ON public.tx_out (address);
+
+-- 2) Index for address-based lookups in collateral_tx_out
+CREATE INDEX IF NOT EXISTS idx_collateral_tx_out_address
+ON public.collateral_tx_out (address);
+
+-- 3) Index to quickly filter tx by hash
+CREATE INDEX IF NOT EXISTS idx_tx_hash
+ON public.tx (hash);

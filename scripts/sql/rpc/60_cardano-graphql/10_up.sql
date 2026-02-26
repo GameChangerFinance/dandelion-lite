@@ -354,8 +354,6 @@ FROM ma_tx_out
 JOIN multi_asset
   ON ma_tx_out.ident = multi_asset.id;
 
-DROP VIEW IF EXISTS cardano_graphql."Transaction";
-
 DO $DDL$
 BEGIN
   IF EXISTS (
