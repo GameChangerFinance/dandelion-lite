@@ -50,15 +50,15 @@ CREATE OR REPLACE FUNCTION cardano_sql.query(query TEXT, params JSON) RETURNS SE
 
 
 --manifest (using cardano-sql-companion REST API)--
-DROP FUNCTION IF EXISTS cardano_sql.manifest ;
-CREATE OR REPLACE FUNCTION cardano_sql.manifest() RETURNS JSON LANGUAGE SQL AS $BODY$
-     WITH s AS (
-         SELECT sql_private_extensions.get_json('http://cardano-sql-companion:4000/info/manifest')
-     ) SELECT * FROM s;
- $BODY$
-     SECURITY DEFINER
-     -- Set a search_path with priorities to allow plugin schema users to use sql_private_extensions schema underneath this function
-     SET search_path = sql_private_extensions, cardano_sql;
+-- DROP FUNCTION IF EXISTS cardano_sql.manifest ;
+-- CREATE OR REPLACE FUNCTION cardano_sql.manifest() RETURNS JSON LANGUAGE SQL AS $BODY$  -- DEACTIVATED!
+--      WITH s AS (
+--          SELECT sql_private_extensions.get_json('http://cardano-sql-companion:4000/info/manifest')
+--      ) SELECT * FROM s;
+--  $BODY$
+--      SECURITY DEFINER
+--      -- Set a search_path with priorities to allow plugin schema users to use sql_private_extensions schema underneath this function
+--      SET search_path = sql_private_extensions, cardano_sql;
 
 -- Example usage --
 -- SELECT cardano_sql.manifest() ;
