@@ -1,7 +1,7 @@
 #!/bin/bash
 source .env
 
-backupDir=${BACKUP_DIR} # ends with slash /
+backupDir=${1:-$BACKUP_DIR} # ends with slash /
 [[ -z $backupDir ]] && echo "❌ Missing BACKUP_DIR (with trailing slash). $usage" && exit 1
 [[ ! -d $backupDir ]] && echo "❌ BACKUP_DIR does not exist: '$backupDir'" && exit 1
 
