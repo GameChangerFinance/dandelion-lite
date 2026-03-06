@@ -835,6 +835,7 @@ configs:
       "description": "${NODE_DESCRIPTION}",      
       "ticker": "${NODE_TICKER}",
       "groups": ${NODE_GROUPS},
+      "treasury": "${NODE_TREASURY_ADDRESS}",
       "extensions":[${NODE_EXTENSIONS}]
       }
   index_html:
@@ -855,20 +856,31 @@ configs:
           <meta name="twitter:title" content="GC Node">
           <meta name="twitter:description" content="${NODE_DESCRIPTION}">   
           <!-- End of Meta Tags for Social Media -->
+          <style>
+          :root{--dando-bg:#070612;--dando-bg2:#0b0720;--dando-card:#0a0a12;--dando-card2:#0d0b18;--dando-txt:#f4f7ff;--dando-muted:rgba(244,247,255,.72);--dando-blue:#3b82f6;--dando-violet:#a855f7;--dando-cyan:#22d3ee;--dando-magenta:#ff2ea6;--dando-line:rgba(244,247,255,.14);--dando-line2:rgba(34,211,238,.22);--dando-shadow:0 18px 60px rgba(0,0,0,.55);--dando-glow1:0 0 28px rgba(59,130,246,.28);--dando-glow2:0 0 34px rgba(168,85,247,.22);--dando-radius:18px;--dando-font:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,"Helvetica Neue",Arial,"Noto Sans","Apple Color Emoji","Segoe UI Emoji"}*{box-sizing:border-box}html,body{height:100%}body{margin:0;font-family:var(--dando-font);color:var(--dando-txt);background:radial-gradient(1200px 700px at 15% 8%,rgba(168,85,247,.30),transparent 60%),radial-gradient(1000px 650px at 85% 18%,rgba(59,130,246,.30),transparent 58%),radial-gradient(900px 600px at 55% 92%,rgba(34,211,238,.16),transparent 55%),linear-gradient(135deg,var(--dando-bg),var(--dando-bg2));overflow-x:hidden}body:before{content:"";position:fixed;inset:0;pointer-events:none;background:linear-gradient(90deg,transparent,rgba(255,255,255,.05),transparent);opacity:.06;mix-blend-mode:screen;transform:skewY(-8deg)}.container{width:min(980px,92vw);margin:clamp(18px,4vw,48px) auto 26px;padding:clamp(18px,3.2vw,34px);background:linear-gradient(180deg,rgba(10,10,18,.92),rgba(9,7,16,.92));border:1px solid var(--dando-line);box-shadow:var(--dando-shadow),var(--dando-glow1),var(--dando-glow2);backdrop-filter:blur(10px);border-radius:var(--dando-radius);position:relative;overflow:hidden}.container:before{content:"";position:absolute;inset:-2px;pointer-events:none;background:radial-gradient(600px 240px at 20% 0,rgba(168,85,247,.22),transparent 60%),radial-gradient(520px 220px at 95% 15%,rgba(59,130,246,.22),transparent 60%),linear-gradient(135deg,rgba(34,211,238,.10),transparent 40%,rgba(255,46,166,.06));opacity:.9}.container:after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(255,255,255,.10),transparent 22%,transparent 78%,rgba(255,255,255,.06));opacity:.10}h1{margin:0 0 14px;font-size:clamp(1.25rem,3.1vw,2.05rem);letter-spacing:.02em;text-transform:uppercase;line-height:1.15;position:relative;z-index:1;text-shadow:0 0 18px rgba(34,211,238,.22),0 0 22px rgba(168,85,247,.20)}h1 i{font-style:normal;color:var(--dando-cyan)}p{margin:10px 0;color:var(--dando-muted);line-height:1.55;position:relative;z-index:1}b,strong{color:var(--dando-txt)}#node-rewards{word-break:break-all;border-top:1px dashed rgba(244,247,255,.18);padding-top:12px;margin-top:14px}#node-services{margin-bottom:6px}ul.api-list{list-style:none;padding:0;margin:10px 0 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;position:relative;z-index:1}ul.api-list li{margin:0}ul.api-list a{display:block;padding:10px 12px;border:1px solid rgba(244,247,255,.12);border-radius:12px;background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.02));color:var(--dando-txt);text-decoration:none;transition:transform .12s ease,border-color .12s ease,box-shadow .12s ease,background .12s ease;box-shadow:0 0 0 rgba(0,0,0,0);position:relative;overflow:hidden}ul.api-list a:before{content:"";position:absolute;inset:-2px;opacity:.0;background:linear-gradient(90deg,transparent,rgba(34,211,238,.25),rgba(168,85,247,.22),transparent);filter:blur(0);transition:opacity .12s ease}ul.api-list a:hover{transform:translateY(-1px);border-color:rgba(34,211,238,.32);box-shadow:0 0 18px rgba(34,211,238,.14),0 0 26px rgba(168,85,247,.12)}ul.api-list a:hover:before{opacity:1}ul.api-list a:focus{outline:none;border-color:rgba(255,46,166,.34);box-shadow:0 0 0 3px rgba(255,46,166,.18),0 0 22px rgba(255,46,166,.12)}.footer{width:min(980px,92vw);margin:0 auto 18px;padding:14px 10px;color:rgba(244,247,255,.72);text-align:center;font-size:.92rem}a{color:var(--dando-cyan);text-underline-offset:3px;text-decoration-color:rgba(34,211,238,.35)}a:hover{color:var(--dando-magenta);text-decoration-color:rgba(255,46,166,.45)}@media (max-width:520px){.container{padding:16px}ul.api-list{grid-template-columns:1fr}h1{text-transform:none;letter-spacing:.01em}}@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+          </style>
       </head>
       <body>
           <div class="container">
-              <h1><i>'${NODE_NAME}'</i> [${NODE_TICKER}]</h1>
-              <p>Welcome to the <b>Decentralized Dandelion Network!</b></p>              
-              <p><b>Description:</b> ${NODE_DESCRIPTION}</p>
+              <h1 id="node-label" style="text-align:center;"> 🟢 <i>'${NODE_NAME}'</i> [${NODE_TICKER}]</h1>         
+              <p id="node-network"><b>Network:</b> ${DLT} ${NETWORK} </p>
+              <p id="node-description"><b>Description:</b> ${NODE_DESCRIPTION}</p>
               <p></p>
-              <p>APIs available on this ${DLT} ${NETWORK} <b>Dandelion Lite Node</b>:</p>
+              <p id="node-services"> <b>Services:</b>:
               <ul class="api-list">
                   ${INDEX_LINKS}
               </ul>
+              </p>
+              <p></p>
+              <p id="node-rewards"> 🎁 <b>Rewards and Donations:</b> <br/>${NODE_TREASURY_ADDRESS}</p>
           </div>
           <div class="footer">
-              Made with ❤️ by GameChanger Finance + M2Tec
+              <b>Decentralized Dandelion Network (<a href="https://github.com/GameChangerFinance/dandelion-lite" target="_blank"
+                  rel="noopener noreferrer">Github</a>)</b> 
+               | Made with ❤️ by 
+              <a href="https://gamechanger.finance/" target="_blank" rel="noopener noreferrer"> GameChanger Finance </a>
+              + 
+              <a href="https://www.m2tec.nl/" target="_blank" rel="noopener noreferrer"> M2Tec </a>
           </div>
       </body>
       </html>
