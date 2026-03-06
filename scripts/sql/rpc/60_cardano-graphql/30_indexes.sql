@@ -153,8 +153,9 @@ ON public.collateral_tx_in (tx_out_id, tx_out_index);
 
 
 -- 1) Index for address-based lookups in tx_out
-CREATE INDEX IF NOT EXISTS idx_tx_out_address
-ON public.tx_out (address);
+-- WARNING: disabled because was failing on mainnet due to table sizes!
+-- CREATE INDEX IF NOT EXISTS idx_tx_out_address
+-- ON public.tx_out (address);
 
 -- 2) Index for address-based lookups in collateral_tx_out
 CREATE INDEX IF NOT EXISTS idx_collateral_tx_out_address

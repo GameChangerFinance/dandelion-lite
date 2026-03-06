@@ -175,13 +175,34 @@ services:
       #RPC_SCHEMA: ${RPC_SCHEMA} #Deprecated, use the ones down below:
       KOIOS_LITE_SCHEMA: ${KOIOS_LITE_SCHEMA}
       KOIOS_ARTIFACTS_SCHEMA: ${KOIOS_ARTIFACTS_SCHEMA}
-    shm_size: '2gb'
+    shm_size: '${POSTGRES_SHM_SIZE}'
     healthcheck:
       test:  ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 15s
       timeout: 5s
       retries: 100  
-    command: postgres ${POSTGRES_ARGS}
+    command:
+      - postgres
+      - -c
+      - max_connections=${POSTGRES_MAX_CONNECTIONS}
+      - -c
+      - wal_level=${POSTGRES_WAL_LEVEL}
+      - -c
+      - max_wal_senders=${POSTGRES_MAX_WAL_SENDERS}
+      - -c
+      - synchronous_commit=${POSTGRES_SYNCHRONOUS_COMMIT}
+      - -c
+      - maintenance_work_mem=${POSTGRES_MAINTENANCE_WORK_MEM}
+      - -c
+      - max_parallel_maintenance_workers=${POSTGRES_MAX_PARALLEL_MAINTENANCE_WORKERS}
+      - -c
+      - max_parallel_workers=${POSTGRES_MAX_PARALLEL_WORKERS}
+      - -c
+      - max_worker_processes=${POSTGRES_MAX_WORKER_PROCESSES}
+      - -c
+      - maintenance_io_concurrency=${POSTGRES_MAINTENANCE_IO_CONCURRENCY}
+      - -c
+      - shared_buffers=${POSTGRES_SHARED_BUFFERS}
     restart: always
     logging:
       driver: "json-file"
