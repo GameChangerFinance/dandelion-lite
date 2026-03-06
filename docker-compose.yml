@@ -639,6 +639,8 @@ services:
     hostname: ${HAPROXY_HOST}
     environment:
       # variables accesible in config/haproxy/haproxy.conf
+      HAPROXY_MAX_CONNECTIONS: "${HAPROXY_MAX_CONNECTIONS:-10000}"
+      HAPROXY_WORKER_THREADS: "${HAPROXY_WORKER_THREADS:-8}"
       HAPROXY_IP_BLACKLIST: /usr/local/etc/haproxy/ip-blacklist.lst
       HAPROXY_ORIGIN_WHITELIST: /usr/local/etc/haproxy/origin-whitelist.map
       # HAPROXY_PORT: ${HAPROXY_PORT}
