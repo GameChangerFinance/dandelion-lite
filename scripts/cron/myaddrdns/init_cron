@@ -1,2 +1,3 @@
 # myaddrdns
 */3 * * * * /scripts/cron/myaddrdns/update.sh >> /var/log/myaddrdns_update.log 2>&1
+0 */12 * * * /scripts/cron/myaddrdns/certbot.sh >> /var/log/myaddrdns_certbot.log 2>&1
