@@ -637,28 +637,20 @@ services:
   haproxy:
     image: haproxy:2.9.0-bookworm
     hostname: ${HAPROXY_HOST}
-    # environment:
+    environment:
       # variables accesible in config/haproxy/haproxy.conf
+      HAPROXY_IP_BLACKLIST: /usr/local/etc/haproxy/ip-blacklist.lst
+      HAPROXY_ORIGIN_WHITELIST: /usr/local/etc/haproxy/origin-whitelist.map
       # HAPROXY_PORT: ${HAPROXY_PORT}
       # NETWORK: ${NETWORK}
-      # OGMIOS_PORT: ${OGMIOS_PORT}
-      # POSTGREST_PORT: ${POSTGREST_PORT}
-      # CARDANO_GRAPHQL_PORT: ${CARDANO_GRAPHQL_PORT}
-      # CARDANO_GRAPHQL_LEGACY_SERVER_PORT: ${CARDANO_GRAPHQL_LEGACY_SERVER_PORT}
-      # DBLESS_CARDANO_TOKEN_REGISTRY_PORT: ${DBLESS_CARDANO_TOKEN_REGISTRY_PORT}
-      # DANDELION_POSTGREST_PORT: ${DANDELION_POSTGREST_PORT}
-      # CARDANO_SQL_POSTGREST_PORT: ${CARDANO_SQL_POSTGREST_PORT}
-      # UNIMATRIX_PORT: ${UNIMATRIX_PORT}
     volumes:
       - ./configs/haproxy/:/usr/local/etc/haproxy/
       - ./scripts/:/scripts/
       - ./configs/ssl/server.pem:/etc/ssl/server.pem
     configs:
       - source: manifest_json
-        #target: /usr/local/etc/haproxy/manifest.json
         target: /usr/local/etc/www/manifest.json
       - source: index_html
-        #target: /usr/local/etc/haproxy/index.html
         target: /usr/local/etc/www/index.html
     ports:
       - ${HAPROXY_BINDED_HOST}${HAPROXY_PORT:-8053}:8053
