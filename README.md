@@ -97,7 +97,6 @@ Last updated: 10/10/2024
 ### Cardano Mainnet
         
     17G     db-sync-data.tar.gz
-    377M    dbless-cardano-token-registry-data.tar.gz
     97G     node-db.tar.gz
     4.0K    node-ipc.tar.gz
     12K     pgadmin-data.tar.gz
@@ -112,7 +111,6 @@ Last updated: 10/10/2024
    
     
     1.7G    db-sync-data.tar.gz
-    16M     dbless-cardano-token-registry-data.tar.gz
     3.8G    node-db.tar.gz
     4.0K    node-ipc.tar.gz
     12K     pgadmin-data.tar.gz
