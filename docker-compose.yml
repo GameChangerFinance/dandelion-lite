@@ -293,6 +293,19 @@ services:
       DB_PASSWORD: ${POSTGRES_PASSWORD}
       DB_NAME: ${POSTGRES_DB}
       DB_URL: jdbc:postgresql://${POSTGRES_HOST}:5432/${POSTGRES_DB}?currentSchema=${CARDANO_TOKEN_REGISTRY_SCHEMA}
+      # Official current defaults / knobs, hardcoded here only for reference:
+      # GITHUB_TMP_FOLDER: "/tmp"
+      # GITHUB_FORCE_CLONE: "false"
+      # API_LOCAL_BIND_PORT: "8080"
+      # CIP_QUERY_PRIORITY: "CIP_68,CIP_26"
+      # Mainnet example values from official current .env:
+      # STORE_CARDANO_PROTOCOL_MAGIC: "764824073"
+      # STORE_CARDANO_HOST: "backbone.mainnet.cardanofoundation.org"
+      # STORE_CARDANO_PORT: "3001"
+      # STORE_CARDANO_SYNC_START_SLOT: "65836843"
+      # STORE_CARDANO_SYNC_START_BLOCKHASH: "cb09cae9c54026afebfe6124189600fc0f76c2299bc9f9c32305944979a12fed"
+      # STORE_SYNCAUTOSTART: "true"
+      # STORE_BLOCKS_EPOCH_CALCULATION_INTERVAL: "14400"
     depends_on:
       postgress:
         condition: service_healthy      
