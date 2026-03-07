@@ -275,41 +275,47 @@ services:
         max-file: "10"
 
 
-# #################################
-# ####     token registry  ########
-# #################################
 
-  cardano-token-registry:
-    image: ${CARDANO_TOKEN_REGISTRY_IMAGE}
-    hostname: ${CARDANO_TOKEN_REGISTRY_HOSTNAME}
-    ports:
-      - ${CARDANO_TOKEN_REGISTRY_PORT:-8080}:8080
-    environment:
-      TOKEN_METADATA_SYNC_JOB: ${CARDANO_TOKEN_REGISTRY_SYNC_JOB}
-      GITHUB_ORGANIZATION: ${CARDANO_TOKEN_REGISTRY_GITHUB_ORGANIZATION}
-      GITHUB_PROJECT_NAME: ${CARDANO_TOKEN_REGISTRY_GITHUB_PROJECT_NAME}
-      GITHUB_MAPPINGS_FOLDER: ${CARDANO_TOKEN_REGISTRY_GITHUB_MAPPINGS_FOLDER}
-      DB_USERNAME: ${POSTGRES_USER}
-      DB_PASSWORD: ${POSTGRES_PASSWORD}
-      DB_NAME: ${POSTGRES_DB}
-      DB_URL: jdbc:postgresql://${POSTGRES_HOST}:5432/${POSTGRES_DB}?currentSchema=${CARDANO_TOKEN_REGISTRY_SCHEMA}
-      # Official current defaults / knobs, hardcoded here only for reference:
-      # GITHUB_TMP_FOLDER: "/tmp"
-      # GITHUB_FORCE_CLONE: "false"
-      # API_LOCAL_BIND_PORT: "8080"
-      # CIP_QUERY_PRIORITY: "CIP_68,CIP_26"
-      # Mainnet example values from official current .env:
-      # STORE_CARDANO_PROTOCOL_MAGIC: "764824073"
-      # STORE_CARDANO_HOST: "backbone.mainnet.cardanofoundation.org"
-      # STORE_CARDANO_PORT: "3001"
-      # STORE_CARDANO_SYNC_START_SLOT: "65836843"
-      # STORE_CARDANO_SYNC_START_BLOCKHASH: "cb09cae9c54026afebfe6124189600fc0f76c2299bc9f9c32305944979a12fed"
-      # STORE_SYNCAUTOSTART: "true"
-      # STORE_BLOCKS_EPOCH_CALCULATION_INTERVAL: "14400"
-    depends_on:
-      postgress:
-        condition: service_healthy      
-    restart: always
+# # #################################
+# # ####     token registry  ########
+# # #################################
+
+# disabled now because:
+# - forces you to use Yaci Store which is great but not included yet and redundant for just making token registry to work! 
+# - old version creates terrible deadlocks with db and crashes on preprod
+# - after MKII, only service using is Blockfrost, and just for this we can use official online URLs
+
+#   cardano-token-registry:
+#     image: ${CARDANO_TOKEN_REGISTRY_IMAGE}
+#     hostname: ${CARDANO_TOKEN_REGISTRY_HOSTNAME}
+#     ports:
+#       - ${CARDANO_TOKEN_REGISTRY_PORT:-8080}:8080
+#     environment:
+#       TOKEN_METADATA_SYNC_JOB: ${CARDANO_TOKEN_REGISTRY_SYNC_JOB}
+#       GITHUB_ORGANIZATION: ${CARDANO_TOKEN_REGISTRY_GITHUB_ORGANIZATION}
+#       GITHUB_PROJECT_NAME: ${CARDANO_TOKEN_REGISTRY_GITHUB_PROJECT_NAME}
+#       GITHUB_MAPPINGS_FOLDER: ${CARDANO_TOKEN_REGISTRY_GITHUB_MAPPINGS_FOLDER}
+#       DB_USERNAME: ${POSTGRES_USER}
+#       DB_PASSWORD: ${POSTGRES_PASSWORD}
+#       DB_NAME: ${POSTGRES_DB}
+#       DB_URL: jdbc:postgresql://${POSTGRES_HOST}:5432/${POSTGRES_DB}?currentSchema=${CARDANO_TOKEN_REGISTRY_SCHEMA}
+#       # Official current defaults / knobs, hardcoded here only for reference:
+#       # GITHUB_TMP_FOLDER: "/tmp"
+#       # GITHUB_FORCE_CLONE: "false"
+#       # API_LOCAL_BIND_PORT: "8080"
+#       # CIP_QUERY_PRIORITY: "CIP_68,CIP_26"
+#       # Mainnet example values from official current .env:
+#       # STORE_CARDANO_PROTOCOL_MAGIC: "764824073"
+#       # STORE_CARDANO_HOST: "backbone.mainnet.cardanofoundation.org"
+#       # STORE_CARDANO_PORT: "3001"
+#       # STORE_CARDANO_SYNC_START_SLOT: "65836843"
+#       # STORE_CARDANO_SYNC_START_BLOCKHASH: "cb09cae9c54026afebfe6124189600fc0f76c2299bc9f9c32305944979a12fed"
+#       # STORE_SYNCAUTOSTART: "true"
+#       # STORE_BLOCKS_EPOCH_CALCULATION_INTERVAL: "14400"
+#     depends_on:
+#       postgress:
+#         condition: service_healthy      
+#     restart: always
 
 
 #################################
@@ -360,7 +366,6 @@ services:
       KOIOS_ARTIFACTS_SCHEMA: ${KOIOS_ARTIFACTS_SCHEMA}
       DANDELION_POSTGREST_SCHEMA: ${DANDELION_POSTGREST_SCHEMA}
       CRON_DO_NOT_INITIALIZE: ${CRON_DO_NOT_INITIALIZE}      
-      DBLESS_CARDANO_TOKEN_REGISTRY_DATA: /root/token-registry
       DUCKDNS_DOMAINS: ${DUCKDNS_DOMAINS:-}
       DUCKDNS_TOKEN: ${DUCKDNS_TOKEN:-}
       DUCKDNS_IP: ${DUCKDNS_IP:-}
