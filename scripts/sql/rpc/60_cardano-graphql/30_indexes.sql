@@ -153,9 +153,13 @@ ON public.collateral_tx_in (tx_out_id, tx_out_index);
 
 
 -- 1) Index for address-based lookups in tx_out
--- WARNING: disabled because was failing on mainnet due to table sizes!
+-- (*) WARNING: disabled because was failing on mainnet due to table sizes! (this fails because index row requires 10520 bytes, maximum size is 8191)
 -- CREATE INDEX IF NOT EXISTS idx_tx_out_address
 -- ON public.tx_out (address);
+
+-- 1) Index for address-based lookups in tx_out (based on hash to avoid failing due to index row size limit!)
+CREATE INDEX IF NOT EXISTS idx_tx_out_address
+ON public.tx_out USING hash (address);
 
 -- 2) Index for address-based lookups in collateral_tx_out
 CREATE INDEX IF NOT EXISTS idx_collateral_tx_out_address
@@ -164,3 +168,51 @@ ON public.collateral_tx_out (address);
 -- 3) Index to quickly filter tx by hash
 CREATE INDEX IF NOT EXISTS idx_tx_hash
 ON public.tx (hash);
+
+
+-- based on the new Utxo view to solve (*) :
+
+-- -- 1) Balance lookups: only index live UTxOs, not the whole tx_out table. (this fails because index row requires 10520 bytes, maximum size is 8191)
+-- CREATE INDEX IF NOT EXISTS idx_tx_out_unspent_address
+-- ON tx_out (address)
+-- WHERE consumed_by_tx_id IS NULL;
+
+-- 1) Balance lookups: only index live UTxOs, not the whole tx_out table. (based on hash to avoid failing due to index row size limit!)
+CREATE INDEX IF NOT EXISTS idx_tx_out_unspent_address_hash
+ON tx_out USING hash (address)
+WHERE consumed_by_tx_id IS NULL;
+
+-- 2) Native token balance and token expansion from UTxOs/outputs.
+CREATE INDEX IF NOT EXISTS idx_ma_tx_out_tx_out_id
+ON ma_tx_out (tx_out_id);
+
+-- 3) Outputs of a transaction.
+CREATE INDEX IF NOT EXISTS idx_tx_out_tx_id_id
+ON tx_out (tx_id, id);
+
+-- 4) Inputs/reference inputs/collateral inputs of a transaction.
+CREATE INDEX IF NOT EXISTS idx_tx_in_tx_in_id_tx_out
+ON tx_in (tx_in_id, tx_out_id, tx_out_index);
+
+CREATE INDEX IF NOT EXISTS idx_reference_tx_in_tx_in_id_tx_out
+ON reference_tx_in (tx_in_id, tx_out_id, tx_out_index);
+
+CREATE INDEX IF NOT EXISTS idx_collateral_tx_in_tx_in_id_tx_out
+ON collateral_tx_in (tx_in_id, tx_out_id, tx_out_index);
+
+-- 5) Metadata, mints, scripts, redeemers hanging off tx_id.
+CREATE INDEX IF NOT EXISTS idx_tx_metadata_tx_id_id
+ON tx_metadata (tx_id, id);
+
+CREATE INDEX IF NOT EXISTS idx_ma_tx_mint_tx_id
+ON ma_tx_mint (tx_id);
+
+CREATE INDEX IF NOT EXISTS idx_script_tx_id_id
+ON script (tx_id, id);
+
+CREATE INDEX IF NOT EXISTS idx_redeemer_tx_id_id
+ON redeemer (tx_id, id);
+
+CREATE INDEX IF NOT EXISTS idx_collateral_tx_out_tx_id
+ON collateral_tx_out (tx_id);
+

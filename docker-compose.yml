@@ -161,7 +161,7 @@ services:
     volumes:
       # - postgresdb:/var/lib/postgresql/data # DEPRECATED in v18
       - postgresdb:/var/lib/postgresql
-      - ./scripts/:/scripts/:ro
+      - ./scripts/:/scripts/
     ports:
       - ${POSTGRES_PORT:-5432}:5432
     environment:
