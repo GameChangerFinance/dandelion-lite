@@ -268,7 +268,6 @@ CREATE TYPE cardano_graphql."TransactionHistory_order_by" AS ENUM (
   'NATURAL'   -- "natural" order by tx.id (surrogate PK insertion order)
 );
 
-
 CREATE OR REPLACE FUNCTION cardano_graphql."getTransactionHistoryForAddresses"(
   addresses character varying[],                          -- required, base type matches public.tx_out.address
   "sort" cardano_graphql."TransactionHistory_order_by" DEFAULT 'DESC',  -- optional: 'ASC' | 'DESC' | 'NATURAL'
@@ -285,31 +284,38 @@ AS $func$
     SELECT DISTINCT unnest(addresses)::varchar AS address
   ),
 
-  -- 1) Direct outputs (tx_out): transactions that *produce* outputs to these addresses.
-  tx_ids_from_outputs AS (
-    SELECT DISTINCT o.tx_id
+  -- Materialize the matched tx_out rows once and reuse them across all history branches.
+  -- This avoids repeating the same tx_out(address) lookup for outputs, inputs,
+  -- reference inputs, and collateral inputs.
+  matched_outputs AS (
+    SELECT DISTINCT
+      o.tx_id,
+      o.index,
+      o.consumed_by_tx_id
     FROM addr
     JOIN public.tx_out AS o
       ON o.address = addr.address
   ),
 
+  -- 1) Direct outputs (tx_out): transactions that *produce* outputs to these addresses.
+  tx_ids_from_outputs AS (
+    SELECT tx_id
+    FROM matched_outputs
+  ),
+
   -- 2) Inputs that spend those outputs (tx_in): transactions that *consume* UTxOs at these addresses.
+  -- For normal spends, db-sync already materializes the consuming tx on tx_out.consumed_by_tx_id,
+  -- so we can avoid re-deriving it through a join to public.tx_in here.
   tx_ids_from_inputs AS (
-    SELECT DISTINCT i.tx_in_id AS tx_id
-    FROM addr
-    JOIN public.tx_out AS o
-      ON o.address = addr.address
-    JOIN public.tx_in AS i
-      ON i.tx_out_id    = o.tx_id
-     AND i.tx_out_index = o.index
+    SELECT consumed_by_tx_id AS tx_id
+    FROM matched_outputs
+    WHERE consumed_by_tx_id IS NOT NULL
   ),
 
   -- 3) Reference inputs (reference_tx_in): transactions that *reference* UTxOs at these addresses.
   tx_ids_from_reference_inputs AS (
     SELECT DISTINCT ri.tx_in_id AS tx_id
-    FROM addr
-    JOIN public.tx_out AS o
-      ON o.address = addr.address
+    FROM matched_outputs AS o
     JOIN public.reference_tx_in AS ri
       ON ri.tx_out_id    = o.tx_id
      AND ri.tx_out_index = o.index
@@ -318,9 +324,7 @@ AS $func$
   -- 4) Collateral inputs (collateral_tx_in): transactions that *use as collateral* UTxOs at these addresses.
   tx_ids_from_collateral_inputs AS (
     SELECT DISTINCT ci.tx_in_id AS tx_id
-    FROM addr
-    JOIN public.tx_out AS o
-      ON o.address = addr.address
+    FROM matched_outputs AS o
     JOIN public.collateral_tx_in AS ci
       ON ci.tx_out_id    = o.tx_id
      AND ci.tx_out_index = o.index
