@@ -61,13 +61,12 @@ for volumeName in $volumeNames; do
         --split=16 \
         --min-split-size=1M \
         --check-certificate=false \
-        --out="$fileName" \
+        --out="${fileName}.tar.gz" \
         --dir="$backupDir" \
         "$url"
     fi
 
     echo "✅ Downloaded $fileName.tar.gz"
-    exit
   fi
 done
 
