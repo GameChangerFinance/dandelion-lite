@@ -10,7 +10,7 @@ RUN apt-get update \
 RUN curl -fsSL \
     "https://github.com/IntersectMBO/ogmios/releases/download/${CARDANO_OGMIOS_VERSION}/ogmios-${CARDANO_OGMIOS_VERSION}-${CARDANO_OGMIOS_ARCH}.tar.gz" \
     -o /tmp/ogmios.tar.gz \
-  && tar -xzf /tmp/ogmios.tar.gz -C /usr/local/bin \
+  && tar -xzf /tmp/ogmios.tar.gz -C /usr/local \
   && rm /tmp/ogmios.tar.gz \
   && chmod +x /usr/local/bin/ogmios
 

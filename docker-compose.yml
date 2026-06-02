@@ -10,16 +10,11 @@ services:
     hostname: ${CARDANO_NODE_HOST}
     platform: linux/x86_64
     restart: always
-    command:
-      - run
-      - --config
-      - ${CARDANO_NODE_CONFIG_PATH}
-      - --topology
-      - ${CARDANO_NODE_TOPOLOGY_PATH}
-      - --database-path
-      - ${CARDANO_NODE_DB_PATH}
-      - --socket-path
-      - ${CARDANO_NODE_SOCKET_PATH}
+    environment:
+      NETWORK: ${NETWORK}
+      CARDANO_NODE_SOCKET_PATH: ${CARDANO_NODE_SOCKET_PATH}
+      CARDANO_NODE_CONFIG_DIR: /config/cardano-node
+      CARDANO_NODE_EKG_PORT: 12788
     healthcheck:
       test: ["CMD-SHELL", "/scripts/healthcheck.sh"]
       interval: 30s
@@ -35,6 +30,7 @@ services:
       - node-ipc:/ipc
       - ./configs/cardano/config/network/${NETWORK}:/config:ro
       - ./scripts/cardano-node/:/scripts/:ro
+
 
   cardano-ogmios:
     image: ${CARDANO_OGMIOS_IMAGE}

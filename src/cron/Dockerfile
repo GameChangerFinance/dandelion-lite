@@ -1,7 +1,7 @@
 # Use Alpine Linux as the base image
 FROM alpine:latest
 
-ARG CARDANO_NODE_VERSION=10.1.4
+ARG CARDANO_NODE_VERSION=11.0.1
 
 # Install jq, curl, PostgreSQL client, and gawk b2sum (coreutils) and tini
 RUN apk add --no-cache jq curl postgresql-client gawk git bash coreutils tini certbot
@@ -21,8 +21,8 @@ RUN touch /var/log/cron.log
 
 # install minimal deps, grab and extract cardano-cli, then clean up
 RUN apk add --no-cache ca-certificates curl tar gzip \
-     && curl -sL \
-          https://github.com/input-output-hk/cardano-node/releases/download/${CARDANO_NODE_VERSION}/cardano-node-${CARDANO_NODE_VERSION}-linux.tar.gz \
+     && curl -fsSL \
+          https://github.com/IntersectMBO/cardano-node/releases/download/${CARDANO_NODE_VERSION}/cardano-node-${CARDANO_NODE_VERSION}-linux-amd64.tar.gz \
           | tar xz \
                --wildcards \
                --no-anchored \
