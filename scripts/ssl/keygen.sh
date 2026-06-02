@@ -1,6 +1,6 @@
-#/bin/bash
+#!/usr/bin/env bash
 
-if [[ -z $1 ]]; then
+if [[ -z ${1:-} ]]; then
   echo "Error:Missing arguments."
   echo "USAGE:"
   echo "    ./keygen.sh <domain> <file-prefix>"
@@ -13,15 +13,17 @@ if [[ -z $1 ]]; then
   exit 1
 fi
 
-echo "Generating [$2] tls secret for [$1] domain..."
-openssl req -x509 -nodes -days 3650 -newkey rsa:4096 -keyout $2key.key -out $2cert.crt -sha256 -subj "/CN=$1"
+prefix="${2:-}"
+
+echo "Generating [${prefix}] tls secret for [$1] domain..."
+openssl req -x509 -nodes -days 3650 -newkey rsa:4096 -keyout "${prefix}key.key" -out "${prefix}cert.crt" -sha256 -subj "/CN=$1"
 
 # alternative for adding extra fields:
 #openssl req -x509 -nodes -days 3650 -newkey rsa:4096 -keyout $2key.key -out $2cert.crt -sha256 -subj "/C=XX/ST=StateName/L=CityName/O=CompanyName/OU=CompanySectionName/CN=CommonNameOrHostname"
 
-cat $2key.key $2cert.crt > $2server.pem
+cat "${prefix}key.key" "${prefix}cert.crt" > "${prefix}server.pem"
 
-echo "Store '$2server.pem' as configs/ssl/server.pem for Haproxy to be able to mount it on start"
+echo "Store '${prefix}server.pem' as secrets/ssl/server.pem for HAProxy, or as configs/ssl/server.pem before running rotate-ssl-and-restart-haproxy.sh"
 
 echo "Done."
 exit 0

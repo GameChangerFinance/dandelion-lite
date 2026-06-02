@@ -23,7 +23,8 @@ ___  ____ __ _ ___  ____ _    _ ____ __ _
 
 This setup includes several key components:
 
-- `cardano-node-ogmios`: Runs the Cardano node plus the lightweight bridge interface Ogmios.
+- `cardano-node`: Runs the Cardano node.
+- `cardano-ogmios`: Runs the lightweight bridge interface Ogmios against `cardano-node`.
 - `cardano-db-sync`: Synchronizes the blockchain data to a PostgreSQL database.
 - `haproxy`: A high-performance proxy to distribute network traffic among various components.
 - `postgres`: The PostgreSQL database, storing the synchronized blockchain data.
@@ -147,7 +148,7 @@ To deploy or run Dandelion Lite:
 7. Once on tip, execute `scripts/dandoman.sh` > `Setup->Initialise Postgres` to deploy custom RPCs and test via PostgREST/HAProxy endpoints using curl:
 ```bash
 # Check if the node is synced using docker
-docker inspect --format "{{json .State.Health }}" dandolite-preprod-cardano-node-ogmios-1 | jq
+docker inspect --format "{{json .State.Health }}" dandolite-preprod-cardano-node-1 | jq
 
 # Check if db-sync is ready 
 docker inspect --format "{{json .State.Health }}" dandolite-preprod-cardano-db-sync-1 | jq
@@ -199,7 +200,7 @@ This will **WIPE ALL YOUR DEPLOYMENT DATA** and will restore a previous backup:
 
 You can terminate your connections with SSL encryption by setting up SSL certificate on Haproxy
 
-1. Place your `server.pem` file on `configs/ssl/`. You can create a self signed certificate like this `$ ./scripts/ssl/keygen.sh <domain> <file-prefix>"`
+1. Place the active HAProxy PEM at `secrets/ssl/server.pem`. Certbot and manual renewal workflows write a temporary candidate to `configs/ssl/server.pem` first. You can create a self signed certificate like this `$ ./scripts/ssl/keygen.sh <domain> <file-prefix>"`
 2. Uncomment SSL line and comment the default one on `config/haproxy/haproxy.cfg`, like this:
 
 ```

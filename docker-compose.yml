@@ -2,84 +2,54 @@ name: "${PROJ_NAME}"
 services:
 
 #################################
-#### guild node + ogmios ########
+#### cardano node + ogmios ######
 #################################
 
-#  cardano-node:
-#    image: ${CARDANO_NODE_IMAGE}
-#    init: true
-#    hostname: cardano-node
-#    environment:
-#      NETWORK: ${NETWORK}
-#      SOCKET: "${CARDANO_NODE_HOME}/sockets/node.socket" 
-#      UPDATE_CHECK: "N"
-#      EXPORTED_CONFIG: "${CARDANO_NODE_HOME}/sockets/exportedConfig"
-#    volumes:
-#      - node-db:${CARDANO_NODE_HOME}/db
-#      - node-ipc:${CARDANO_NODE_HOME}/sockets
-#      - ./scripts/:/scripts/
-#    entrypoint: >
-#      /bin/sh -c "
-#      echo \"Preparing setup for network '${NETWORK}'\" ;
-#      mkdir -p $${EXPORTED_CONFIG};
-#      chown -Rv guild $${EXPORTED_CONFIG};
-#      rm -rf $${EXPORTED_CONFIG}/*.json;
-#      echo \"Exporting config files from '${CARDANO_NODE_HOME}/files' into '$${EXPORTED_CONFIG}'...\" ;
-#      cp ${CARDANO_NODE_HOME}/files/*.json $${EXPORTED_CONFIG} ;
-#      echo 'Identifying lines with potencial issues with protocol magic number and file paths...' ;
-#      grep -Rnw $${EXPORTED_CONFIG} -e '764824073' ;
-#      grep -Rnw $${EXPORTED_CONFIG} -e '${CARDANO_NODE_HOME}/files' ;
-#      echo \"Patching exported files...\" ;
-#      [ \"${NETWORK}\" = \"preprod\" ] && find $${EXPORTED_CONFIG} -name '*.json' -print0 | xargs -0 sed -i 's/764824073/1/g' ;
-#      [ \"${NETWORK}\" = \"preview\" ] && find $${EXPORTED_CONFIG} -name '*.json' -print0 | xargs -0 sed -i 's/764824073/2/g' ;
-#      find $${EXPORTED_CONFIG} -name '*.json' -print0 | xargs -0 sed -i \"s#${CARDANO_NODE_HOME}/files#$${EXPORTED_CONFIG}#g\" ;
-#      echo 'Config files exported:' ;
-#      ls -ls $${EXPORTED_CONFIG} ;
-#      ./entrypoint.sh ;
-#      "
-#    restart: always
-#    healthcheck:
-#      test: ["CMD-SHELL", "netstat -ntlp | grep 12798"]
-#      interval: 30s
-#      timeout: 10s
-#      retries: 3
-#    logging:
-#      driver: "json-file"
-#      options:
-#        max-size: "200k"
-#        max-file: "10"
-
-  # TODO: add http backend ogmios and it's entry on /configs/haproxy/haproxy.cfg
-  # Important: https://github.com/cardano-community/guild-operators/pull/1261/files
-#  ogmios:
-#    image:  ${OGMIOS_IMAGE}
-#    restart: always
-#    environment:
-#      NETWORK: ${NETWORK}
-#    command: [
-#      "--host", "0.0.0.0",
-#      "--node-socket", "${CARDANO_NODE_HOME}/sockets/node.socket",
-#      "--node-config", "${CARDANO_NODE_HOME}/sockets/exportedConfig/config.json"
-#    ]
-#    volumes:
-#      # exported automagically from cardano-node for plug-n-play ogmios
-#      - node-ipc:${CARDANO_NODE_HOME}/sockets
-#    ports:
-#      - ${OGMIOS_PORT:-1337}:1337
-#    depends_on:
-#      cardano-node:
-#        condition: service_healthy
-
-#################################
-### node + ogmios + indexer #####
-#################################
-
-  cardano-node-ogmios:
-    image: ${CARDANO_NODE_OGMIOS_IMAGE}
-    hostname: cardano-node
-    #init: true
+  cardano-node:
+    image: ${CARDANO_NODE_IMAGE}
+    hostname: ${CARDANO_NODE_HOST}
     platform: linux/x86_64
     restart: always
+    command:
+      - run
+      - --config
+      - ${CARDANO_NODE_CONFIG_PATH}
+      - --topology
+      - ${CARDANO_NODE_TOPOLOGY_PATH}
+      - --database-path
+      - ${CARDANO_NODE_DB_PATH}
+      - --socket-path
+      - ${CARDANO_NODE_SOCKET_PATH}
+    healthcheck:
+      test: ["CMD-SHELL", "/scripts/healthcheck.sh"]
+      interval: 30s
+      timeout: 10s
+      retries: 1000000
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "400k"
+        max-file: "10"
+    volumes:
+      - node-db:${CARDANO_NODE_DB_PATH}
+      - node-ipc:/ipc
+      - ./configs/cardano/config/network/${NETWORK}:/config:ro
+      - ./scripts/cardano-node/:/scripts/:ro
+
+  cardano-ogmios:
+    image: ${CARDANO_OGMIOS_IMAGE}
+    hostname: ${CARDANO_OGMIOS_HOST}
+    platform: linux/x86_64
+    restart: always
+    command:
+      - --host
+      - 0.0.0.0
+      - --port
+      - "${CARDANO_OGMIOS_INTERNAL_PORT}"
+      - --node-socket
+      - ${CARDANO_OGMIOS_NODE_SOCKET_PATH}
+      - --node-config
+      - ${CARDANO_OGMIOS_NODE_CONFIG_PATH}
     healthcheck:
       test: ["CMD-SHELL", "/scripts/healthcheck.sh"]
       interval: 30s
@@ -91,21 +61,19 @@ services:
         max-size: "400k"
         max-file: "10"
     ports:
-      - ${OGMIOS_PORT:-1337}:1337
-    environment:
-      NETWORK: ${NETWORK}
-      #SOCKET: "${CARDANO_NODE_HOME}/ipc/node.socket" 
-      #UPDATE_CHECK: "N"
-      #EXPORTED_CONFIG: "${CARDANO_NODE_HOME}/config"
+      - ${CARDANO_OGMIOS_PORT:-1337}:${CARDANO_OGMIOS_INTERNAL_PORT:-1337}
     volumes:
-      #- node-db:/db
-      #- node-ipc:/ipc 
-      # Uncomment if you want to use your own config files or the provided ones.
-      # Current configs are also available at: https://book.world.dev.cardano.org/
-      #- ./configs/cardano/config/network/${NETWORK}:/config
-      - node-db:${CARDANO_NODE_HOME}/db
-      - node-ipc:${CARDANO_NODE_HOME}/ipc
-      - ./scripts/cardano-node-ogmios/:/scripts/:ro
+      - node-ipc:/ipc
+      - ./configs/cardano/config/network/${NETWORK}:/config:ro
+      - ./scripts/cardano-ogmios/:/scripts/:ro
+    depends_on:
+      cardano-node:
+        condition: service_healthy
+
+
+#################################
+## cardano dbsync + postgresDB ##
+#################################
 
   cardano-db-sync:
     image:  ${CARDANO_DB_SYNC_IMAGE}
@@ -135,7 +103,7 @@ services:
       retries: 5000000
     depends_on:
       # Depend on both services to be started before starting.
-      cardano-node-ogmios:
+      cardano-node:
         condition: service_started
       postgress:
         condition: service_started
@@ -220,7 +188,7 @@ services:
     ports:
       - ${CARDANO_GRAPHQL_PORT:-4000}:4000
     depends_on:
-      cardano-node-ogmios:
+      cardano-ogmios:
         condition: service_healthy
       postgress:
         condition: service_healthy
@@ -375,6 +343,7 @@ services:
       MYADDR_ACME_CHALLENGE: ${MYADDR_ACME_CHALLENGE:-}
       CERTBOT_ENABLED: ${CERTBOT_ENABLED:-}
       CERTBOT_EMAIL: ${CERTBOT_EMAIL:-}
+      CERTBOT_DNS_PROPAGATION_SECONDS: ${CERTBOT_DNS_PROPAGATION_SECONDS:-60}
       CARDANO_TOKEN_REGISTRY_GITHUB_ORGANIZATION: ${CARDANO_TOKEN_REGISTRY_GITHUB_ORGANIZATION}
       CARDANO_TOKEN_REGISTRY_GITHUB_PROJECT_NAME: ${CARDANO_TOKEN_REGISTRY_GITHUB_PROJECT_NAME}
       CARDANO_TOKEN_REGISTRY_GITHUB_MAPPINGS_FOLDER: ${CARDANO_TOKEN_REGISTRY_GITHUB_MAPPINGS_FOLDER}
@@ -387,6 +356,7 @@ services:
       - node-ipc:/node-ipc
       - ./logs/cron:/var/log/
       - ./configs/ssl/:/data/ssl/
+      - ./secrets/letsencrypt/:/etc/letsencrypt/
     restart: always
     depends_on:
       postgress:
@@ -434,7 +404,7 @@ services:
     environment:
       - NETWORK=${NETWORK}
     depends_on:
-      cardano-node-ogmios:
+      cardano-node:
         condition: service_healthy
     volumes:
       - node-ipc:/ipc
@@ -457,7 +427,7 @@ services:
 #################################
 
   blockfrost:
-    image: ${BLOCKFROST_IMAGE:-blockfrost/backend-ryo:v4.1.0}
+    image: ${BLOCKFROST_IMAGE:-blockfrost/backend-ryo:v6.5.0}
     ports:
       - ${BLOCKFROST_PORT:-8055}:${BLOCKFROST_CONFIG_SERVER_PORT:-8055}
     depends_on:
@@ -511,7 +481,7 @@ services:
     volumes:
       - ./configs/haproxy/:/usr/local/etc/haproxy/:ro
       - ./scripts/:/scripts/:ro
-      - ./configs/ssl/server.pem:/etc/ssl/server.pem:ro
+      - ./secrets/ssl/server.pem:/etc/ssl/server.pem:ro
     configs:
       - source: manifest_json
         target: /usr/local/etc/www/manifest.json

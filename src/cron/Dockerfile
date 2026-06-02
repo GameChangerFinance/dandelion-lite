@@ -4,7 +4,7 @@ FROM alpine:latest
 ARG CARDANO_NODE_VERSION=10.1.4
 
 # Install jq, curl, PostgreSQL client, and gawk b2sum (coreutils) and tini
-RUN apk add --no-cache jq curl postgresql-client gawk git bash coreutils tini
+RUN apk add --no-cache jq curl postgresql-client gawk git bash coreutils tini certbot
 
 # Set up the cron job environment
 # Create a directory for cron jobs
