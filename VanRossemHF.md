@@ -2,6 +2,9 @@
 
 ## Runtime Split
 
+The official Intersect `cardano-node` container is used in its `NETWORK`-driven mode, matching Intersect `cardano-node` and `cardano-db-sync` Docker Compose examples. Dandelion does not pass `cardano-node run --config ...` into this image because that image has its own generated runtime wrapper/config.
+
+
 Particular situations with Ogmios team maintainance on last hard forks/critical updates are forcing us to decouple Ogmios from Cardano Node, a bundle shipped by Ogmios team.
 
 Dandelion now runs Cardano node and Ogmios as separate services: `cardano-node` and `cardano-ogmios`. Public ports and HAProxy routes remain stable. Internal dependencies now point node consumers to `cardano-node` and Ogmios consumers to `cardano-ogmios`.
@@ -28,7 +31,8 @@ Sanchonet was left untouched because the checked official config URLs returned 4
 
 ## Healthchecks
 
-`cardano-node` health now means `cardano-cli query tip` returns tip JSON with `hash`, `block`, and `slot`. It no longer blocks startup on sync percentage to improve DNO user experience.
+`cardano-node` health follows the official Intersect Compose pattern and checks the node EKG endpoint on `127.0.0.1:12788`. It no longer blocks startup on sync percentage.
+
 
 `cardano-ogmios` health uses Ogmios health tooling when available and falls back to `GET /health` on the internal Ogmios port.
 
