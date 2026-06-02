@@ -19,6 +19,22 @@ Important files:
 
 When internal service names change, update only backend targets in `haproxy.cfg`. Public paths should stay stable unless a breaking API migration is intentionally planned.
 
+## Cardano Submit API
+
+`cardano-submit-api/` contains the submit-api tracing config mounted read-only at `/config/cardano-submit-api/`.
+
+Cardano Submit API `11.x` reads the new trace-dispatcher schema. The checked-in `config.json` intentionally uses `TraceOptions`, not the legacy `options` object present in older submit-api configs. The Docker Compose service runs the official Intersect image in custom mode, so `NETWORK` is not passed to this service.
+
+Set `CARDANO_SUBMIT_API_NETWORK_ARGS` in `.env` for the selected network:
+
+```env
+CARDANO_SUBMIT_API_NETWORK_ARGS="--mainnet"
+CARDANO_SUBMIT_API_NETWORK_ARGS="--testnet-magic 1"
+CARDANO_SUBMIT_API_NETWORK_ARGS="--testnet-magic 2"
+```
+
+Mainnet uses `--mainnet`; preprod uses testnet magic `1`; preview uses testnet magic `2`.
+
 ## SSL
 
 `ssl/` is a temporary input location for certificate renewal workflows. It is mounted read/write only into the cron container at `/data/ssl/`.

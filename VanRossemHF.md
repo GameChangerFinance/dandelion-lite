@@ -42,6 +42,14 @@ Sanchonet was left untouched because the checked official config URLs returned 4
 
 `cardano-ogmios` health uses Ogmios health tooling when available and falls back to `GET /health` on the internal Ogmios port.
 
+## Cardano Submit API
+
+`cardano-submit-api` now runs the official Intersect image in custom mode instead of `NETWORK` scripts mode. Dandelion mounts `configs/cardano-submit-api/config.json` and passes `--mainnet` or `--testnet-magic N` through `CARDANO_SUBMIT_API_NETWORK_ARGS`.
+
+The mounted config uses `TraceOptions`, which matches `trace-dispatcher` 2.12.x used by submit-api 11.x and avoids the legacy-config crash: `AesonException "Error in $: key \"Options\" not found"`.
+
+Reference proofs: [`iohk-nix` generates submit-api configs with `TraceOptions.""`](https://github.com/input-output-hk/iohk-nix/blob/master/cardano-lib/default.nix#L133-L143), and [`cardonnay` ships the same submit-api `TraceOptions` shape](https://github.com/IntersectMBO/cardonnay/blob/master/src/cardonnay_scripts/scripts/conway_fast/submit-api-config.json#L111-L120) while invoking submit-api with `--config`.
+
 ## SSL And Certbot
 
 HAProxy now reads only the active PEM from:

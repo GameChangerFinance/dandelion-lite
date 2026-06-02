@@ -397,13 +397,13 @@ services:
 
   cardano-submit-api:
     image: ${CARDANO_SUBMIT_API_IMAGE}
-    environment:
-      - NETWORK=${NETWORK}
     depends_on:
       cardano-node:
         condition: service_healthy
+    command: --config /config/cardano-submit-api/config.json ${CARDANO_SUBMIT_API_NETWORK_ARGS} --socket-path /ipc/node.socket --port 8090 --listen-address 0.0.0.0
     volumes:
       - node-ipc:/ipc
+      - ./configs/cardano-submit-api/:/config/cardano-submit-api/:ro
     ports:
       - ${CARDANO_SUBMIT_API_PORT:-8090}:8090
     restart: always
