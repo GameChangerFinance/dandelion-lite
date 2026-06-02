@@ -21,7 +21,13 @@ CARDANO_SUBMIT_API_VERSION=11.0.1
 BLOCKFROST_VERSION=6.5.0
 ```
 
-Currently Ogmios uses a local dockerfile that will be published as `ghcr.io/gamechangerfinance/ogmios:${CARDANO_OGMIOS_VERSION}` as there is no official Ogmios image published yet on any registry and we are 4 days close to the HF event. `src/cardano-ogmios/Dockerfile` builds it from the official Intersect Ogmios `v6.14.0.1` Linux tarball.
+Currently Ogmios uses a local dockerfile, now published as `ghcr.io/gamechangerfinance/ogmios:${CARDANO_OGMIOS_VERSION}` as there is no official Ogmios image published yet on any registry and we are 4 days close to the HF event. `src/cardano-ogmios/Dockerfile` builds it from the official Intersect Ogmios `v6.14.0.1` Linux tarball.
+
+Alternative public Ogmios docker image:
+```sh
+docker pull ghcr.io/gamechangerfinance/ogmios:v6.14.0.1
+# sha256:60d13b52ede893ebbab3381d2395b38c898e6538f88897de886c3dd61ffac963
+```
 
 ## Network Configs
 
