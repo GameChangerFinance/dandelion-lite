@@ -26,7 +26,7 @@ Currently Ogmios uses a local dockerfile, now published as `ghcr.io/gamechangerf
 Alternative public Ogmios docker image:
 ```sh
 docker pull ghcr.io/gamechangerfinance/ogmios:v6.14.0.2
-# sha256:60d13b52ede893ebbab3381d2395b38c898e6538f88897de886c3dd61ffac963
+# sha256:d097aa6dcff338c098d51c5c45474fba6a38e9657bcd01fa2df2c7274fdcba86
 ```
 
 ## Network Configs
