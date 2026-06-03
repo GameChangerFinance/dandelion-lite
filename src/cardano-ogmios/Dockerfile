@@ -1,6 +1,6 @@
 FROM debian:bookworm-slim
 
-ARG CARDANO_OGMIOS_VERSION=v6.14.0.1
+ARG CARDANO_OGMIOS_VERSION=v6.14.0.2
 ARG CARDANO_OGMIOS_ARCH=x86_64-linux
 
 RUN apt-get update \

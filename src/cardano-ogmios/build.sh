@@ -9,7 +9,7 @@ docker build \
     -f src/cardano-ogmios/Dockerfile \
     src/cardano-ogmios
 
-docker run --rm ghcr.io/gamechangerfinance/ogmios:v6.14.0.1 --version
+docker run --rm ghcr.io/gamechangerfinance/ogmios:v6.14.0.2 --version
 
 #docker login ghcr.io -u GameChangerFinance
-#docker push ghcr.io/gamechangerfinance/ogmios:v6.14.0.1
+#docker push ghcr.io/gamechangerfinance/ogmios:v6.14.0.2
