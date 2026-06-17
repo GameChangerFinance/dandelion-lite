@@ -26,16 +26,22 @@ For the project goal and broader Dandelion concept, read [docs/concept.md](docs/
 This setup includes several key components:
 
 - `cardano-node`: Runs the Cardano node.
-- `cardano-ogmios`: Runs the lightweight bridge interface Ogmios against `cardano-node`.
+- `cardano-ogmios`: Runs the lightweight API/bridge interface Ogmios against `cardano-node`.
 - `cardano-db-sync`: Synchronizes the blockchain data to a PostgreSQL database.
-- `haproxy`: A high-performance proxy to distribute network traffic among various components.
 - `postgres`: The PostgreSQL database, storing the synchronized blockchain data.
-- `koios`: RESTful API for Cardano, based on PostGREST, adapted for Dandelion Lite. 
+- `haproxy`: A high-performance proxy to distribute network traffic among various components.
 - `blockfrost`: RESTful API for Cardano, using `blockfrost-ryo` official images. 
-- `cardano-graphql`: Official GraphQL API for Cardano.
-- `cardano-token-registry`: Official Token Registry API for Cardano.
+- `cardano-graphql-mk2`: Community-maintained GraphQL API for Cardano, 90% backward compatible with the Official Cardano GraphQL API. Created by GameChanger Finance
 - `cardano-submit-api`: Official Transactions Submit API for Cardano.
-- `dandelion-postgrest`: Dandelion PostGREST API for Cardano, a RESTful API for querying the blockchain data stored in PostgreSQL
+- `dandelion-postgrest`: Dandelion PostGREST API for Cardano, a RESTful API for querying the blockchain data stored in PostgreSQL and some extra handy queries.
+- `manifest`: JSON information of deployed Dandelion Lite Node, required for client applications and for joining the Dandelion Network of decentralized nodes
+- `home`: HTML landing website of deployed Dandelion Lite Node 
+- `backups`: your volume backups hosted with password protection 
+
+Some other experimental, legacy, non-performant APIs, non-compliant with popular dbsync configuration and developer-only services are disabled by default but are also included:
+
+- `koios`: RESTful API for Cardano, based on PostGREST, adapted for Dandelion Lite. 
+- `cardano-token-registry`: Official Token Registry API for Cardano.
 - `cardano-sql`: (MVP - WIP) PosgreSQL-over-HTTP API gateway wrapping several services such as
     - ogmios
     - cardano-db-sync
@@ -44,11 +50,12 @@ This setup includes several key components:
     - dandelion-postgrest
     - cardano-token-registry
     - more..
-- `manifest`: JSON information of deployed Dandelion Lite Node, required for client applications and for joining the Dandelion Network of decentralized nodes
-- `home`: HTML landing website of deployed Dandelion Lite Node 
-- `backups`: your volume backups hosted with password protection 
+- `pgadmin`: Web administration UI for inspecting and managing PostgreSQL data during development or maintenance.
+- `portainer`: Optional Docker/Podman management UI for monitoring and operating containers and volumes.
+- `swagger`: Development API explorer UI for testing and documenting HTTP endpoints.
 
-Each service is containerized and managed via Docker, ensuring easy deployment and scalability.
+Each service is containerized and managed via Podman (as an alias of Docker) and orquestrated using Docker Compose, ensuring easy deployment and scalability.
+
 
 ## Hardware Requirements (10-10-2024):
 
