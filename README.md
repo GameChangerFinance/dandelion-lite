@@ -32,7 +32,7 @@ This setup includes several key components:
 - [`postgres`](https://www.postgresql.org/): The PostgreSQL database, storing the synchronized blockchain data.
 - [`haproxy`](https://www.haproxy.com/): A high-performance proxy to distribute network traffic among various components.
 - [`blockfrost`](https://github.com/blockfrost/blockfrost-backend-ryo): RESTful API for Cardano, using `blockfrost-ryo` official images. 
-- [`cardano-graphql-mk2`](https://github.com/GameChangerFinance/cardano-graph/pkgs/container/cardano-graphql): Community-maintained GraphQL API for Cardano, 90% backward compatible with the Official Cardano GraphQL API. Created by GameChanger Finance
+- [`cardano-graphql-mk2`](https://github.com/GameChangerFinance/cardano-graph/pkgs/container/cardano-graphql): Cardano GraphQL MKII is a monolithic community-maintained rewrite of the legacy API. ~90% backward compatible with the Official Cardano GraphQL project. Created by GameChanger Finance.
 - [`cardano-submit-api`](https://github.com/IntersectMBO/cardano-node/pkgs/container/cardano-submit-api): Official Transactions Submit API for Cardano.
 - `dandelion-postgrest`: Dandelion PostGREST API for Cardano, a RESTful API for querying the blockchain data stored in PostgreSQL and some extra handy queries.
 - `manifest`: JSON information of deployed Dandelion Lite Node, required for client applications and for joining the Dandelion Network of decentralized nodes
@@ -318,7 +318,7 @@ sudo reboot now
 
 ### Koios Support
 
-Due to special **Koios** requirements on **cardano-db-sync** database setup ( [variant schema](https://github.com/IntersectMBO/cardano-db-sync/blob/master/doc/schema.md#variant-schema) ), it makes it not fully compatible with other APIs like **Blockfrost** and **cardano-graphql**.
+Due to special **Koios** requirements on **cardano-db-sync** database setup ( [variant schema](https://github.com/IntersectMBO/cardano-db-sync/blob/master/doc/schema.md#variant-schema) ), it makes it not fully compatible with other APIs like **Blockfrost** and **cardano-graphql-mk2**.
 
 As it is not adviced to run 2 **cardano-db-sync** instances to keep also other APIs working under the same setup, we offer out of the box a semi-working **Koios** API (without *variant schema*), and if you setup **cardano-db-sync** properly you can get it working at full, but affecting the other services.
 
