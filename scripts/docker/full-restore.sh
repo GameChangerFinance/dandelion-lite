@@ -13,26 +13,26 @@ backupDir=${2:-"$BACKUP_DIR"}
 postgresService="postgress"
 
 
-[[ -z $projectName ]] && echo "Missing docker compose project name (actually only a prefix is required)" && exit 1
-[[ -z $backupDir ]] && echo "Missing directory path with the stored backup files (with last slash)" && exit 1
+[[ -z $projectName ]] && echo "❌ Missing docker compose project name (actually only a prefix is required)" && exit 1
+[[ -z $backupDir ]] && echo "❌ Missing directory path with the stored backup files (with last slash)" && exit 1
 
-echo "Restoring project '$projectName'..."
+echo "ℹ️ Restoring project '$projectName'..."
 echo
 
 volumeNames=$(docker volume ls -q)
 
-echo "About to try restoring all these volumes with these backup files (${backupDir}<volume_name_without_project_name.tar.gz>):"
+echo "ℹ️ About to try restoring all these volumes with these backup files (${backupDir}<volume_name_without_project_name.tar.gz>):"
 
 for volumeName in $volumeNames; do
     if [[ $volumeName == "$projectName"* ]]; then   # True if $volumeName starts with $projectName.
         fileName=$(echo $volumeName | sed "s/^${projectName}//")
-	echo "${volumeName}: ${fileName}.tar.gz"
+		echo "ℹ️ ${volumeName}: ${fileName}.tar.gz"
 	ls -alh "${backupDir}${fileName}.tar.gz" | awk '{print $5, $9}'
     fi
 done
 echo
 
-echo "Warning: all containers will be turned off AND ALL VOLUME DATA WILL BE REPLACED !"
+echo "⚠️ Warning: all containers will be turned off AND ALL VOLUME DATA WILL BE REPLACED !"
 
 read -p "Press key to continue.. (Ctrl + C to abort)" -n1 -s
 echo
@@ -43,7 +43,7 @@ echo
 for volumeName in $volumeNames; do
     if [[ $volumeName == "$projectName"* ]]; then   # True if $volumeName starts with $projectName.
 	fileName=$(echo $volumeName | sed "s/^${projectName}//")
-	echo $fileName
+		echo "ℹ️ $fileName"
     	./scripts/docker/restore-volume.sh "${volumeName}" "${fileName}" "${backupDir}">> full-restore.log 2>&1
 	ls -alh "${backupDir}${fileName}.tar.gz" | awk '{print $5, $9}'
 	#read -p "Press key to continue.. (Ctrl + C to abort)" -n1 -s
@@ -51,10 +51,11 @@ for volumeName in $volumeNames; do
     fi
 done
 
-echo "Setting your custom database password as backups are shipped with a dummy one..."
+echo "ℹ️ Setting your custom database password as backups are shipped with a dummy one..."
 docker compose up "$postgresService" -d
 docker compose exec -T "$postgresService" psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "ALTER USER \"$POSTGRES_USER\" WITH PASSWORD '${POSTGRES_PASSWORD}';"
 docker compose down
 
-exit 0
+echo "✅ Full restore completed."
 
+exit 0

@@ -19,6 +19,8 @@ ___  ____ __ _ ___  ____ _    _ ____ __ _
 
 **Dandelion Lite** is a convenient way of deploying your own local Cardano Node and a set of Dandelion APIs. It uses docker-compose, podman and handy scripts to ease the setup and reduce node syncronization times by using volume snapshots for backup and restore procedures. Dandelion Lite is a fork of Koios Lite, extending it beyond Koios, created by GameChanger Finance and M2Tec teams.
 
+For the project goal and broader Dandelion concept, read [docs/concept.md](/home/zxpectre/bin/AI/tmp/dandelion-lite/docs/concept.md).
+
 ## Components
 
 This setup includes several key components:
@@ -169,6 +171,8 @@ To auto run on system start:
 
 Syncing Cardano node and databases can take even more than a week, it is adviced for you to download compressed snapshots of the databases to get you started.
 
+Remote backup syncs are guarded by the special `READY` (metadata) and `SHA256SUMS` (integrity hashes) files published beside the backup archives. If `READY` file exists it will be interpreted as a standy flag for third party operators to sync with the published files. `READY` content must match the local `DLT` and `NETWORK` environment variables; Cardano node and db-sync version differences are shown as explicit warnings because they may be valid only during planned upgrade workflows. The downloader uses `aria2c` to resume partial files overwriting existing files and without creating temporary files for disk usage optimization. Make your own backups, files are meant to be overwritten!
+
 1. Set the `BACKUP_DIR` environment variable on `.env` file with the location on where you want to store the files, like `BACKUP_DIR="/home/${USER}/backups/${NETWORK}/"`. Check [Volume Backup Sizes](#volume-backup-sizes) for estimating the required size.
 2. Execute `scripts/dandoman.sh` > `Setup->Download Backup` and follow steps.
 
@@ -187,7 +191,7 @@ Press key to continue.. (Ctrl + C to abort)
 Syncing Cardano node and databases can take even more than a week, it is adviced for you to take compressed snapshots or backups of your databases after 2 or 3 of months at least.
 1. Set the `BACKUP_DIR` environment variable on `.env` file with the location on where you want to store the files, like `BACKUP_DIR="/home/${USER}/backups/${NETWORK}/"`. Check [Volume Backup Sizes](#volume-backup-sizes) for estimating the required size.
 2. Customize `NGINX_WWW_BACKUP_USER` and `NGINX_WWW_BACKUP_PASSWORD` to protect with a password the hosting of your backup files
-3. Execute `scripts/dandoman.sh` > `Setup->Full backup` and follow steps.
+3. Execute `scripts/dandoman.sh` > `Setup->Full backup` and follow steps. The backup flow will also create the special `READY` and `SHA256SUMS` files (you can do manually by calling `./scripts/docker/create-backup-checksum.sh`).
 
 ### Run a Full Deploy Restore
 
