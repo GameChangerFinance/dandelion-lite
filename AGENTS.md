@@ -36,6 +36,7 @@ Goal: keep the project production-safe while improving operator experience.
 - Inspect current files before editing.
 - Keep changes surgical and current-code-aware.
 - Do not rewrite working scripts just to make them stylistically nicer.
+- Do not tamper with already-working path semantics unless the user explicitly requests a path behavior change.
 - Preserve public script call signatures unless the user explicitly approves a breaking change.
 - Treat helper scripts as production entrypoints used by both humans and automation.
 - Avoid new external dependencies and OS package installs unless the existing toolchain cannot solve the task.
@@ -219,6 +220,7 @@ Good operator UX means:
 - no silent fallbacks that hide data integrity problems
 - no surprising disk amplification
 - no unexpected call signature changes
+- do not leak maintainer absolute filesystem paths, user `.env` files, backup directories, private keys, or other sensitive traces in logs, docs, screenshots, or prompt text
 
 When changing scripts, review the exact output operators will see during a real deployment.
 

@@ -19,7 +19,7 @@ ___  ____ __ _ ___  ____ _    _ ____ __ _
 
 **Dandelion Lite** is a convenient way of deploying your own local Cardano Node and a set of Dandelion APIs. It uses docker-compose, podman and handy scripts to ease the setup and reduce node syncronization times by using volume snapshots for backup and restore procedures. Dandelion Lite is a fork of Koios Lite, extending it beyond Koios, created by GameChanger Finance and M2Tec teams.
 
-For the project goal and broader Dandelion concept, read [docs/concept.md](/home/zxpectre/bin/AI/tmp/dandelion-lite/docs/concept.md).
+For the project goal and broader Dandelion concept, read [docs/concept.md](docs/concept.md).
 
 ## Components
 
