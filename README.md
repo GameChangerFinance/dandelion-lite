@@ -32,7 +32,7 @@ This setup includes several key components:
 - [`postgres`](https://www.postgresql.org/): The PostgreSQL database, storing the synchronized blockchain data.
 - [`haproxy`](https://www.haproxy.com/): A high-performance proxy to distribute network traffic among various components.
 - [`blockfrost`](https://github.com/blockfrost/blockfrost-backend-ryo): RESTful API for Cardano, using `blockfrost-ryo` official images. 
-- [`cardano-graphql-mk2`](https://github.com/GameChangerFinance/cardano-graph/pkgs/container/cardano-graphql): Cardano GraphQL MKII is a monolithic community-maintained rewrite of the legacy API. ~90% backward compatible with the Official Cardano GraphQL project. Created by GameChanger Finance.
+- [`cardano-graphql-mk2`](https://github.com/GameChangerFinance/cardano-graph/pkgs/container/cardano-graphql): Cardano GraphQL MKII is a modern, community-maintained rewrite of the legacy API. ~90% backward compatible with the Official Cardano GraphQL project. Created by GameChanger Finance.
 - [`cardano-submit-api`](https://github.com/IntersectMBO/cardano-node/pkgs/container/cardano-submit-api): Official Transactions Submit API for Cardano.
 - `dandelion-postgrest`: Dandelion PostGREST API for Cardano, a RESTful API for querying the blockchain data stored in PostgreSQL and some extra handy queries.
 - `manifest`: JSON information of deployed Dandelion Lite Node, required for client applications and for joining the Dandelion Network of decentralized nodes
