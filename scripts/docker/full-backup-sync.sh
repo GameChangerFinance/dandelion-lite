@@ -23,6 +23,7 @@ if [[ -n $remoteBackupUser && -z $remoteBackupPassword ]] || [[ -z $remoteBackup
 fi
 
 command -v aria2c >/dev/null 2>&1 || { echo "❌ Missing aria2c command. Install dependencies with ./scripts/dandoman.sh before downloading remote backups." >&2; exit 1; }
+command -v md5sum >/dev/null 2>&1 || { echo "❌ Missing md5sum command. Install dependencies with ./scripts/dandoman.sh before downloading remote backups." >&2; exit 1; }
 
 cd "$REPO_ROOT" || exit 1
 if [[ -f .env ]]; then
@@ -135,25 +136,51 @@ confirm_version_mismatches() {
 }
 
 manifest_hash_for() {
-  local wanted=$1
+  local manifestFile=$1
+  local wanted=$2
+  local hashPattern='^[0-9a-fA-F]{64}$'
+
+  if [[ $manifestFile == *MD5SUMS ]]; then
+    hashPattern='^[0-9a-fA-F]{32}$'
+  fi
+
   awk -v wanted="$wanted" '
-    $1 ~ /^[0-9a-fA-F]{64}$/ {
+    $1 ~ hashPattern {
       name=$0
-      sub(/^[0-9a-fA-F]{64}[[:space:]][[:space:]]?[*]?/, "", name)
+      sub(/^[0-9a-fA-F]+[[:space:]][[:space:]]?[*]?/, "", name)
       if (name == wanted || name == "./" wanted) {
         print $1
         exit
       }
     }
-  ' "$tmpDir/SHA256SUMS"
+  ' hashPattern="$hashPattern" "$manifestFile"
 }
 
 file_matches_hash() {
   local file=$1
   local hash=$2
+  local commandName=$3
 
   [[ -f $file ]] || return 1
-  printf '%s  %s\n' "$hash" "$file" | sha256sum -c --status -
+  printf '%s  %s\n' "$hash" "$file" | "$commandName" -c --status -
+}
+
+compare_final_sha256_payloads() {
+  local fileName remoteHash localHash
+
+  while IFS= read -r fileName; do
+    [[ -z $fileName ]] && continue
+    remoteHash=$(manifest_hash_for "$tmpDir/SHA256SUMS" "$fileName")
+    localHash=$(manifest_hash_for "${backupDir}SHA256SUMS" "$fileName")
+
+    [[ -n $remoteHash ]] || { echo "❌ Missing remote SHA256SUMS entry for '$fileName'." >&2; return 1; }
+    [[ -n $localHash ]] || { echo "❌ Missing local SHA256SUMS entry for '$fileName'." >&2; return 1; }
+
+    if [[ $remoteHash != "$localHash" ]]; then
+      echo "❌ SHA256SUMS mismatch for '$fileName'. Remote has '$remoteHash' but local generated '$localHash'." >&2
+      return 1
+    fi
+  done < "$tmpDir/expected-backup-files"
 }
 
 ensure_compose_volumes() {
@@ -178,6 +205,7 @@ ensure_compose_volumes() {
 echo
 echo "ℹ️ Checking remote backup metadata..."
 download_metadata READY READY || { echo "❌ Missing remote READY metadata file at '${remoteBackupURL}READY'. Remote backup repository is not ready or not reachable." >&2; exit 1; }
+download_metadata MD5SUMS MD5SUMS || { echo "❌ Missing remote MD5SUMS fast-checks file at '${remoteBackupURL}MD5SUMS'. Remote backup repository is not ready or not reachable." >&2; exit 1; }
 download_metadata SHA256SUMS SHA256SUMS || { echo "❌ Missing remote SHA256SUMS checksums file at '${remoteBackupURL}SHA256SUMS'. Remote backup repository is not ready or not reachable." >&2; exit 1; }
 parse_ready "$tmpDir/READY"
 
@@ -201,41 +229,43 @@ echo "ℹ️ Ensuring Docker Compose volumes exist before downloading backups...
 ensure_compose_volumes
 
 mkdir -p "$backupDir"
-rm -f "${backupDir}READY" "${backupDir}SHA256SUMS"
+rm -f "${backupDir}READY" "${backupDir}MD5SUMS" "${backupDir}SHA256SUMS"
 
 echo "ℹ️ Downloading backups from '$remoteBackupURL' into local dir '$backupDir'..."
 # echo "ℹ️ Will attempt to download backup files into: ${backupDir}<volume_name_without_prefix>.tar.gz"
 echo
 
 mapfile -t volumeNames < <(docker volume ls -q | sort)
+: > "$tmpDir/expected-backup-files"
 
 for volumeName in "${volumeNames[@]}"; do
   if [[ $volumeName == "$projectName"* ]]; then
     fileName=${volumeName#"$projectName"}
     backupFileName="${fileName}.tar.gz"
     targetPath="${backupDir}${backupFileName}"
-    expectedSha256=$(manifest_hash_for "$backupFileName")
+    expectedMd5=$(manifest_hash_for "$tmpDir/MD5SUMS" "$backupFileName")
 
-    [[ -z $expectedSha256 ]] && echo "❌ Missing SHA256SUMS entry for expected backup file '$backupFileName'." >&2 && exit 1
+    [[ -z $expectedMd5 ]] && echo "❌ Missing MD5SUMS entry for expected backup file '$backupFileName'." >&2 && exit 1
+    echo "$backupFileName" >> "$tmpDir/expected-backup-files"
 
-    if file_matches_hash "$targetPath" "$expectedSha256"; then
-      echo "✅ Local file already matches SHA256SUMS: $backupFileName"
+    if file_matches_hash "$targetPath" "$expectedMd5" md5sum; then
+      echo "✅ Local file already matches MD5SUMS fast-check: $backupFileName"
       echo
       continue
     fi
 
     if [[ -f $targetPath ]]; then
-      echo "ℹ️ Local file exists but does not match SHA256SUMS; trying aria2 resume before overwrite."
+      echo "ℹ️ Local file exists but does not match MD5SUMS fast-check; trying aria2 resume before overwrite."
     fi
 
     "$script_dir/backup-sync.sh" "$remoteBackupURL" "$volumeName" "$fileName" "$backupDir" "$remoteBackupUser" "$remoteBackupPassword"
 
-    if ! file_matches_hash "$targetPath" "$expectedSha256"; then
-      echo "⚠️ Resume/update completed but did not produce the expected hash; removing only '$targetPath' and retrying once." >&2
+    if ! file_matches_hash "$targetPath" "$expectedMd5" md5sum; then
+      echo "⚠️ Resume/update completed but did not produce the expected MD5 fast-check; removing only '$targetPath' and retrying once." >&2
       rm -f "$targetPath" "${targetPath}.aria2"
       "$script_dir/backup-sync.sh" "$remoteBackupURL" "$volumeName" "$fileName" "$backupDir" "$remoteBackupUser" "$remoteBackupPassword"
-      file_matches_hash "$targetPath" "$expectedSha256" || {
-        echo "❌ Downloaded backup file failed SHA256SUMS verification: $targetPath" >&2
+      file_matches_hash "$targetPath" "$expectedMd5" md5sum || {
+        echo "❌ Downloaded backup file failed MD5SUMS fast-check: $targetPath" >&2
         exit 1
       }
     fi
@@ -244,8 +274,18 @@ for volumeName in "${volumeNames[@]}"; do
   fi
 done
 
-cp "$tmpDir/READY" "${backupDir}READY"
-cp "$tmpDir/SHA256SUMS" "${backupDir}SHA256SUMS"
+echo "ℹ️ Creating local READY, MD5SUMS and SHA256SUMS files..."
+READY_SOURCE_FILE="$tmpDir/READY" "$script_dir/create-backup-checksum.sh" "$backupDir"
+
+echo "ℹ️ Verifying generated local SHA256SUMS against remote SHA256SUMS..."
+compare_final_sha256_payloads || {
+  mkdir -p "${backupDir}old"
+  mv -f "${backupDir}READY" "${backupDir}old/READY"
+  echo "⚠️ Final SHA256SUMS verification failed because local files do not match the remote hashes. READY file was moved to '${backupDir}old/READY' so other operators do not treat this published backup set as ready yet." >&2  
+  echo "ℹ️ Re-run '${script_dir}full-backup-sync.sh' to sync with remote again, this will create a READY file matching remote docker image versions" >&2    
+  echo "ℹ️ Run '${script_dir}create-backup-checksum.sh' to create the READY file matching your local backup files and docker image versions" >&2    
+  exit 1
+}
 
 echo
 echo "ℹ️ Current backup files in $backupDir:"

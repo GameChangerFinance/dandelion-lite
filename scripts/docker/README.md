@@ -26,6 +26,7 @@ Published backup sets must include these files beside the `.tar.gz` archives:
 
 ```text
 READY
+MD5SUMS
 SHA256SUMS
 ```
 
@@ -41,7 +42,13 @@ UPDATED_AT=2026-06-17T00:00:00Z
 
 `READY` parsing is position-agnostic. Key order may vary, blank lines and comment lines are ignored, and required keys must appear exactly once.
 
-`SHA256SUMS` uses the standard `sha256sum` format:
+`MD5SUMS` uses the standard `md5sum` format and is used only as a fast-change hint before downloads:
+
+```text
+<md5-hex>  <filename>
+```
+
+`SHA256SUMS` uses the standard `sha256sum` format and remains the final integrity authority:
 
 ```text
 <sha256-hex>  <filename>
@@ -56,22 +63,24 @@ sha256sum -c SHA256SUMS
 
 ## Sync Safety
 
-`full-backup-sync.sh` treats remote `READY` and `SHA256SUMS` as the authority before downloading payload files.
+`full-backup-sync.sh` treats remote `READY`, `MD5SUMS`, and `SHA256SUMS` as the published backup contract. `MD5SUMS` is used to quickly decide whether a local file needs a download. `SHA256SUMS` is regenerated locally after sync and compared against the remote payload hashes before success is reported.
 
 Validation behavior:
 
 - missing remote `READY`: fail before payload downloads
+- missing remote `MD5SUMS`: fail before payload downloads
 - missing remote `SHA256SUMS`: fail before payload downloads
 - remote `DLT` mismatch: fail with incoming and local values
 - remote `NETWORK` mismatch: fail with incoming and local values
 - `CARDANO_NODE_VERSION` mismatch: warn with incoming and local values
 - `CARDANO_DB_SYNC_VERSION` mismatch: warn with incoming and local values
+- final SHA256 mismatch: move `READY` into `old/READY` and fail so the backup set is not advertised as ready
 
 Version mismatches require explicit operator intent. In an interactive shell, type `OK` when prompted. For planned non-interactive upgrade flows, set `ALLOW_BACKUP_VERSION_MISMATCH=1` only for that command invocation.
 
 The payload downloader uses `aria2c` with file auto-renaming disabled. It writes to the final target filename and must not create duplicate backup files such as `.1`, `.2`, or `.3`.
 
-If a local file already matches `SHA256SUMS`, it is skipped. If it is partial or stale, the downloader first lets `aria2c` try to resume/update the existing target. Only after a completed transfer still fails hash validation does it remove that single target file and retry once from zero.
+If a local file already matches `MD5SUMS`, it is skipped quickly. If it is partial or stale, the downloader first lets `aria2c` try to resume/update the existing target. Only after a completed transfer still fails the MD5 fast-check does it remove that single target file and retry once from zero. After all downloads finish, local `SHA256SUMS` is regenerated and compared against the remote payload hashes.
 
 ## Scripts
 
@@ -113,7 +122,7 @@ Full remote backup sync wrapper.
 ./scripts/docker/full-backup-sync.sh <remoteBackupURL> <projectNamePrefix> <backupDir> [user] [password]
 ```
 
-It validates remote `READY` and `SHA256SUMS`, discovers project volumes, then delegates each archive download to `backup-sync.sh`.
+It validates remote `READY`, `MD5SUMS`, and `SHA256SUMS`, discovers project volumes, then delegates each archive download to `backup-sync.sh`.
 
 ### `full-backup.sh`
 
@@ -123,7 +132,7 @@ Full local backup wrapper.
 ./scripts/docker/full-backup.sh <projectNamePrefix> <backupDir>
 ```
 
-It stops services for a clean backup, exports matching volumes, restores the local database password, then calls `create-backup-checksum.sh` to publish `READY` and `SHA256SUMS`.
+It stops services for a clean backup, exports matching volumes, restores the local database password, then calls `create-backup-checksum.sh` to publish `READY`, `MD5SUMS`, and `SHA256SUMS`.
 
 ### `full-restore.sh`
 
@@ -143,7 +152,7 @@ Canonical metadata and checksum generator.
 ./scripts/docker/create-backup-checksum.sh [backupDir]
 ```
 
-It reads the local `.env`, writes `READY`, and creates a standard `SHA256SUMS` manifest for `READY` and all `.tar.gz` files in the backup directory.
+It reads the local `.env`, writes `READY`, and creates standard `MD5SUMS` and `SHA256SUMS` manifests for `READY` and all `.tar.gz` files in the backup directory.
 
 ### `db-sync-snapshot-sync.sh`
 

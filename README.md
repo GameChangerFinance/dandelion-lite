@@ -179,7 +179,7 @@ To auto run on system start:
 
 Syncing Cardano node and databases can take even more than a week, it is adviced for you to download compressed snapshots of the databases to get you started.
 
-Remote backup syncs are guarded by the special `READY` (metadata) and `SHA256SUMS` (integrity hashes) files published beside the backup archives. If `READY` file exists it will be interpreted as a standy flag for third party operators to sync with the published files. `READY` content must match the local `DLT` and `NETWORK` environment variables; Cardano node and db-sync version differences are shown as explicit warnings because they may be valid only during planned upgrade workflows. The downloader uses `aria2c` to resume partial files overwriting existing files and without creating temporary files for disk usage optimization. Make your own backups, files are meant to be overwritten!
+Remote backup syncs are guarded by the special `READY` metadata file plus `MD5SUMS` fast-checks and `SHA256SUMS` integrity hashes published beside the backup archives. If `READY` file exists it will be interpreted as a standby flag for third party operators to sync with the published files. `READY` content must match the local `DLT` and `NETWORK` environment variables; Cardano node and db-sync version differences are shown as explicit warnings because they may be valid only during planned upgrade workflows. The downloader uses `MD5SUMS` to quickly decide whether files need syncing, then regenerates local `SHA256SUMS` and compares it with remote payload hashes before reporting success. If the final SHA verification fails, `READY` is moved into `old/READY` so the set is not advertised as ready. Make your own backups, files are meant to be overwritten!
 
 1. Set the `BACKUP_DIR` environment variable on `.env` file with the location on where you want to store the files, like `BACKUP_DIR="/home/${USER}/backups/${NETWORK}/"`. Check [Volume Backup Sizes](#volume-backup-sizes) for estimating the required size.
 2. Execute `scripts/dandoman.sh` > `Setup->Download Backup` and follow steps.
@@ -199,7 +199,7 @@ Press key to continue.. (Ctrl + C to abort)
 Syncing Cardano node and databases can take even more than a week, it is adviced for you to take compressed snapshots or backups of your databases after 2 or 3 of months at least.
 1. Set the `BACKUP_DIR` environment variable on `.env` file with the location on where you want to store the files, like `BACKUP_DIR="/home/${USER}/backups/${NETWORK}/"`. Check [Volume Backup Sizes](#volume-backup-sizes) for estimating the required size.
 2. Customize `NGINX_WWW_BACKUP_USER` and `NGINX_WWW_BACKUP_PASSWORD` to protect with a password the hosting of your backup files
-3. Execute `scripts/dandoman.sh` > `Setup->Full backup` and follow steps. The backup flow will also create the special `READY` and `SHA256SUMS` files (you can do manually by calling `./scripts/docker/create-backup-checksum.sh`).
+3. Execute `scripts/dandoman.sh` > `Setup->Full backup` and follow steps. The backup flow will also create the special `READY`, `MD5SUMS`, and `SHA256SUMS` files (you can do manually by calling `./scripts/docker/create-backup-checksum.sh`).
 
 ### Run a Full Deploy Restore
 
