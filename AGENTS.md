@@ -89,7 +89,7 @@ Examples:
 
 - `full-backup-sync.sh` may validate remote metadata, compare versions, decide whether to skip or retry files, and delegate downloads.
 - `backup-sync.sh` should only download one requested backup archive cleanly.
-- `create-backup-checksum.sh` is the canonical local producer of `READY` and `SHA256SUMS`.
+- `create-backup-checksum.sh` is the canonical local producer of `READY`, `MD5SUMS`, and `SHA256SUMS`.
 - `backup-volume.sh` and `restore-volume.sh` should stay narrow volume export/import primitives.
 
 ## Documentation
@@ -126,7 +126,10 @@ Design rules:
 - Let `aria2c` resume before replacing a local file.
 - If a completed transfer still fails checksum verification, wrappers may remove only that single target file and retry once.
 - Hashes are the source of truth; HTTP headers are only an optimization.
-- Remote backup sync must be gated by remote `READY` and `SHA256SUMS`.
+- Remote backup sync must be gated by remote `READY`, `MD5SUMS`, and `SHA256SUMS`.
+- `MD5SUMS` may be used as a fast-change hint to avoid expensive SHA256 hashing before downloads.
+- `SHA256SUMS` remains the final integrity authority and must be regenerated locally after sync before reporting success.
+- If final SHA256 verification fails, move `READY` to `old/READY` instead of deleting it, so the set is clearly marked not-ready.
 - Missing remote `READY` means the remote backup repository is not ready or invalid.
 - `DLT` and `NETWORK` mismatches are hard failures.
 - `CARDANO_NODE_VERSION` and `CARDANO_DB_SYNC_VERSION` mismatches must warn with incoming and local values and require explicit operator intent.
@@ -159,7 +162,7 @@ Goal: keep each backup script understandable and replaceable during incidents.
 - `full-backup-sync.sh`: wrapper that validates remote backup metadata, discovers expected volumes, and delegates payload downloads.
 - `full-backup.sh`: wrapper for creating a local backup set.
 - `full-restore.sh`: wrapper for restoring local backup sets.
-- `create-backup-checksum.sh`: canonical generator for local `READY` and `SHA256SUMS`.
+- `create-backup-checksum.sh`: canonical generator for local `READY`, `MD5SUMS`, and `SHA256SUMS`.
 
 Do not reintroduce `sha256sum-backups.sh`. The canonical checksum script is:
 

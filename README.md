@@ -58,82 +58,113 @@ Some other experimental, legacy, non-performant APIs, non-compliant with popular
 Each service is containerized and managed via Podman (as an alias of Docker) and orquestrated using Docker Compose, ensuring easy deployment and scalability.
 
 
-## Hardware Requirements (10-10-2024):
+## Hardware Requirements:
+
+**Last updated: 18/06/2026**
 
 Suggested setup for concurrent **Cardano Mainnet** and **Preproduction Testnet** with volume backups consists on
 
 - 128GB RAM (DDR4 ECC RAM)
-- 2TB M2 NVME for storage
+- 2TB M2 NVME for full storage (OS + docker images + volumes + backups)
 - Dual Intel Xeon E5 2680 v4 (LGA 2011-3 motherboard)
 
-### Volume sizes
+### Storage Requirements
+
+<table>
+  <thead>
+    <tr>
+      <th>network</th>
+      <th>service</th>
+      <th>volume size</th>
+      <th>total volume size</th>
+      <th>backup size</th>
+      <th>total backup size</th>
+      <th>total</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td rowspan="5">mainnet</td>
+      <td>db-sync-data</td>
+      <td>25G</td>
+      <td rowspan="5">724.23G</td>
+      <td>1.4G</td>
+      <td rowspan="5">357.385G</td>
+      <td rowspan="5">~1.08T</td>
+    </tr>
+    <tr>
+      <td>node-db</td>
+      <td>187G</td>
+      <td>120G</td>
+    </tr>
+    <tr>
+      <td>node-ipc</td>
+      <td>8.0K</td>
+      <td>92</td>
+    </tr>
+    <tr>
+      <td>postgresdb</td>
+      <td>512G</td>
+      <td>236G</td>
+    </tr>
+    <tr>
+      <td>unimatrix-data</td>
+      <td>8.0K</td>
+      <td>92</td>
+    </tr>
+    <tr>
+      <td rowspan="5">preprod</td>
+      <td>db-sync-data</td>
+      <td>3.9G</td>
+      <td rowspan="5">27.94G</td>
+      <td>1.4G</td>
+      <td rowspan="5">24.585G</td>
+      <td rowspan="5">~52.5G</td>
+    </tr>
+    <tr>
+      <td>node-db</td>
+      <td>8.8G</td>
+      <td>8.2G</td>
+    </tr>
+    <tr>
+      <td>node-ipc</td>
+      <td>8.0K</td>
+      <td>92</td>
+    </tr>
+    <tr>
+      <td>postgresdb</td>
+      <td>16G</td>
+      <td>15G</td>
+    </tr>
+    <tr>
+      <td>unimatrix-data</td>
+      <td>8.0K</td>
+      <td>92</td>
+    </tr>
+  </tbody>
+</table>
+
+**Important**: Container image sizes and OS footprint not listed on table
+
+Full volumes download (sync), backup and restore procedures can be run manually by helper scripts or using the menu on `$ ./scripts/dandoman.sh`.
+
+### Volume sizes (mandatory)
 
 These are sizes of the volumes used by the containers of recent production deployments.
 
-Using: `$ ./scripts/docker/list-volume-sizes.sh`
-
-Last updated: 10/10/2024
-
-### Cardano Mainnet   
-
-    25G     gc-node-mainnet_db-sync-data
-    445M    gc-node-mainnet_dbless-cardano-token-registry-data
-    187G    gc-node-mainnet_node-db
-    8.0K    gc-node-mainnet_node-ipc
-    512G    gc-node-mainnet_postgresdb
-    8.0K    gc-node-mainnet_unimatrix-data
-
-    Total   724.43 GB
-
-### Cardano Pre-Production Testnet
-
-    3.9G    gc-node-preprod_db-sync-data
-    41M     gc-node-preprod_dbless-cardano-token-registry-data
-    8.8G    gc-node-preprod_node-db
-    8.0K    gc-node-preprod_node-ipc
-    16G     gc-node-preprod_postgresdb
-    8.0K    gc-node-preprod_unimatrix-data
-
-    Total   28.74 GB
+Get them using: `$ ./scripts/docker/list-volume-sizes.sh`
 
 
-### Volume Backup Sizes
+### Volume Backup Sizes (optional)
 
-These are sizes of compressed backups of container volumes on recent production deployments. Is not estrictly required to take these disk space lists into consideration for hardware adquisition but is adviced as working without snapshots can delay node syncing times even for more than a week.
+These are sizes of compressed backups of container volumes on recent production deployments. Is not estrictly required to take these disk space lists into consideration for hardware adquisition but is adviced as working without backup snapshots can delay node syncing times even for more than a week.
 
-Full volumes backup and restore procedures can be run manually by helper scripts or using the menu on `$ ./scripts/dandoman.sh`.
-
-Last updated: 10/10/2024
-
-### Cardano Mainnet
-        
-    17G     db-sync-data.tar.gz
-    97G     node-db.tar.gz
-    4.0K    node-ipc.tar.gz
-    12K     pgadmin-data.tar.gz
-    4.0K    portainer-data.tar.gz
-    137G    postgresdb.tar.gz
-    4.0K    unimatrix-data.tar.gz
-    
-    Total   250G
+Get them with integrity hashes and local deployment metadata using: `$ ./scripts/docker/create-backup-checksum.sh`
 
 
-### Cardano Pre-Production Testnet
-   
-    
-    1.7G    db-sync-data.tar.gz
-    3.8G    node-db.tar.gz
-    4.0K    node-ipc.tar.gz
-    12K     pgadmin-data.tar.gz
-    4.0K    portainer-data.tar.gz
-    3.8G    postgresdb.tar.gz
-    4.0K    unimatrix-data.tar.gz
+## Software Requirements:
 
-    Total   9.3G
-
-## Software Requirements (10-10-2024):
-
-Reported to be working on:
+Reported to be working in production on:
 
 - Ubuntu Server version 24.04 (normal, not minimal install)
 
@@ -141,7 +172,9 @@ Reported to be working on:
 
 ### Base system install
 
-As a base system we use **ubuntu-server version 24.04**. We use the normal install not the minimal one. Also install **OpenSSH** server to allow for system administration. 
+As suggested base system you can use **ubuntu-server**. 
+
+We use the normal install not the minimal one. Also install **OpenSSH** server to allow for system administration. 
 
 1. When install is completed do `ip -br a` to get the ip address of your newly installed server 
 2. From you local system. So not on your server do `ssh-copy-id USER_NAME@SERVER_IP` This will copy your ssh keys to the server to allow easy login
@@ -162,9 +195,6 @@ docker inspect --format "{{json .State.Health }}" dandolite-preprod-cardano-node
 
 # Check if db-sync is ready 
 docker inspect --format "{{json .State.Health }}" dandolite-preprod-cardano-db-sync-1 | jq
-
-# Koios tip check
-curl http://127.0.0.1:8050/koios/v1/tip
 ```
 
 Remember to secure your deployment according to best practices, including securing your database and API endpoints.
@@ -179,7 +209,7 @@ To auto run on system start:
 
 Syncing Cardano node and databases can take even more than a week, it is adviced for you to download compressed snapshots of the databases to get you started.
 
-Remote backup syncs are guarded by the special `READY` (metadata) and `SHA256SUMS` (integrity hashes) files published beside the backup archives. If `READY` file exists it will be interpreted as a standy flag for third party operators to sync with the published files. `READY` content must match the local `DLT` and `NETWORK` environment variables; Cardano node and db-sync version differences are shown as explicit warnings because they may be valid only during planned upgrade workflows. The downloader uses `aria2c` to resume partial files overwriting existing files and without creating temporary files for disk usage optimization. Make your own backups, files are meant to be overwritten!
+#### Instructions
 
 1. Set the `BACKUP_DIR` environment variable on `.env` file with the location on where you want to store the files, like `BACKUP_DIR="/home/${USER}/backups/${NETWORK}/"`. Check [Volume Backup Sizes](#volume-backup-sizes) for estimating the required size.
 2. Execute `scripts/dandoman.sh` > `Setup->Download Backup` and follow steps.
@@ -194,17 +224,26 @@ Press key to continue.. (Ctrl + C to abort)
 ✅ All done.
 ```
 
+
+#### Behavior
+Remote backup syncs are guarded by the special `READY` metadata file plus `MD5SUMS` fast-checks and `SHA256SUMS` integrity hashes published beside the backup archives. 
+
+If `READY` file exists it will be interpreted as a standby flag for third party operators to sync with the published files. `READY` content must match the local `DLT` and `NETWORK` environment variables; Cardano node and db-sync version differences are shown as explicit warnings because they may be valid only during planned upgrade workflows. The downloader uses `MD5SUMS` to quickly decide whether files need syncing, then regenerates local `SHA256SUMS` and compares it with remote payload hashes before reporting success. 
+
+If the final SHA verification fails, `READY` is moved into `old/READY` so the set is not advertised as ready. Make your own backups, files are meant to be overwritten!
+
+
 ### Run a Full Deploy Backup
 
 Syncing Cardano node and databases can take even more than a week, it is adviced for you to take compressed snapshots or backups of your databases after 2 or 3 of months at least.
-1. Set the `BACKUP_DIR` environment variable on `.env` file with the location on where you want to store the files, like `BACKUP_DIR="/home/${USER}/backups/${NETWORK}/"`. Check [Volume Backup Sizes](#volume-backup-sizes) for estimating the required size.
+1. Set the `BACKUP_DIR` environment variable on `.env` file with the location on where you want to store the files, like `BACKUP_DIR="/home/${USER}/backups/${NETWORK}/"`. Check [Volume Backup Sizes](###-storage-requirements) for estimating the required size.
 2. Customize `NGINX_WWW_BACKUP_USER` and `NGINX_WWW_BACKUP_PASSWORD` to protect with a password the hosting of your backup files
-3. Execute `scripts/dandoman.sh` > `Setup->Full backup` and follow steps. The backup flow will also create the special `READY` and `SHA256SUMS` files (you can do manually by calling `./scripts/docker/create-backup-checksum.sh`).
+3. Execute `scripts/dandoman.sh` > `Setup->Full backup` and follow steps. The backup flow will also create the special `READY`, `MD5SUMS`, and `SHA256SUMS` files (you can do manually by calling `./scripts/docker/create-backup-checksum.sh`).
 
 ### Run a Full Deploy Restore
 
 This will **WIPE ALL YOUR DEPLOYMENT DATA** and will restore a previous backup:
-1. Set the `BACKUP_DIR` environment variable on `.env` file with the location from where you want to read the stored files, like `BACKUP_DIR="/home/${USER}/backups/${NETWORK}/"`. Check [Volume Backup Sizes](#volume-backup-sizes) for estimating the required size.
+1. Set the `BACKUP_DIR` environment variable on `.env` file with the location from where you want to read the stored files, like `BACKUP_DIR="/home/${USER}/backups/${NETWORK}/"`. Check[Volume Backup Sizes](###-storage-requirements)  for estimating the required size.
 2. Execute `scripts/dandoman.sh` > `Setup->Full restore` and follow steps.
 
 
