@@ -8,26 +8,26 @@ composePath=$4
 exampleUsage="Example usage: ./scripts/docker/systemdAdd.sh myProject \$PWD/docker-compose.yml \$PWD/.env \$PODMAN_COMPOSE_PROVIDER"
 
 if [ -z "$projectName" ]; then
-  echo "Missing docker/podman compose yaml project name"
-  echo $exampleUsage
+  echo "❌ Missing docker/podman compose yaml project name"
+  echo "ℹ️ $exampleUsage"
   exit 1
 fi
 
 if [ -z "$projectFile" ]; then
-  echo "Missing docker/podman compose yaml project file (docker-compose.yml)"
-  echo $exampleUsage
+  echo "❌ Missing docker/podman compose yaml project file (docker-compose.yml)"
+  echo "ℹ️ $exampleUsage"
   exit 1
 fi
 
 if [ -z "$composePath" ]; then
-  echo "Missing docker/podman executable path (example: /usr/local/bin/docker-compose) "
-  echo $exampleUsage
+  echo "❌ Missing docker/podman executable path (example: /usr/local/bin/docker-compose) "
+  echo "ℹ️ $exampleUsage"
   exit 1
 fi
 
 if [ -z "$envFile" ]; then
-  echo "Missing .env file path"
-  echo $exampleUsage
+  echo "❌ Missing .env file path"
+  echo "ℹ️ $exampleUsage"
   exit 1
 fi
 
@@ -36,39 +36,39 @@ envFile=$(realpath $envFile)
 composePath=$(realpath $composePath)
 
 if [ -f "${projectFile}" ]; then
-  echo "Installing project as service on SystemD '$projectFile'..."
+  echo "ℹ️ Installing project as service on SystemD '$projectFile'..."
 else
-  echo "Error: project file '${projectFile}' does not exist"
-  echo $exampleUsage
+  echo "❌ Error: project file '${projectFile}' does not exist"
+  echo "ℹ️ $exampleUsage"
   exit 1
 fi
 
 if [ -f "${composePath}" ]; then
-  echo "Using '${composePath}'..."
+  echo "ℹ️ Using '${composePath}'..."
 else
-  echo "Error: compose executable path '${composePath}' does not exist"
-  echo $exampleUsage
+  echo "❌ Error: compose executable path '${composePath}' does not exist"
+  echo "ℹ️ $exampleUsage"
   exit 1
 fi
 
 
 if [ -f "${envFile}" ]; then
-  echo "Applying '$envFile' variables..."
+  echo "ℹ️ Applying '$envFile' variables..."
 else
-  echo "Error: .env file '${envFile}' does not exist"
-  echo $exampleUsage
+  echo "❌ Error: .env file '${envFile}' does not exist"
+  echo "ℹ️ $exampleUsage"
   exit 1
 fi
 
 
 echo
-echo "About to install, are you sure you want to continue?"
+echo "⚠️ About to install, are you sure you want to continue?"
 
 read -p "Press key to continue.. (Ctrl + C to abort)" -n1 -s
 echo
 
 
-echo "Installing '${projectName}'..."
+echo "ℹ️ Installing '${projectName}'..."
 
 serviceName=${projectName}
 serviceFile=/etc/systemd/system/${serviceName}.service
@@ -81,7 +81,7 @@ export PODMAN_COMPOSE_PROVIDER=${composePath}
 
 scriptPath=$(dirname "$(realpath "$0")")
 
-echo "Creating systemd service file '${serviceFile}'..."
+echo "ℹ️ Creating systemd service file '${serviceFile}'..."
 echo
 cat <<EOF | sudo tee ${serviceFile}
 [Unit]
@@ -114,24 +114,23 @@ EOF
 
 echo
 
-echo "Enabling persistent execution beyond user session..."
+echo "ℹ️ Enabling persistent execution beyond user session..."
 loginctl enable-linger
 
-echo "Reloading systemd daemon..."
+echo "ℹ️ Reloading systemd daemon..."
 sudo systemctl daemon-reload
 
-echo "Enabling and starting the service..."
+echo "ℹ️ Enabling and starting the service..."
 systemctl enable ${serviceName}.service
 #systemctl start ${serviceName}.service
 
-echo "Service '${serviceName}' has been installed. Useful commands:"
+echo "✅ Service '${serviceName}' has been installed. Useful commands:"
 echo
 echo "    start:  systemctl start  ${serviceName}"
 echo "    stop:   systemctl stop   ${serviceName}"
 echo "    status: systemctl status ${serviceName}"
 echo "    logs:   journalctl -u ${serviceName}"
 echo 
-echo "You should set 'KillUserProcesses=no' on '/etc/systemd/logind.conf'" 
-echo " and run 'systemctl restart systemd-logind'"
+echo "ℹ️ You should set 'KillUserProcesses=no' on '/etc/systemd/logind.conf'" 
+echo "ℹ️ and run 'systemctl restart systemd-logind'"
 echo
-

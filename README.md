@@ -7,11 +7,12 @@ ___  ____ __ _ ___  ____ _    _ ____ __ _
 ```
 # 🚀 Join the Dandelion Network!
 
-**Join the Dandelion Network as a DNO (Dandelion Node Operator) for helping students and developers to jump into building with ease and help us decentralize Cardano dapps and services further**
+**Join the Dandelion Network as a DNO (Dandelion Node Operator) to help students and developers to learn, build, scale and specially decentralize Cardano dapps and services**
 
-*DNOs will be incentivized in the future, we are actively working on modular, and client side revenue channels and alternative compensation methods for your efforts. For now please support us on Catalyst to walk our first steps together*:
+## Incentives
+ *DNOs can now earn rewards while helping decentralize GameChanger Wallet and other Cardano services!. More modular revenue channels may be added in the future. For now see the GameChanger Wallet [🎁 Get Rewarded](https://gamechanger.finance/) section for current details*
 
-[ ❤️ Support the Dandelion Network on Catalyst](https://github.com/GameChangerFinance/gamechanger.wallet/blob/main/catalyst/FUND13.md)
+<!-- Also [ ❤️ support the Dandelion Network on Catalyst](https://github.com/GameChangerFinance/gamechanger.wallet/blob/main/catalyst/FUND13.md) -->
 
 # What's this?
 
@@ -19,21 +20,29 @@ ___  ____ __ _ ___  ____ _    _ ____ __ _
 
 **Dandelion Lite** is a convenient way of deploying your own local Cardano Node and a set of Dandelion APIs. It uses docker-compose, podman and handy scripts to ease the setup and reduce node syncronization times by using volume snapshots for backup and restore procedures. Dandelion Lite is a fork of Koios Lite, extending it beyond Koios, created by GameChanger Finance and M2Tec teams.
 
+For the project goal and broader Dandelion concept, read [docs/concept.md](docs/concept.md).
+
 ## Components
 
 This setup includes several key components:
 
-- `cardano-node`: Runs the Cardano node.
-- `cardano-ogmios`: Runs the lightweight bridge interface Ogmios against `cardano-node`.
-- `cardano-db-sync`: Synchronizes the blockchain data to a PostgreSQL database.
-- `haproxy`: A high-performance proxy to distribute network traffic among various components.
-- `postgres`: The PostgreSQL database, storing the synchronized blockchain data.
-- `koios`: RESTful API for Cardano, based on PostGREST, adapted for Dandelion Lite. 
-- `blockfrost`: RESTful API for Cardano, using `blockfrost-ryo` official images. 
-- `cardano-graphql`: Official GraphQL API for Cardano.
-- `cardano-token-registry`: Official Token Registry API for Cardano.
-- `cardano-submit-api`: Official Transactions Submit API for Cardano.
-- `dandelion-postgrest`: Dandelion PostGREST API for Cardano, a RESTful API for querying the blockchain data stored in PostgreSQL
+- [`cardano-node`](https://github.com/IntersectMBO/cardano-node): Runs the Cardano node.
+- [`cardano-ogmios`](https://github.com/CardanoSolutions/ogmios): Runs the lightweight API/bridge interface Ogmios against `cardano-node`.
+- [`cardano-db-sync`](https://github.com/IntersectMBO/cardano-db-sync): Synchronizes the blockchain data to a PostgreSQL database.
+- [`postgres`](https://www.postgresql.org/): The PostgreSQL database, storing the synchronized blockchain data.
+- [`haproxy`](https://www.haproxy.com/): A high-performance proxy to distribute network traffic among various components.
+- [`blockfrost`](https://github.com/blockfrost/blockfrost-backend-ryo): RESTful API for Cardano, using `blockfrost-ryo` official images. 
+- [`cardano-graphql-mk2`](https://github.com/GameChangerFinance/cardano-graph/pkgs/container/cardano-graphql): Cardano GraphQL MKII is a modern, community-maintained rewrite of the legacy API. ~90% backward compatible with the Official Cardano GraphQL project. Created by GameChanger Finance.
+- [`cardano-submit-api`](https://github.com/IntersectMBO/cardano-node/pkgs/container/cardano-submit-api): Official Transactions Submit API for Cardano.
+- `dandelion-postgrest`: Dandelion PostGREST API for Cardano, a RESTful API for querying the blockchain data stored in PostgreSQL and some extra handy queries.
+- `manifest`: JSON information of deployed Dandelion Lite Node, required for client applications and for joining the Dandelion Network of decentralized nodes
+- `home`: HTML landing website of deployed Dandelion Lite Node 
+- `backups`: your volume backups hosted with password protection 
+
+Some other experimental, legacy, non-performant APIs, non-compliant with popular dbsync configuration and developer-only services are disabled by default but are also included:
+
+- [`koios`](https://github.com/cardano-community/koios-artifacts): RESTful API for Cardano, based on PostGREST, adapted for Dandelion Lite. 
+- [`cardano-token-registry`](https://github.com/cardano-foundation/cardano-token-registry): Official Token Registry API for Cardano. (we only support the legacy, dbsync-compatible version) 
 - `cardano-sql`: (MVP - WIP) PosgreSQL-over-HTTP API gateway wrapping several services such as
     - ogmios
     - cardano-db-sync
@@ -42,11 +51,12 @@ This setup includes several key components:
     - dandelion-postgrest
     - cardano-token-registry
     - more..
-- `manifest`: JSON information of deployed Dandelion Lite Node, required for client applications and for joining the Dandelion Network of decentralized nodes
-- `home`: HTML landing website of deployed Dandelion Lite Node 
-- `backups`: your volume backups hosted with password protection 
+- [`pgadmin`](https://www.pgadmin.org/): Web administration UI for inspecting and managing PostgreSQL data during development or maintenance.
+- [`portainer`](https://www.portainer.io/): Optional Docker/Podman management UI for monitoring and operating containers and volumes.
+- [`swagger`](https://swagger.io/tools/swagger-ui/): Development API explorer UI for testing and documenting HTTP endpoints.
 
-Each service is containerized and managed via Docker, ensuring easy deployment and scalability.
+Each service is containerized and managed via Podman (as an alias of Docker) and orquestrated using Docker Compose, ensuring easy deployment and scalability.
+
 
 ## Hardware Requirements (10-10-2024):
 
@@ -169,6 +179,8 @@ To auto run on system start:
 
 Syncing Cardano node and databases can take even more than a week, it is adviced for you to download compressed snapshots of the databases to get you started.
 
+Remote backup syncs are guarded by the special `READY` (metadata) and `SHA256SUMS` (integrity hashes) files published beside the backup archives. If `READY` file exists it will be interpreted as a standy flag for third party operators to sync with the published files. `READY` content must match the local `DLT` and `NETWORK` environment variables; Cardano node and db-sync version differences are shown as explicit warnings because they may be valid only during planned upgrade workflows. The downloader uses `aria2c` to resume partial files overwriting existing files and without creating temporary files for disk usage optimization. Make your own backups, files are meant to be overwritten!
+
 1. Set the `BACKUP_DIR` environment variable on `.env` file with the location on where you want to store the files, like `BACKUP_DIR="/home/${USER}/backups/${NETWORK}/"`. Check [Volume Backup Sizes](#volume-backup-sizes) for estimating the required size.
 2. Execute `scripts/dandoman.sh` > `Setup->Download Backup` and follow steps.
 
@@ -187,7 +199,7 @@ Press key to continue.. (Ctrl + C to abort)
 Syncing Cardano node and databases can take even more than a week, it is adviced for you to take compressed snapshots or backups of your databases after 2 or 3 of months at least.
 1. Set the `BACKUP_DIR` environment variable on `.env` file with the location on where you want to store the files, like `BACKUP_DIR="/home/${USER}/backups/${NETWORK}/"`. Check [Volume Backup Sizes](#volume-backup-sizes) for estimating the required size.
 2. Customize `NGINX_WWW_BACKUP_USER` and `NGINX_WWW_BACKUP_PASSWORD` to protect with a password the hosting of your backup files
-3. Execute `scripts/dandoman.sh` > `Setup->Full backup` and follow steps.
+3. Execute `scripts/dandoman.sh` > `Setup->Full backup` and follow steps. The backup flow will also create the special `READY` and `SHA256SUMS` files (you can do manually by calling `./scripts/docker/create-backup-checksum.sh`).
 
 ### Run a Full Deploy Restore
 
@@ -306,7 +318,7 @@ sudo reboot now
 
 ### Koios Support
 
-Due to special **Koios** requirements on **cardano-db-sync** database setup ( [variant schema](https://github.com/IntersectMBO/cardano-db-sync/blob/master/doc/schema.md#variant-schema) ), it makes it not fully compatible with other APIs like **Blockfrost** and **cardano-graphql**.
+Due to special **Koios** requirements on **cardano-db-sync** database setup ( [variant schema](https://github.com/IntersectMBO/cardano-db-sync/blob/master/doc/schema.md#variant-schema) ), it makes it not fully compatible with other APIs like **Blockfrost** and **cardano-graphql-mk2**.
 
 As it is not adviced to run 2 **cardano-db-sync** instances to keep also other APIs working under the same setup, we offer out of the box a semi-working **Koios** API (without *variant schema*), and if you setup **cardano-db-sync** properly you can get it working at full, but affecting the other services.
 
