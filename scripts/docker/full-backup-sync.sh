@@ -175,6 +175,7 @@ ensure_compose_volumes() {
   done < "$tmpDir/compose-volumes"
 }
 
+echo
 echo "ℹ️ Checking remote backup metadata..."
 download_metadata READY READY || { echo "❌ Missing remote READY metadata file at '${remoteBackupURL}READY'. Remote backup repository is not ready or not reachable." >&2; exit 1; }
 download_metadata SHA256SUMS SHA256SUMS || { echo "❌ Missing remote SHA256SUMS checksums file at '${remoteBackupURL}SHA256SUMS'. Remote backup repository is not ready or not reachable." >&2; exit 1; }
@@ -203,7 +204,7 @@ mkdir -p "$backupDir"
 rm -f "${backupDir}READY" "${backupDir}SHA256SUMS"
 
 echo "ℹ️ Downloading backups from '$remoteBackupURL' into local dir '$backupDir'..."
-echo "ℹ️ Will attempt to download backup files into: ${backupDir}<volume_name_without_prefix>.tar.gz"
+# echo "ℹ️ Will attempt to download backup files into: ${backupDir}<volume_name_without_prefix>.tar.gz"
 echo
 
 mapfile -t volumeNames < <(docker volume ls -q | sort)
