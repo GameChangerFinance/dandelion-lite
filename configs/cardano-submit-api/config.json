@@ -1,0 +1,12 @@
+{
+  "TraceOptions": {
+    "": {
+      "severity": "Info",
+      "detail": "DNormal",
+      "backends": [
+        "Stdout HumanFormatColoured",
+        "EKGBackend"
+      ]
+    }
+  }
+}

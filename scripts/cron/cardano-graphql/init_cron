@@ -1,0 +1,3 @@
+# cardano-graphql:
+*/10 * * * * /scripts/cron/cardano-graphql/asset-registry-update.sh >> /var/log/cron_cardano-graphql_asset-registry-update.log 2>&1
+

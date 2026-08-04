@@ -1,0 +1,2 @@
+DROP SCHEMA IF EXISTS cardano_graphql_ctl CASCADE;
+DROP SCHEMA IF EXISTS cardano_graphql CASCADE;

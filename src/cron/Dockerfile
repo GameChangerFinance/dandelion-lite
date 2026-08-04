@@ -1,10 +1,10 @@
 # Use Alpine Linux as the base image
 FROM alpine:latest
 
-ARG CARDANO_NODE_VERSION=10.1.4
+ARG CARDANO_NODE_VERSION=11.0.1
 
-# Install jq, curl, PostgreSQL client, and gawk b2sum (coreutils)
-RUN apk add --no-cache jq curl postgresql-client gawk git bash coreutils
+# Install jq, curl, PostgreSQL client, and gawk b2sum (coreutils) and tini
+RUN apk add --no-cache jq curl postgresql-client gawk git bash coreutils tini certbot
 
 # Set up the cron job environment
 # Create a directory for cron jobs
@@ -21,8 +21,8 @@ RUN touch /var/log/cron.log
 
 # install minimal deps, grab and extract cardano-cli, then clean up
 RUN apk add --no-cache ca-certificates curl tar gzip \
-     && curl -sL \
-          https://github.com/input-output-hk/cardano-node/releases/download/${CARDANO_NODE_VERSION}/cardano-node-${CARDANO_NODE_VERSION}-linux.tar.gz \
+     && curl -fsSL \
+          https://github.com/IntersectMBO/cardano-node/releases/download/${CARDANO_NODE_VERSION}/cardano-node-${CARDANO_NODE_VERSION}-linux-amd64.tar.gz \
           | tar xz \
                --wildcards \
                --no-anchored \
@@ -32,6 +32,9 @@ RUN apk add --no-cache ca-certificates curl tar gzip \
      && chmod +x /usr/local/bin/cardano-cli 
 
 # curl tar gzip are used by cron job scripts, do not remove.
+
+# tini as PID 1 to reap orphaned children, otherwise this saturate OS with zombie processes
+ENTRYPOINT ["/sbin/tini", "--"]
 
 # Run the command on container startup
 CMD ["/scripts/cron/entrypoint.sh"]

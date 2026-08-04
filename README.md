@@ -7,11 +7,12 @@ ___  ____ __ _ ___  ____ _    _ ____ __ _
 ```
 # 🚀 Join the Dandelion Network!
 
-**Join the Dandelion Network as a DNO (Dandelion Node Operator) for helping students and developers to jump into building with ease and help us decentralize Cardano dapps and services further**
+**Join the Dandelion Network as a DNO (Dandelion Node Operator) to help students and developers to learn, build, scale and specially decentralize Cardano dapps and services**
 
-*DNOs will be incentivized in the future, we are actively working on modular, and client side revenue channels and alternative compensation methods for your efforts. For now please support us on Catalyst to walk our first steps together*:
+## Incentives
+ *DNOs can now earn rewards while helping decentralize GameChanger Wallet and other Cardano services!. More modular revenue channels may be added in the future. For now see the GameChanger Wallet [🎁 Get Rewarded](https://gamechanger.finance/) section for current details*
 
-[ ❤️ Support the Dandelion Network on Catalyst](https://github.com/GameChangerFinance/gamechanger.wallet/blob/main/catalyst/FUND13.md)
+<!-- Also [ ❤️ support the Dandelion Network on Catalyst](https://github.com/GameChangerFinance/gamechanger.wallet/blob/main/catalyst/FUND13.md) -->
 
 # What's this?
 
@@ -19,20 +20,29 @@ ___  ____ __ _ ___  ____ _    _ ____ __ _
 
 **Dandelion Lite** is a convenient way of deploying your own local Cardano Node and a set of Dandelion APIs. It uses docker-compose, podman and handy scripts to ease the setup and reduce node syncronization times by using volume snapshots for backup and restore procedures. Dandelion Lite is a fork of Koios Lite, extending it beyond Koios, created by GameChanger Finance and M2Tec teams.
 
+For the project goal and broader Dandelion concept, read [docs/concept.md](docs/concept.md).
+
 ## Components
 
 This setup includes several key components:
 
-- `cardano-node-ogmios`: Runs the Cardano node plus the lightweight bridge interface Ogmios.
-- `cardano-db-sync`: Synchronizes the blockchain data to a PostgreSQL database.
-- `haproxy`: A high-performance proxy to distribute network traffic among various components.
-- `postgres`: The PostgreSQL database, storing the synchronized blockchain data.
-- `koios`: RESTful API for Cardano, based on PostGREST, adapted for Dandelion Lite. 
-- `blockfrost`: RESTful API for Cardano, using `blockfrost-ryo` official images. 
-- `cardano-graphql`: Official GraphQL API for Cardano.
-- `cardano-token-registry`: Official Token Registry API for Cardano.
-- `cardano-submit-api`: Official Transactions Submit API for Cardano.
-- `dandelion-postgrest`: Dandelion PostGREST API for Cardano, a RESTful API for querying the blockchain data stored in PostgreSQL
+- [`cardano-node`](https://github.com/IntersectMBO/cardano-node): Runs the Cardano node.
+- [`cardano-ogmios`](https://github.com/CardanoSolutions/ogmios): Runs the lightweight API/bridge interface Ogmios against `cardano-node`.
+- [`cardano-db-sync`](https://github.com/IntersectMBO/cardano-db-sync): Synchronizes the blockchain data to a PostgreSQL database.
+- [`postgres`](https://www.postgresql.org/): The PostgreSQL database, storing the synchronized blockchain data.
+- [`haproxy`](https://www.haproxy.com/): A high-performance proxy to distribute network traffic among various components.
+- [`blockfrost`](https://github.com/blockfrost/blockfrost-backend-ryo): RESTful API for Cardano, using `blockfrost-ryo` official images. 
+- [`cardano-graphql-mk2`](https://github.com/GameChangerFinance/cardano-graph/pkgs/container/cardano-graphql): Cardano GraphQL MKII is a modern, community-maintained rewrite of the legacy API. ~90% backward compatible with the Official Cardano GraphQL project. Created by GameChanger Finance.
+- [`cardano-submit-api`](https://github.com/IntersectMBO/cardano-node/pkgs/container/cardano-submit-api): Official Transactions Submit API for Cardano.
+- `dandelion-postgrest`: Dandelion PostGREST API for Cardano, a RESTful API for querying the blockchain data stored in PostgreSQL and some extra handy queries.
+- `manifest`: JSON information of deployed Dandelion Lite Node, required for client applications and for joining the Dandelion Network of decentralized nodes
+- `home`: HTML landing website of deployed Dandelion Lite Node 
+- `backups`: your volume backups hosted with password protection 
+
+Some other experimental, legacy, non-performant APIs, non-compliant with popular dbsync configuration and developer-only services are disabled by default but are also included:
+
+- [`koios`](https://github.com/cardano-community/koios-artifacts): RESTful API for Cardano, based on PostGREST, adapted for Dandelion Lite. 
+- [`cardano-token-registry`](https://github.com/cardano-foundation/cardano-token-registry): Official Token Registry API for Cardano. (we only support the legacy, dbsync-compatible version) 
 - `cardano-sql`: (MVP - WIP) PosgreSQL-over-HTTP API gateway wrapping several services such as
     - ogmios
     - cardano-db-sync
@@ -41,90 +51,120 @@ This setup includes several key components:
     - dandelion-postgrest
     - cardano-token-registry
     - more..
-- `manifest`: JSON information of deployed Dandelion Lite Node, required for client applications and for joining the Dandelion Network of decentralized nodes
-- `home`: HTML landing website of deployed Dandelion Lite Node 
-- `backups`: your volume backups hosted with password protection 
+- [`pgadmin`](https://www.pgadmin.org/): Web administration UI for inspecting and managing PostgreSQL data during development or maintenance.
+- [`portainer`](https://www.portainer.io/): Optional Docker/Podman management UI for monitoring and operating containers and volumes.
+- [`swagger`](https://swagger.io/tools/swagger-ui/): Development API explorer UI for testing and documenting HTTP endpoints.
 
-Each service is containerized and managed via Docker, ensuring easy deployment and scalability.
+Each service is containerized and managed via Podman (as an alias of Docker) and orquestrated using Docker Compose, ensuring easy deployment and scalability.
 
-## Hardware Requirements (10-10-2024):
+
+## Hardware Requirements:
+
+**Last updated: 18/06/2026**
 
 Suggested setup for concurrent **Cardano Mainnet** and **Preproduction Testnet** with volume backups consists on
 
 - 128GB RAM (DDR4 ECC RAM)
-- 2TB M2 NVME for storage
+- 2TB M2 NVME for full storage (OS + docker images + volumes + backups)
 - Dual Intel Xeon E5 2680 v4 (LGA 2011-3 motherboard)
 
-### Volume sizes
+### Storage Requirements
+
+<table>
+  <thead>
+    <tr>
+      <th>network</th>
+      <th>service</th>
+      <th>volume size</th>
+      <th>total volume size</th>
+      <th>backup size</th>
+      <th>total backup size</th>
+      <th>total</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td rowspan="5">mainnet</td>
+      <td>db-sync-data</td>
+      <td>25G</td>
+      <td rowspan="5">724.23G</td>
+      <td>1.4G</td>
+      <td rowspan="5">357.385G</td>
+      <td rowspan="5">~1.08T</td>
+    </tr>
+    <tr>
+      <td>node-db</td>
+      <td>187G</td>
+      <td>120G</td>
+    </tr>
+    <tr>
+      <td>node-ipc</td>
+      <td>8.0K</td>
+      <td>92</td>
+    </tr>
+    <tr>
+      <td>postgresdb</td>
+      <td>512G</td>
+      <td>236G</td>
+    </tr>
+    <tr>
+      <td>unimatrix-data</td>
+      <td>8.0K</td>
+      <td>92</td>
+    </tr>
+    <tr>
+      <td rowspan="5">preprod</td>
+      <td>db-sync-data</td>
+      <td>3.9G</td>
+      <td rowspan="5">27.94G</td>
+      <td>1.4G</td>
+      <td rowspan="5">24.585G</td>
+      <td rowspan="5">~52.5G</td>
+    </tr>
+    <tr>
+      <td>node-db</td>
+      <td>8.8G</td>
+      <td>8.2G</td>
+    </tr>
+    <tr>
+      <td>node-ipc</td>
+      <td>8.0K</td>
+      <td>92</td>
+    </tr>
+    <tr>
+      <td>postgresdb</td>
+      <td>16G</td>
+      <td>15G</td>
+    </tr>
+    <tr>
+      <td>unimatrix-data</td>
+      <td>8.0K</td>
+      <td>92</td>
+    </tr>
+  </tbody>
+</table>
+
+**Important**: Container image sizes and OS footprint not listed on table
+
+Full volumes download (sync), backup and restore procedures can be run manually by helper scripts or using the menu on `$ ./scripts/dandoman.sh`.
+
+### Volume sizes (mandatory)
 
 These are sizes of the volumes used by the containers of recent production deployments.
 
-Using: `$ ./scripts/docker/list-volume-sizes.sh`
-
-Last updated: 10/10/2024
-
-### Cardano Mainnet   
-
-    25G     gc-node-mainnet_db-sync-data
-    445M    gc-node-mainnet_dbless-cardano-token-registry-data
-    187G    gc-node-mainnet_node-db
-    8.0K    gc-node-mainnet_node-ipc
-    512G    gc-node-mainnet_postgresdb
-    8.0K    gc-node-mainnet_unimatrix-data
-
-    Total   724.43 GB
-
-### Cardano Pre-Production Testnet
-
-    3.9G    gc-node-preprod_db-sync-data
-    41M     gc-node-preprod_dbless-cardano-token-registry-data
-    8.8G    gc-node-preprod_node-db
-    8.0K    gc-node-preprod_node-ipc
-    16G     gc-node-preprod_postgresdb
-    8.0K    gc-node-preprod_unimatrix-data
-
-    Total   28.74 GB
+Get them using: `$ ./scripts/docker/list-volume-sizes.sh`
 
 
-### Volume Backup Sizes
+### Volume Backup Sizes (optional)
 
-These are sizes of compressed backups of container volumes on recent production deployments. Is not estrictly required to take these disk space lists into consideration for hardware adquisition but is adviced as working without snapshots can delay node syncing times even for more than a week.
+These are sizes of compressed backups of container volumes on recent production deployments. Is not estrictly required to take these disk space lists into consideration for hardware adquisition but is adviced as working without backup snapshots can delay node syncing times even for more than a week.
 
-Full volumes backup and restore procedures can be run manually by helper scripts or using the menu on `$ ./scripts/dandoman.sh`.
-
-Last updated: 10/10/2024
-
-### Cardano Mainnet
-        
-    17G     db-sync-data.tar.gz
-    377M    dbless-cardano-token-registry-data.tar.gz
-    97G     node-db.tar.gz
-    4.0K    node-ipc.tar.gz
-    12K     pgadmin-data.tar.gz
-    4.0K    portainer-data.tar.gz
-    137G    postgresdb.tar.gz
-    4.0K    unimatrix-data.tar.gz
-    
-    Total   250G
+Get them with integrity hashes and local deployment metadata using: `$ ./scripts/docker/create-backup-checksum.sh`
 
 
-### Cardano Pre-Production Testnet
-   
-    
-    1.7G    db-sync-data.tar.gz
-    16M     dbless-cardano-token-registry-data.tar.gz
-    3.8G    node-db.tar.gz
-    4.0K    node-ipc.tar.gz
-    12K     pgadmin-data.tar.gz
-    4.0K    portainer-data.tar.gz
-    3.8G    postgresdb.tar.gz
-    4.0K    unimatrix-data.tar.gz
+## Software Requirements:
 
-    Total   9.3G
-
-## Software Requirements (10-10-2024):
-
-Reported to be working on:
+Reported to be working in production on:
 
 - Ubuntu Server version 24.04 (normal, not minimal install)
 
@@ -132,7 +172,9 @@ Reported to be working on:
 
 ### Base system install
 
-As a base system we use **ubuntu-server version 24.04**. We use the normal install not the minimal one. Also install **OpenSSH** server to allow for system administration. 
+As suggested base system you can use **ubuntu-server**. 
+
+We use the normal install not the minimal one. Also install **OpenSSH** server to allow for system administration. 
 
 1. When install is completed do `ip -br a` to get the ip address of your newly installed server 
 2. From you local system. So not on your server do `ssh-copy-id USER_NAME@SERVER_IP` This will copy your ssh keys to the server to allow easy login
@@ -149,13 +191,10 @@ To deploy or run Dandelion Lite:
 7. Once on tip, execute `scripts/dandoman.sh` > `Setup->Initialise Postgres` to deploy custom RPCs and test via PostgREST/HAProxy endpoints using curl:
 ```bash
 # Check if the node is synced using docker
-docker inspect --format "{{json .State.Health }}" dandolite-preprod-cardano-node-ogmios-1 | jq
+docker inspect --format "{{json .State.Health }}" dandolite-preprod-cardano-node-1 | jq
 
 # Check if db-sync is ready 
 docker inspect --format "{{json .State.Health }}" dandolite-preprod-cardano-db-sync-1 | jq
-
-# Koios tip check
-curl http://127.0.0.1:8050/koios/v1/tip
 ```
 
 Remember to secure your deployment according to best practices, including securing your database and API endpoints.
@@ -170,6 +209,8 @@ To auto run on system start:
 
 Syncing Cardano node and databases can take even more than a week, it is adviced for you to download compressed snapshots of the databases to get you started.
 
+#### Instructions
+
 1. Set the `BACKUP_DIR` environment variable on `.env` file with the location on where you want to store the files, like `BACKUP_DIR="/home/${USER}/backups/${NETWORK}/"`. Check [Volume Backup Sizes](#volume-backup-sizes) for estimating the required size.
 2. Execute `scripts/dandoman.sh` > `Setup->Download Backup` and follow steps.
 
@@ -183,17 +224,26 @@ Press key to continue.. (Ctrl + C to abort)
 ✅ All done.
 ```
 
+
+#### Behavior
+Remote backup syncs are guarded by the special `READY` metadata file plus `MD5SUMS` fast-checks and `SHA256SUMS` integrity hashes published beside the backup archives. 
+
+If `READY` file exists it will be interpreted as a standby flag for third party operators to sync with the published files. `READY` content must match the local `DLT` and `NETWORK` environment variables; Cardano node and db-sync version differences are shown as explicit warnings because they may be valid only during planned upgrade workflows. The downloader uses `MD5SUMS` to quickly decide whether files need syncing, then regenerates local `SHA256SUMS` and compares it with remote payload hashes before reporting success. 
+
+If the final SHA verification fails, `READY` is moved into `old/READY` so the set is not advertised as ready. Make your own backups, files are meant to be overwritten!
+
+
 ### Run a Full Deploy Backup
 
 Syncing Cardano node and databases can take even more than a week, it is adviced for you to take compressed snapshots or backups of your databases after 2 or 3 of months at least.
-1. Set the `BACKUP_DIR` environment variable on `.env` file with the location on where you want to store the files, like `BACKUP_DIR="/home/${USER}/backups/${NETWORK}/"`. Check [Volume Backup Sizes](#volume-backup-sizes) for estimating the required size.
+1. Set the `BACKUP_DIR` environment variable on `.env` file with the location on where you want to store the files, like `BACKUP_DIR="/home/${USER}/backups/${NETWORK}/"`. Check [Volume Backup Sizes](###-storage-requirements) for estimating the required size.
 2. Customize `NGINX_WWW_BACKUP_USER` and `NGINX_WWW_BACKUP_PASSWORD` to protect with a password the hosting of your backup files
-3. Execute `scripts/dandoman.sh` > `Setup->Full backup` and follow steps.
+3. Execute `scripts/dandoman.sh` > `Setup->Full backup` and follow steps. The backup flow will also create the special `READY`, `MD5SUMS`, and `SHA256SUMS` files (you can do manually by calling `./scripts/docker/create-backup-checksum.sh`).
 
 ### Run a Full Deploy Restore
 
 This will **WIPE ALL YOUR DEPLOYMENT DATA** and will restore a previous backup:
-1. Set the `BACKUP_DIR` environment variable on `.env` file with the location from where you want to read the stored files, like `BACKUP_DIR="/home/${USER}/backups/${NETWORK}/"`. Check [Volume Backup Sizes](#volume-backup-sizes) for estimating the required size.
+1. Set the `BACKUP_DIR` environment variable on `.env` file with the location from where you want to read the stored files, like `BACKUP_DIR="/home/${USER}/backups/${NETWORK}/"`. Check[Volume Backup Sizes](###-storage-requirements)  for estimating the required size.
 2. Execute `scripts/dandoman.sh` > `Setup->Full restore` and follow steps.
 
 
@@ -201,7 +251,7 @@ This will **WIPE ALL YOUR DEPLOYMENT DATA** and will restore a previous backup:
 
 You can terminate your connections with SSL encryption by setting up SSL certificate on Haproxy
 
-1. Place your `server.pem` file on `configs/ssl/`. You can create a self signed certificate like this `$ ./scripts/ssl/keygen.sh <domain> <file-prefix>"`
+1. Place the active HAProxy PEM at `secrets/ssl/server.pem`. Certbot and manual renewal workflows write a temporary candidate to `configs/ssl/server.pem` first. You can create a self signed certificate like this `$ ./scripts/ssl/keygen.sh <domain> <file-prefix>"`
 2. Uncomment SSL line and comment the default one on `config/haproxy/haproxy.cfg`, like this:
 
 ```
@@ -307,7 +357,7 @@ sudo reboot now
 
 ### Koios Support
 
-Due to special **Koios** requirements on **cardano-db-sync** database setup ( [variant schema](https://github.com/IntersectMBO/cardano-db-sync/blob/master/doc/schema.md#variant-schema) ), it makes it not fully compatible with other APIs like **Blockfrost** and **cardano-graphql**.
+Due to special **Koios** requirements on **cardano-db-sync** database setup ( [variant schema](https://github.com/IntersectMBO/cardano-db-sync/blob/master/doc/schema.md#variant-schema) ), it makes it not fully compatible with other APIs like **Blockfrost** and **cardano-graphql-mk2**.
 
 As it is not adviced to run 2 **cardano-db-sync** instances to keep also other APIs working under the same setup, we offer out of the box a semi-working **Koios** API (without *variant schema*), and if you setup **cardano-db-sync** properly you can get it working at full, but affecting the other services.
 

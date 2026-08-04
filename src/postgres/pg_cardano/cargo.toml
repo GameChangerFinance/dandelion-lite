@@ -1,7 +1,14 @@
+# Optional local override for pg_cardano's Cargo.toml.
+# This file is NOT used by default in the Dockerfile, but is kept here as a ready-to-apply patch
+# if you ever need to hotfix or pin pg_cardano locally.
+#
+# Reference: upstream v1.2.0 Cargo.toml (default feature pg18 + pgrx 0.17.0)
+
 [package]
 name = "pg_cardano"
-version = "1.0.5-p2"
-edition = "2021"
+version = "1.2.0"
+edition = "2024"
+resolver = "3"
 
 [lib]
 crate-type = ["cdylib", "lib"]
@@ -11,31 +18,26 @@ name = "pgrx_embed_pg_cardano"
 path = "./src/bin/pgrx_embed.rs"
 
 [features]
-default = ["pg16"]
-# pg12 = ["pgrx/pg12", "pgrx-tests/pg12" ]
-# pg13 = ["pgrx/pg13", "pgrx-tests/pg13" ]
-# pg14 = ["pgrx/pg14", "pgrx-tests/pg14" ]
-# pg15 = ["pgrx/pg15", "pgrx-tests/pg15" ]
-pg16 = ["pgrx/pg16", "pgrx-tests/pg16" ]
-# pg17 = ["pgrx/pg17", "pgrx-tests/pg17" ]
+default = ["pg18"]
+pg15 = ["pgrx/pg15", "pgrx-tests/pg15"]
+pg16 = ["pgrx/pg16", "pgrx-tests/pg16"]
+pg17 = ["pgrx/pg17", "pgrx-tests/pg17"]
+pg18 = ["pgrx/pg18", "pgrx-tests/pg18"]
 pg_test = []
 
 [dependencies]
 bs58 = "0.5.1"
-bech32 = "0.11.0"
+bech32 = "0.11.1"
 serde = { version = "1.0", features = ["derive"] }
-serde_cbor = "0.11"
-serde_json = "1.0"
+serde_json = { version = "1.0", features = ["preserve_order"] }
 blake2 = "0.10"
-ed25519-dalek = "2.1"
-rand = "0.8"
-pgrx = { version = "0.12"}
+ed25519-dalek = "2.2"
+pgrx = { version = "0.17.0" }
 hex = "0.4.3"
-linked-hash-map = { version = "0.5", features = ["serde"] }
-indexmap = { version = "2.7.1", features = ["serde"] }
+ciborium = "0.2.2"
 
 [dev-dependencies]
-pgrx-tests = "=0.12"
+pgrx-tests = "=0.17.0"
 
 [profile.dev]
 panic = "unwind"

@@ -1,0 +1,5 @@
+# Enforce one IP or CIDR per line to became blacklisted
+# Examples:
+# 203.0.113.10
+# 198.51.100.0/24
+# 2001:db8:dead:beef::/64

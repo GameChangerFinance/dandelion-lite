@@ -4,53 +4,53 @@
 CREATE SCHEMA IF NOT EXISTS sql_private_extensions ;
 
 -- PROTECTED PG_CURL EXTENSION --
-CREATE EXTENSION IF NOT EXISTS pg_curl SCHEMA sql_private_extensions ;
+-- CREATE EXTENSION IF NOT EXISTS pg_curl SCHEMA sql_private_extensions ; -- DEACTIVATED!
 
 -- PROTECTED GET FUNCTION --
-DROP FUNCTION IF EXISTS sql_private_extensions.get ;
-CREATE OR REPLACE FUNCTION sql_private_extensions.get(url TEXT) RETURNS TEXT LANGUAGE SQL AS $BODY$
-    WITH s AS (SELECT
-        sql_private_extensions.curl_easy_reset(),
-        sql_private_extensions.curl_easy_setopt_url(url),
-        sql_private_extensions.curl_easy_perform(),
-        sql_private_extensions.curl_easy_getinfo_data_in()
-    ) SELECT convert_from(curl_easy_getinfo_data_in, 'utf-8') FROM s;
-$BODY$;
+-- DROP FUNCTION IF EXISTS sql_private_extensions.get ;
+-- CREATE OR REPLACE FUNCTION sql_private_extensions.get(url TEXT) RETURNS TEXT LANGUAGE SQL AS $BODY$ -- DEACTIVATED!
+--     WITH s AS (SELECT
+--         sql_private_extensions.curl_easy_reset(),
+--         sql_private_extensions.curl_easy_setopt_url(url),
+--         sql_private_extensions.curl_easy_perform(),
+--         sql_private_extensions.curl_easy_getinfo_data_in()
+--     ) SELECT convert_from(curl_easy_getinfo_data_in, 'utf-8') FROM s;
+-- $BODY$;
 
-DROP FUNCTION IF EXISTS sql_private_extensions.get_json ;
-CREATE OR REPLACE FUNCTION sql_private_extensions.get_json(url TEXT) RETURNS JSON LANGUAGE SQL AS $BODY$
-    WITH s AS (SELECT
-        sql_private_extensions.curl_easy_reset(),
-        sql_private_extensions.curl_easy_setopt_url(url),
-        sql_private_extensions.curl_easy_perform(),
-        sql_private_extensions.curl_easy_getinfo_data_in()
-    ) SELECT CAST(convert_from(curl_easy_getinfo_data_in, 'utf-8') as JSON ) FROM s;
-$BODY$;
+-- DROP FUNCTION IF EXISTS sql_private_extensions.get_json ;
+-- CREATE OR REPLACE FUNCTION sql_private_extensions.get_json(url TEXT) RETURNS JSON LANGUAGE SQL AS $BODY$ -- DEACTIVATED!
+--     WITH s AS (SELECT
+--         sql_private_extensions.curl_easy_reset(),
+--         sql_private_extensions.curl_easy_setopt_url(url),
+--         sql_private_extensions.curl_easy_perform(),
+--         sql_private_extensions.curl_easy_getinfo_data_in()
+--     ) SELECT CAST(convert_from(curl_easy_getinfo_data_in, 'utf-8') as JSON ) FROM s;
+-- $BODY$;
 
 -- PROTECTED POST FUNCTION --
-DROP FUNCTION IF EXISTS sql_private_extensions.post ;
-CREATE OR REPLACE FUNCTION sql_private_extensions.post(url TEXT, request JSON) RETURNS TEXT LANGUAGE SQL AS $BODY$
-    WITH s AS (SELECT
-        sql_private_extensions.curl_easy_reset(),
-        sql_private_extensions.curl_easy_setopt_postfields(convert_to(request::TEXT, 'utf-8')),
-        sql_private_extensions.curl_easy_setopt_url(url),
-        sql_private_extensions.curl_header_append('Content-Type', 'application/json; charset=utf-8'),
-        sql_private_extensions.curl_easy_perform(),
-        sql_private_extensions.curl_easy_getinfo_data_in()
-    ) SELECT convert_from(curl_easy_getinfo_data_in, 'utf-8') FROM s;
-$BODY$;
+-- DROP FUNCTION IF EXISTS sql_private_extensions.post ;
+-- CREATE OR REPLACE FUNCTION sql_private_extensions.post(url TEXT, request JSON) RETURNS TEXT LANGUAGE SQL AS $BODY$  -- DEACTIVATED!
+--     WITH s AS (SELECT
+--         sql_private_extensions.curl_easy_reset(),
+--         sql_private_extensions.curl_easy_setopt_postfields(convert_to(request::TEXT, 'utf-8')),
+--         sql_private_extensions.curl_easy_setopt_url(url),
+--         sql_private_extensions.curl_header_append('Content-Type', 'application/json; charset=utf-8'),
+--         sql_private_extensions.curl_easy_perform(),
+--         sql_private_extensions.curl_easy_getinfo_data_in()
+--     ) SELECT convert_from(curl_easy_getinfo_data_in, 'utf-8') FROM s;
+-- $BODY$;
 
-DROP FUNCTION IF EXISTS sql_private_extensions.post_json ;
-CREATE OR REPLACE FUNCTION sql_private_extensions.post_json(url TEXT, request JSON) RETURNS JSON LANGUAGE SQL AS $BODY$
-    WITH s AS (SELECT
-        sql_private_extensions.curl_easy_reset(),
-        sql_private_extensions.curl_easy_setopt_postfields(convert_to(request::TEXT, 'utf-8')),
-        sql_private_extensions.curl_easy_setopt_url(url),
-        sql_private_extensions.curl_header_append('Content-Type', 'application/json; charset=utf-8'),
-        sql_private_extensions.curl_easy_perform(),
-        sql_private_extensions.curl_easy_getinfo_data_in()
-    ) SELECT CAST(convert_from(curl_easy_getinfo_data_in, 'utf-8') as JSON ) FROM s;
-$BODY$;
+-- DROP FUNCTION IF EXISTS sql_private_extensions.post_json ;
+-- CREATE OR REPLACE FUNCTION sql_private_extensions.post_json(url TEXT, request JSON) RETURNS JSON LANGUAGE SQL AS $BODY$  -- DEACTIVATED!
+--     WITH s AS (SELECT
+--         sql_private_extensions.curl_easy_reset(),
+--         sql_private_extensions.curl_easy_setopt_postfields(convert_to(request::TEXT, 'utf-8')),
+--         sql_private_extensions.curl_easy_setopt_url(url),
+--         sql_private_extensions.curl_header_append('Content-Type', 'application/json; charset=utf-8'),
+--         sql_private_extensions.curl_easy_perform(),
+--         sql_private_extensions.curl_easy_getinfo_data_in()
+--     ) SELECT CAST(convert_from(curl_easy_getinfo_data_in, 'utf-8') as JSON ) FROM s;
+-- $BODY$;
 
 -- PROTECTED SCHEMA ALIASING FUNCTIONS --
 

@@ -1,0 +1,11 @@
+# Uncomment to: Allow any origin
+.* *
+
+# Uncomment to: Allow only when it matches one of these regexes
+#^https://wallet\.gamechanger\.finance$ echo
+#^https://([A-Za-z0-9-]+\.)*gamechanger\.finance$ echo
+#^http://localhost(:[0-9]+)?$ echo
+#^https://localhost(:[0-9]+)?$ echo
+
+
+# To test with critical endpoint do: curl -k -i -H 'Origin: https://<origin>' 'https://<deploy>:<port>/manifest/'

@@ -29,14 +29,14 @@ install_dependencies() {
       source /etc/os-release
       case "${ID}" in
         ubuntu|debian)
-          if ! sudo apt update && sudo apt install -y gpg curl gawk; then return 1; fi
+          if ! sudo apt update && sudo apt install -y gpg curl gawk aria2; then return 1; fi
           if ! sudo mkdir -p /etc/apt/keyrings; then return 1; fi
           if [[ ! -f /etc/apt/keyrings/charm.gpg ]] && ! curl -fsSL https://repo.charm.sh/apt/gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/charm.gpg; then return 1; fi
           if ! echo "deb [signed-by=/etc/apt/keyrings/charm.gpg] https://repo.charm.sh/apt/ * *" | sudo tee /etc/apt/sources.list.d/charm.list; then return 1; fi
           if ! sudo apt-get update || ! sudo apt install -y gum; then return 1; fi
           ;;
         fedora|rhel)
-          if ! sudo dnf install curl awk;  then return 1; fi
+          if ! sudo dnf install curl awk aria2;  then return 1; fi
           arch=$(uname -m)
           if [ "$arch" = "x86_64" ]; then
             if ! curl -L https://github.com/charmbracelet/gum/releases/download/v0.13.0/gum-0.13.0-1.x86_64.rpm -o gum.rpm || ! sudo dnf install -y ./gum.rpm; then return 1; fi
@@ -49,10 +49,10 @@ install_dependencies() {
           fi
           ;;
         arch|manjaro)
-          if ! sudo pacman -Syu curl awk gum; then return 1; fi
+          if ! sudo pacman -Syu curl awk gum aria2; then return 1; fi
           ;;
         alpine)
-          if ! sudo apk add curl awk gum; then return 1; fi
+          if ! sudo apk add curl awk gum aria2; then return 1; fi
           ;;
         *)
           echo "Unsupported Linux distribution for automatic installation."
@@ -61,10 +61,10 @@ install_dependencies() {
       esac
       ;;
     Darwin*)
-      if ! brew install curl awk gum; then return 1; fi
+      if ! brew install curl awk gum aria2; then return 1; fi
       ;;
     MINGW*|MSYS*|CYGWIN*)
-      if ! winget install curl awk gum; then return 1; fi
+      if ! winget install curl awk gum aria2; then return 1; fi
       ;;
     *)
       echo "Unsupported operating system."
@@ -575,7 +575,7 @@ menu() {
 
             "Setup")
               # Submenu for Setup with plain text options
-              setup_choice=$(gum choose --height 15 --cursor.foreground 229 --item.foreground 39 "Initialise Postgres" "Reset Postgres" "Full Backup" "Full Restore" "Download Backup" "Run on system start"  "$(gum style --foreground 208 "Back")")
+              setup_choice=$(gum choose --height 15 --cursor.foreground 229 --item.foreground 39 "Initialise Postgres" "Reset Postgres" "Full Backup" "Full Restore" "Download Backup" "Create Self-Signed SSL Candidate" "Check/Renew SSL Candidate" "Rotate SSL and Restart HAProxy" "Run on system start"  "$(gum style --foreground 208 "Back")")
 
               case "$setup_choice" in
                 #"Initialise Cardano Node")
@@ -643,6 +643,33 @@ menu() {
                   echo "About to download backups from '${url}' into '${backupDir}'"
                   read -p "Press key to continue.. (Ctrl + C to abort)" -n1 -s
                   ./scripts/docker/full-backup-sync.sh "${url}" "${PROJ_NAME}_" "${backupDir}" "${username}" "${password}"
+                  read -r -p "Press enter to continue"
+                  show_splash_screen
+                  ;;
+                "Create Self-Signed SSL Candidate")
+                  read -r -p "Domain/Common Name for self-signed certificate: " ssl_domain
+                  if [ -z "$ssl_domain" ]; then
+                    echo "Missing domain/common name. Nothing was generated."
+                  else
+                    mkdir -p "${KLITE_HOME}/configs/ssl"
+                    ssl_tmp_dir=$(mktemp -d)
+                    ssl_prefix="${ssl_tmp_dir}/self-signed-"
+                    "${KLITE_HOME}"/scripts/ssl/keygen.sh "$ssl_domain" "$ssl_prefix"
+                    mv "${ssl_prefix}server.pem" "${KLITE_HOME}/configs/ssl/server.pem"
+                    rm -rf "$ssl_tmp_dir"
+                    echo "Self-signed SSL candidate created at configs/ssl/server.pem."
+                    echo "Run Setup -> Rotate SSL and Restart HAProxy to apply it as secrets/ssl/server.pem."
+                  fi
+                  read -r -p "Press enter to continue"
+                  show_splash_screen
+                  ;;
+                "Check/Renew SSL Candidate")
+                  docker compose -f "${KLITE_HOME}"/docker-compose.yml exec -it cron /scripts/cron/myaddrdns/certbot.sh check-renew
+                  read -r -p "Press enter to continue"
+                  show_splash_screen
+                  ;;
+                "Rotate SSL and Restart HAProxy")
+                  "${KLITE_HOME}"/scripts/ssl/rotate-ssl-and-restart-haproxy.sh --compose-file "${KLITE_HOME}"/docker-compose.yml --project-name "${PROJ_NAME}"
                   read -r -p "Press enter to continue"
                   show_splash_screen
                   ;;
@@ -842,7 +869,7 @@ menu() {
                   ;;
                 "Enter Ogmios")
                   # Logic for Enter Ogmios
-                  service_name="ogmios"
+                  service_name="cardano-ogmios"
                   container_id=$(docker ps -qf "name=${PROJ_NAME}-${service_name}")
                   if [ -z "$container_id" ]; then
                     echo "No running Ogmios container found."
@@ -855,7 +882,7 @@ menu() {
                   ;;
                 "Logs Ogmios")
                   # Logic for Logs Ogmios
-                  service_name="ogmios"
+                  service_name="cardano-ogmios"
                   container_id=$(docker ps -qf "name=${PROJ_NAME}-${service_name}")
                   if [ -z "$container_id" ]; then
                     echo "No running Ogmios container found."
@@ -979,6 +1006,9 @@ display_help_usage() {
   echo -e "--enter-dbsync: \t\t Accesses the DBSync container."
   echo -e "--logs-dbsync: \t\t\t Displays logs for the DBSync container."
   echo -e "--enter-haproxy: \t\t Accesses the HAProxy container."
+  echo -e "--ssl-self-signed: \t Creates a self-signed SSL candidate at configs/ssl/server.pem."
+  echo -e "--ssl-certbot-renew: \t Runs Certbot in the cron container and writes configs/ssl/server.pem."
+  echo -e "--ssl-rotate: \t\t Promotes configs/ssl/server.pem to secrets/ssl/server.pem and restarts HAProxy."
 }
 
 # Function to process command line arguments
@@ -1052,6 +1082,27 @@ process_args() {
       ;;
     --logs-haproxy)
       show_logs "${PROJ_NAME}-haproxy"
+      ;;
+    --ssl-self-signed)
+      ssl_domain="${2:-}"
+      if [ -z "$ssl_domain" ]; then
+        echo "Usage: ./scripts/dandoman.sh --ssl-self-signed <domain-or-common-name>"
+        exit 1
+      fi
+      mkdir -p "${KLITE_HOME}/configs/ssl"
+      ssl_tmp_dir=$(mktemp -d)
+      ssl_prefix="${ssl_tmp_dir}/self-signed-"
+      "${KLITE_HOME}"/scripts/ssl/keygen.sh "$ssl_domain" "$ssl_prefix"
+      mv "${ssl_prefix}server.pem" "${KLITE_HOME}/configs/ssl/server.pem"
+      rm -rf "$ssl_tmp_dir"
+      echo "Self-signed SSL candidate created at configs/ssl/server.pem."
+      echo "Run ./scripts/dandoman.sh --ssl-rotate or the Setup rotation menu to apply it."
+      ;;
+    --ssl-certbot-renew)
+      docker compose -f "${KLITE_HOME}"/docker-compose.yml exec -it cron /scripts/cron/myaddrdns/certbot.sh check-renew
+      ;;
+    --ssl-rotate)
+      "${KLITE_HOME}"/scripts/ssl/rotate-ssl-and-restart-haproxy.sh --compose-file "${KLITE_HOME}"/docker-compose.yml --project-name "${PROJ_NAME}"
       ;;
     --help|-h)
       display_help_usage

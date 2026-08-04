@@ -1,71 +1,77 @@
-# Dockerfile to install these extensions to PostgresDB
-# Extensions: pg_curl,pg_cardano
+# Custom Postgres image with Cardano-related extensions
+# Extensions: pg_cardano (enabled), pg_curl (disabled for now)
 
-FROM postgres:16.1-bullseye
-#FROM postgres:16.8-bullseye
+FROM postgres:18.2-bookworm
 
-# 1) install build tools & libs
-RUN apt-get update && apt-get -y install git make build-essential curl sudo
+ARG PG_CARDANO_VERSION=v1.2.0
+ARG PGRX_VERSION=0.17.0
 
-# 2) build & install pg_curl
-RUN apt-get update && apt-get -y install postgresql-server-dev-16 libcurl-ocaml-dev clang curl sudo
-RUN git clone https://github.com/RekGRpth/pg_curl.git
-COPY pg_curl/Makefile pg_curl/Makefile
-RUN cd pg_curl && make && make install
+# ---- Build deps (needed only at build time) ----
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends \
+    ca-certificates \
+    curl \
+    git \
+    make \
+    build-essential \
+    pkg-config \
+    clang \
+    llvm-dev \
+    libclang-dev \
+    libssl-dev \
+    postgresql-server-dev-$PG_MAJOR \
+ && rm -rf /var/lib/apt/lists/*
 
-
-# 3) download, unpack & install pg_cardano v1.0.5-p2
-# ARG PG_CARDANO_VERSION=v1.0.5-p2
-# RUN curl -sL \
-#       https://github.com/cardano-community/pg_cardano/releases/download/${PG_CARDANO_VERSION}/pg_cardano_linux_x64_${PG_CARDANO_VERSION}.tar.gz \
-#     | tar xz -C /tmp \
-#  && cd /tmp/pg_cardano\
-#  && chmod +x install.sh \
-#  && ./install.sh
-
-
-# 2) Install Rust toolchain non-interactively:
+# ---- Rust toolchain (needed to build pg_cardano via pgrx) ----
 ENV RUSTUP_HOME=/usr/local/rustup \
-        CARGO_HOME=/usr/local/cargo \
-        PATH=/usr/local/cargo/bin:$PATH 
+    CARGO_HOME=/usr/local/cargo \
+    PATH=/usr/local/cargo/bin:$PATH
 
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \
-        | sh -s -- -y --default-toolchain stable
-        
-# 3) Clone, build & install pg_cardano:
-ARG PG_CARDANO_VERSION=v1.0.5-p2
-RUN apt-get update && apt-get -y install libclang-dev libreadline-dev zlib1g-dev flex bison libxml2-dev libxslt-dev libssl-dev libxml2-utils xsltproc ccache pkg-config
+  | sh -s -- -y --default-toolchain stable
+
+RUN cargo install cargo-pgrx --version ${PGRX_VERSION} --locked
+
+# ---- Build & install pg_cardano ----
 RUN git clone --branch ${PG_CARDANO_VERSION} --depth 1 \
-        https://github.com/cardano-community/pg_cardano.git /tmp/pg_cardano
-# COPY pg_cardano/cargo.toml /tmp/pg_cardano/
-RUN  cd /tmp/pg_cardano \
-        && cargo install cargo-pgrx --version 0.12.9 --locked \
-        && cargo pgrx init \
-        && cargo pgrx package \
-        && cargo pgrx install --release --sudo 
+      https://github.com/cardano-community/pg_cardano.git /tmp/pg_cardano \
+ && cargo pgrx init --pg${PG_MAJOR} "$(command -v pg_config)" \
+ && cd /tmp/pg_cardano \
+ && cargo pgrx install --release --features pg${PG_MAJOR} \
+ && rm -rf /tmp/pg_cardano
 
-# clean up source & caches in one go:
-RUN cd / \
-        && rm -rf /tmp/pg_cardano \
-                $RUSTUP_HOME \
-                $CARGO_HOME 
+# ---- pg_curl (DISABLED) ----
+# SECURITY NOTE: enabling pg_curl allows outbound network access from inside Postgres.
+# Only enable if you intentionally want that capability and you fully trust every SQL role
+# that can CREATE FUNCTION / EXECUTE pg_curl functions.
+#
+# To enable, uncomment the block below and rebuild.
+#
+# RUN apt-get update \
+#  && apt-get install -y --no-install-recommends libcurl4-openssl-dev \
+#  && rm -rf /var/lib/apt/lists/*
+#
+# RUN git clone https://github.com/RekGRpth/pg_curl.git /tmp/pg_curl_ext
+# COPY pg_curl/Makefile /tmp/pg_curl_ext/Makefile
+# RUN make -C /tmp/pg_curl_ext PG_CONFIG="$(command -v pg_config)" \
+#  && make -C /tmp/pg_curl_ext install PG_CONFIG="$(command -v pg_config)" \
+#  && rm -rf /tmp/pg_curl_ext
 
+# ---- Cleanup build-time deps & toolchains ----
+RUN rm -rf $RUSTUP_HOME $CARGO_HOME \
+ && apt-get purge -y --auto-remove \
+    git \
+    make \
+    build-essential \
+    pkg-config \
+    clang \
+    llvm-dev \
+    libclang-dev \
+    libssl-dev \
+    postgresql-server-dev-$PG_MAJOR \
+ && rm -rf /var/lib/apt/lists/* /tmp/*
 
-#4)  cleanup build-time packages and temp files
- RUN cd / && \
-        rm -rf /pg_curl && \
-        export SUDO_FORCE_REMOVE=yes && \
-        apt-get remove -y git make postgresql-server-dev-16 clang curl sudo && \
-        apt-get autoremove --purge -y && \
-        apt-get clean && \
-        apt-get purge && \
-        rm -rf /tmp/* /var/lib/apt/lists/*
-
-# 5) Extensions should be managed with private schemas, out from untrusted user's scope. Uncomment if you know what you are doing:to allow them for everybody.
-# RUN echo "CREATE EXTENSION IF NOT EXISTS pg_curl ;" >> /docker-entrypoint-initdb.d/10_extensions.sql
-# RUN echo "CREATE EXTENSION IF NOT EXISTS pg_cardano ;" >> /docker-entrypoint-initdb.d/10_extensions.sql
-CMD ["bash"]
-
-
-
-
+# Extensions can be created at init-time if you want them enabled by default.
+# (Keep disabled unless you know what you're doing.)
+# RUN echo "CREATE EXTENSION IF NOT EXISTS pg_cardano;" >> /docker-entrypoint-initdb.d/10_extensions.sql
+# RUN echo "CREATE EXTENSION IF NOT EXISTS pg_curl;" >> /docker-entrypoint-initdb.d/10_extensions.sql
