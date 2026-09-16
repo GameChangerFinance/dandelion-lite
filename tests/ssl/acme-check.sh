@@ -91,6 +91,15 @@ wait_ssl_mode() {
     echo "SSL file mode did not settle to $mode: $file" >&2
     return 1
 }
+wait_log() {
+    local pattern=$1
+    for attempt in {1..20}; do
+        if docker logs "$name-ingress" 2>&1 | grep -q "$pattern"; then return; fi
+        sleep 1
+    done
+    echo "Expected log line was not emitted: $pattern" >&2
+    return 1
+}
 ssl_sha() {
     docker exec "$name-ingress" sh -c "sha256sum /var/lib/haproxy/ssl/server.pem | cut -d' ' -f1"
 }
@@ -98,6 +107,8 @@ start_ingress
 wait_cert
 wait_ssl_mode server.pem 600
 wait_ssl_mode myaddr.account.key 600
+wait_log 'ℹ️ Automatic SSL is enabled; HAProxy will issue/renew fixture.myaddr.io using native ACME.'
+wait_log '✅ Automatic SSL certificate is persisted, protected with 0600, and valid until '
 first=$(ssl_sha)
 docker exec "$name-ingress" /scripts/ssl/haproxy-acme.sh status
 docker exec "$name-ingress" /scripts/ssl/haproxy-acme.sh renew

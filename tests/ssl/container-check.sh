@@ -45,6 +45,8 @@ for attempt in {1..20}; do
 done
 docker logs "$name" > "$work/ingress.log" 2>&1
 test "$(cat "$work/response")" = '{}'
+grep -q 'ℹ️ Manual TLS is enabled; HAProxy will use secrets/ssl/server.pem.' "$work/ingress.log"
+grep -q '✅ TLS certificate is present, protected with 0600, and valid until ' "$work/ingress.log"
 for attempt in {1..40}; do
     if docker exec "$name" sh -c 'test -S /var/run/dataplaneapi.sock'; then break; fi
     sleep 1

@@ -32,8 +32,25 @@ if [ "$#" -eq 0 ]; then
     }
     start_ssl_permission_guard() {
         (
+            last_cert_id=
             while :; do
                 secure_ssl_state
+                if [ -s "$ssl/server.pem" ]; then
+                    cert_id=$(stat -c '%s:%Y' "$ssl/server.pem")
+                    if [ "$cert_id" != "$last_cert_id" ]; then
+                        if expiry=$(openssl x509 -in "$ssl/server.pem" -noout -enddate 2>/dev/null); then
+                            expiry=${expiry#notAfter=}
+                            if [ "${TLS_ENABLED:-}" = true ] && [ "${ACME_ENABLED:-}" = true ]; then
+                                echo "✅ Automatic SSL certificate is persisted, protected with 0600, and valid until $expiry."
+                            else
+                                echo "✅ TLS certificate is present, protected with 0600, and valid until $expiry."
+                            fi
+                        else
+                            echo '❌ TLS certificate exists but is not a readable X.509 PEM.' >&2
+                        fi
+                        last_cert_id=$cert_id
+                    fi
+                fi
                 sleep 5
             done
         ) &
@@ -52,9 +69,12 @@ if [ "$#" -eq 0 ]; then
                 echo 'TLS_ENABLED=true and ACME_ENABLED=true require MYADDR_TOKEN and MYADDR_DOMAIN. Fix .env and recreate ingress.' >&2
                 exit 1
             fi
+            echo "ℹ️ Automatic SSL is enabled; HAProxy will issue/renew ${MYADDR_DOMAIN}.myaddr.io using native ACME."
         elif [ ! -s "$ssl/server.pem" ]; then
             echo 'TLS_ENABLED=true with ACME disabled requires secrets/ssl/server.pem. Provide a manual PEM, enable ACME, or set TLS_ENABLED=false for plaintext.' >&2
             exit 1
+        else
+            echo 'ℹ️ Manual TLS is enabled; HAProxy will use secrets/ssl/server.pem.'
         fi
     fi
     # The companion saves its config and an HAProxy .lkg on startup.
