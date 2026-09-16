@@ -32,7 +32,9 @@ Pebble uses a test provider instead of MyAddr. Its DNS server lacks the SOA/NS b
 
 ## Results And Limits
 
-2026-09-15/16: all five commands passed. Local CA tests observed persisted PEM mode 0644, account-key mode 0600 and parent mode 0700, and compared the served and persisted certificates.
+2026-09-15/16: all five commands passed. Local CA tests observed persisted PEM
+mode 0600, account-key mode 0600 and parent mode 0700, and compared the served
+and persisted certificates.
 
 Also passed: `bash -n` on touched Bash scripts/tests, `sh -n` on the three new POSIX helpers, `git diff --check`, and `docker compose --env-file .env.example.<network> config --quiet` for mainnet/preprod/preview. Resolved preprod Compose configuration excluding the intentionally changed `haproxy` and `cron` services compared identical to `HEAD` using sorted JSON. No real `.env` was used.
 

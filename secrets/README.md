@@ -14,9 +14,11 @@ Ingress alone mounts `secrets/ssl/` at `/var/lib/haproxy/ssl/`.
 **Keep this directory owner-only (`0700`).** Ingress enforces that mode at
 startup and rejects symlinked storage/certificate/account paths. Data Plane API
 3.4.3 writes PEMs as `0644` despite umask; the private directory is therefore
-the access boundary. Do not relax its permissions while ingress is running.
-Protect exported copies separately with `0600`. Ownership is not automatically
-changed. See [permission details and migration](../docs/ssl.md) and
+the primary access boundary. The ingress entrypoint also tightens `server.pem`
+and `myaddr.account.key` to `0600` when they exist and keeps those exact files
+protected while ingress runs. Do not relax directory permissions while ingress is
+running. Protect exported copies separately with `0600`. Ownership is not
+automatically changed. See [permission details and migration](../docs/ssl.md) and
 [Native ACME With MyAddr](../docs/ACME.md).
 
 ## Automatic MyAddr TLS

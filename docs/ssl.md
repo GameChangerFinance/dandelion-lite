@@ -71,16 +71,16 @@ Host `secrets/ssl/` is mounted only into ingress at `/var/lib/haproxy/ssl/`:
 **Security requirement: keep `secrets/ssl` mode `0700`.** The pinned official
 companion explicitly writes combined PEMs with mode `0644`, overriding umask.
 The owner-only parent directory prevents other users from traversing it and
-reading those keys. This is an approved directory access boundary, not a claim
-that the PEM itself is mode `0600`. On normal service startup, the entrypoint
-logs and sets `0700` on that exact mounted directory, verifies the mode, and
-refuses symlinked storage/certificate/account paths. It does not recursively
-chmod, chown, or delete operator files. Permission errors stop startup.
+reading those keys. The entrypoint also tightens `server.pem` and
+`myaddr.account.key` to `0600` when they exist, and keeps checking those exact
+files while ingress runs so newly persisted ACME material is corrected without a
+host cron job. It does not recursively chmod, chown, or delete operator files.
+Permission errors stop startup.
 
 Do not relax that directory's permissions while ingress is running. Preserve
 the restriction when restoring backups; protect exported PEM copies separately
 with `0600`. A future upstream file-mode fix should be verified before removing
-this protection. [Pinned storage implementation](https://github.com/haproxytech/client-native/blob/v6.4.2/storage/storage.go).
+the file-mode guard. [Pinned storage implementation](https://github.com/haproxytech/client-native/blob/v6.4.2/storage/storage.go).
 
 The image's master and companion run as container root to read existing private
 files and persist replacements; HAProxy workers drop to the image's `haproxy`

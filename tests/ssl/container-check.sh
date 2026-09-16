@@ -20,7 +20,7 @@ printf 'fixture home\n' > "$work/www/index.html"
 openssl req -x509 -newkey rsa:2048 -nodes -days 1 -subj /CN=fixture.myaddr.io \
     -keyout "$work/ssl/key.pem" -out "$work/ssl/cert.pem" 2>"$work/openssl.log"
 cat "$work/ssl/key.pem" "$work/ssl/cert.pem" > "$work/ssl/server.pem"
-chmod 600 "$work/ssl/"*.pem
+chmod 644 "$work/ssl/server.pem"
 # Resolve backend names locally; no backend service is launched.
 hosts=()
 while read -r host; do hosts+=(--add-host "$host:127.0.0.1"); done < <(
@@ -54,6 +54,7 @@ docker exec "$name" sh -c 'curl --unix-socket /var/run/dataplaneapi.sock -s -o /
 test "$(cat "$work/api-status")" = 401
 docker exec "$name" sh -c 'stat -c "%a" /var/run/dataplaneapi.sock /var/run/haproxy-master.sock'
 test "$(stat -c %a "$work/ssl")" = 700
+test "$(stat -c %a "$work/ssl/server.pem")" = 600
 docker exec --user 65534 "$name" sh -c 'test ! -r /var/lib/haproxy/ssl/server.pem'
 docker logs "$name" > "$work/ingress.log" 2>&1
 docker rm -f "$name" >/dev/null

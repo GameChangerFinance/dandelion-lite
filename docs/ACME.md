@@ -122,10 +122,12 @@ is not a defense against an attacker who already controls ingress container root
 
 Keep `secrets/ssl/` mode `0700`. The pinned official persistence library writes
 combined PEM files as `0644`, overriding umask. The owner-only parent directory
-is therefore the enforced access boundary. The ingress entrypoint sets and
-verifies `0700` on that exact mounted directory, refuses symlinked certificate or
-account-key paths, and does not recursively chmod, chown or delete operator
-files.
+is therefore the primary enforced access boundary. The ingress entrypoint sets
+and verifies `0700` on that exact mounted directory, refuses symlinked
+certificate or account-key paths, and tightens `server.pem` plus
+`myaddr.account.key` to `0600` when they exist. A small in-container guard keeps
+those exact files protected after native ACME writes or replaces them. It does
+not recursively chmod, chown or delete operator files.
 
 Exported copies of private PEM material must be protected separately with
 `0600`.

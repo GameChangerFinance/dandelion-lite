@@ -73,21 +73,39 @@ start_ingress() {
 wait_cert() {
     local previous=${1:-none}
     for attempt in {1..90}; do
-        if [ -s "$work/ssl/server.pem" ] && [ "$(sha256sum "$work/ssl/server.pem" | cut -d' ' -f1)" != "$previous" ]; then return; fi
+        if docker exec "$name-ingress" sh -c 'test -s /var/lib/haproxy/ssl/server.pem' >/dev/null 2>&1; then
+            current=$(docker exec "$name-ingress" sh -c "sha256sum /var/lib/haproxy/ssl/server.pem | cut -d' ' -f1")
+            if [ "$current" != "$previous" ]; then return; fi
+        fi
         sleep 1
     done
     echo 'Certificate was not persisted; inspect the fixture logs.' >&2
     return 1
 }
+wait_ssl_mode() {
+    local file=$1 mode=$2
+    for attempt in {1..20}; do
+        if docker exec "$name-ingress" sh -c "[ -e /var/lib/haproxy/ssl/$file ] && [ \"\$(stat -c %a /var/lib/haproxy/ssl/$file)\" = $mode ]" >/dev/null 2>&1; then return; fi
+        sleep 1
+    done
+    echo "SSL file mode did not settle to $mode: $file" >&2
+    return 1
+}
+ssl_sha() {
+    docker exec "$name-ingress" sh -c "sha256sum /var/lib/haproxy/ssl/server.pem | cut -d' ' -f1"
+}
 start_ingress
 wait_cert
-first=$(sha256sum "$work/ssl/server.pem" | cut -d' ' -f1)
+wait_ssl_mode server.pem 600
+wait_ssl_mode myaddr.account.key 600
+first=$(ssl_sha)
 docker exec "$name-ingress" /scripts/ssl/haproxy-acme.sh status
 docker exec "$name-ingress" /scripts/ssl/haproxy-acme.sh renew
 wait_cert "$first"
-second=$(sha256sum "$work/ssl/server.pem" | cut -d' ' -f1)
+wait_ssl_mode server.pem 600
+second=$(ssl_sha)
 test "$(stat -c %a "$work/ssl")" = 700
-test "$(stat -c %a "$work/ssl/server.pem")" = 644
+test "$(stat -c %a "$work/ssl/server.pem")" = 600
 test "$(stat -c %a "$work/ssl/myaddr.account.key")" = 600
 docker exec --user 65534 "$name-ingress" sh -c 'test ! -r /var/lib/haproxy/ssl/server.pem'
 check_served_certificate() {
@@ -95,7 +113,7 @@ check_served_certificate() {
         https://127.0.0.1:8053/manifest > "$work/served.txt"
     sed -n '/-----BEGIN CERTIFICATE-----/,/-----END CERTIFICATE-----/p' "$work/served.txt" > "$work/served.pem"
     test "$(openssl x509 -in "$work/served.pem" -noout -fingerprint -sha256)" = \
-        "$(openssl x509 -in "$work/ssl/server.pem" -noout -fingerprint -sha256)"
+        "$(docker exec "$name-ingress" openssl x509 -in /var/lib/haproxy/ssl/server.pem -noout -fingerprint -sha256)"
 }
 check_served_certificate
 docker exec "$name-ingress" curl -ksf https://127.0.0.1:8053/manifest > "$work/response"
@@ -104,27 +122,31 @@ docker logs "$name-ingress" > "$work/issuance.log" 2>&1
 docker rm -f "$name-ingress" >/dev/null
 start_ingress
 sleep 4
-test "$(sha256sum "$work/ssl/server.pem" | cut -d' ' -f1)" = "$second"
+test "$(ssl_sha)" = "$second"
+wait_ssl_mode server.pem 600
 docker exec "$name-ingress" curl -ksf https://127.0.0.1:8053/manifest >/dev/null
 check_served_certificate
 # Outage must not replace the last valid certificate or interrupt TLS.
 docker stop "$name-ca" >/dev/null
 docker exec "$name-ingress" /scripts/ssl/haproxy-acme.sh renew
 sleep 5
-test "$(sha256sum "$work/ssl/server.pem" | cut -d' ' -f1)" = "$second"
+test "$(ssl_sha)" = "$second"
 docker exec "$name-ingress" curl -ksf https://127.0.0.1:8053/manifest >/dev/null
 check_served_certificate
 # An expired persisted certificate must renew without an admin command.
 docker rm -f "$name-ingress" >/dev/null
 docker start "$name-ca" >/dev/null
-openssl pkey -in "$work/ssl/server.pem" -out "$work/expired-key.pem"
-openssl x509 -in "$work/ssl/server.pem" -signkey "$work/expired-key.pem" \
-    -days -1 -out "$work/expired-cert.pem"
-cat "$work/expired-key.pem" "$work/expired-cert.pem" > "$work/ssl/expired.pem"
-mv "$work/ssl/expired.pem" "$work/ssl/server.pem"
-expired=$(sha256sum "$work/ssl/server.pem" | cut -d' ' -f1)
+docker run --rm -v "$work/ssl:/ssl" dandelion-ssl-test:local sh -c '
+    openssl pkey -in /ssl/server.pem -out /ssl/expired-key.pem
+    openssl x509 -in /ssl/server.pem -signkey /ssl/expired-key.pem \
+        -not_before 20250101000000Z -not_after 20250102000000Z -out /ssl/expired-cert.pem
+    cat /ssl/expired-key.pem /ssl/expired-cert.pem > /ssl/server.pem
+    chmod 0600 /ssl/server.pem
+    rm -f /ssl/expired-key.pem /ssl/expired-cert.pem
+'
 start_ingress
-wait_cert "$expired"
+wait_cert "$second"
+wait_ssl_mode server.pem 600
 check_served_certificate
 echo 'PASS: initial DNS-01 issuance, requested/due renewal, persistence, recreation and CA-outage retention.'
 printf 'Fixture logs: tests/ssl/.work/%s\n' "${work##*/}"
