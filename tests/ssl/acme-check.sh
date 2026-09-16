@@ -63,7 +63,7 @@ start_ingress() {
         -e HAPROXY_MAX_CONNECTIONS=100 -e HAPROXY_WORKER_THREADS=1 \
         -e HAPROXY_IP_BLACKLIST=/usr/local/etc/haproxy/ip-blacklist.lst \
         -e HAPROXY_ORIGIN_WHITELIST=/usr/local/etc/haproxy/origin-whitelist.map \
-        -e ACME_ENABLED=true -e MYADDR_DOMAIN=fixture -e MYADDR_TOKEN=fixture-token \
+        -e TLS_ENABLED=true -e ACME_ENABLED=true -e MYADDR_DOMAIN=fixture -e MYADDR_TOKEN=fixture-token \
         -e DPAPI_ACME_PROPAGTIMEOUT_SEC=-1 \
         -v "$work/config:/usr/local/etc/haproxy:ro" -v "$work/ssl:/var/lib/haproxy/ssl" \
         -v "$work/www:/usr/local/etc/www:ro" -v "$work/ca:/fixtures/ca:ro" \

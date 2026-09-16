@@ -249,11 +249,11 @@ This will **WIPE ALL YOUR DEPLOYMENT DATA** and will restore a previous backup:
 
 ### SSL
 
-SSL is optional. In TLS mode, `ACME_ENABLED=true` with matching `MYADDR_DOMAIN`
-and `MYADDR_TOKEN` enables native HAProxy DNS-01 issuance, renewal and activation.
-No additional public port or routine manual rotation is needed. Manual/self-signed
-TLS remains available with automation disabled; plaintext is selected by `.if 0`
-in the `TLS mode` block of `configs/haproxy/haproxy.cfg`.
+SSL is optional. `TLS_ENABLED=true` enables TLS on the existing HAProxy port.
+With `ACME_ENABLED=true` and matching `MYADDR_DOMAIN` and `MYADDR_TOKEN`,
+HAProxy uses native DNS-01 issuance, renewal and activation. Manual/self-signed
+TLS remains available with automation disabled; plaintext is selected with
+`TLS_ENABLED` empty or false.
 
 Active private state stays in `secrets/ssl/`, which ingress enforces as owner-only
 (`0700`). Read [SSL operation and migration](docs/ssl.md) and

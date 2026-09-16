@@ -39,3 +39,10 @@ Also passed: `bash -n` on touched Bash scripts/tests, `sh -n` on the three new P
 Not verified: authenticated MyAddr, public/staging CA issuance, authoritative propagation, elapsed-time scheduled renewal, every production backend/API, or production upgrade. Those require separately authorized provider testing and a deployment window. Config parsing alone does not prove production compatibility.
 
 After renaming the setting to `ACME_ENABLED` and the CLI flag to `--ssl-renew`, reran unit/script checks, Docker smoke checks, the full local ACME check, shell syntax and all three example Compose validations successfully. A synthetic Compose assertion confirmed the new environment mappings and absence of Certbot-prefixed mappings. Rootless Podman was not rerun for this name-only change. Local `.env` names/comments were updated without printing values; container tests still use synthetic inputs only.
+
+After adding `TLS_ENABLED` as the Compose-first protocol selector, reran unit and
+script fixtures, Docker and rootless Podman smoke checks, the full local ACME
+check, shell syntax, actual `.env` Compose validation and all three example
+Compose validations successfully. Docker/Podman tests covered plaintext with no
+PEM, manual TLS with a PEM, explicit failure for manual TLS without a PEM, and
+ACME parsing/issuance without a pre-existing PEM.

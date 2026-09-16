@@ -19,8 +19,11 @@ expect_failure() {
     fi
     ! grep -Fq "$MYADDR_TOKEN" "$FIXTURE/out" "$FIXTURE/err"
 }
-"$adapter" > "$FIXTURE/out"
+"$adapter" > "$FIXTURE/out" 2> "$FIXTURE/err"
 test ! -s "$FIXTURE/out"
+grep -Eq '^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z .* MyAddr ACME set' "$FIXTURE/err"
+! grep -Fq "$MYADDR_TOKEN" "$FIXTURE/err"
+! grep -Fq "$REC_DATA" "$FIXTURE/err"
 grep -Fxq 'key@-' "$FIXTURE/args"
 grep -Fxq "acme_challenge=$REC_DATA" "$FIXTURE/args"
 grep -Fxq https://myaddr.io/update "$FIXTURE/args"

@@ -21,7 +21,7 @@ runtime() {
 status=$(runtime 'acme status')
 case "$status" in
     *'@myaddr/server'*) ;;
-    *) printf '%s\n' 'No automatic MyAddr certificate is configured. Check TLS mode and ingress logs.' >&2; exit 1 ;;
+    *) printf '%s\n' 'No automatic MyAddr certificate is configured. Check TLS_ENABLED and ingress logs.' >&2; exit 1 ;;
 esac
 if [ "$1" = status ]; then
     printf '%s\n' "$status"

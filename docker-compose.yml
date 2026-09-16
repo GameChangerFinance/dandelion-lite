@@ -473,6 +473,7 @@ services:
       HAPROXY_WORKER_THREADS: "${HAPROXY_WORKER_THREADS:-8}"
       HAPROXY_IP_BLACKLIST: /usr/local/etc/haproxy/ip-blacklist.lst
       HAPROXY_ORIGIN_WHITELIST: /usr/local/etc/haproxy/origin-whitelist.map
+      TLS_ENABLED: ${TLS_ENABLED:-}
       ACME_ENABLED: ${ACME_ENABLED:-}
       MYADDR_DOMAIN: ${MYADDR_DOMAIN:-}
       MYADDR_TOKEN: ${MYADDR_TOKEN:-}

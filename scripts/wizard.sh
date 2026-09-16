@@ -175,18 +175,21 @@ echo ${MYADDR_DOMAIN}
 
 show_splash_screen
 
+TLS_ENABLED=false
 ACME_ENABLED=false
 if [[ "$DOMAIN" = myaddr.io ]] && gum confirm "Enable automatic SSL using MyAddr DNS-01?" --default=true --affirmative "Enable" --negative "Skip"; then
     if [[ -n "$MYADDR_TOKEN" && -n "$MYADDR_DOMAIN" ]]; then
+        TLS_ENABLED=true
         ACME_ENABLED=true
         echo 'HAProxy will issue, renew and apply SSL automatically after deployment. No SSL rotation or challenge port is needed.'
-        echo 'Keep TLS enabled in configs/haproxy/haproxy.cfg. Public APIs still need your selected ingress port to be reachable.'
+        echo 'TLS_ENABLED=true will use the same HAProxy port. Public APIs still need your selected ingress port to be reachable.'
     else
         echo 'Missing MYADDR_TOKEN or MYADDR_DOMAIN; automatic SSL remains disabled.' >&2
     fi
 fi
+update_env_var ".env" "TLS_ENABLED" "$TLS_ENABLED"
 update_env_var ".env" "ACME_ENABLED" "$ACME_ENABLED"
-echo 'Manual/self-signed TLS uses secrets/ssl/server.pem. For plaintext, select .if 0 in the TLS mode block of configs/haproxy/haproxy.cfg.'
+echo 'Manual/self-signed TLS uses TLS_ENABLED=true with secrets/ssl/server.pem. For plaintext, set TLS_ENABLED=false or leave it empty.'
 
 show_splash_screen
 

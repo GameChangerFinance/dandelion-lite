@@ -29,7 +29,7 @@ args=(--network none "${hosts[@]}"
     -e HAPROXY_MAX_CONNECTIONS=100 -e HAPROXY_WORKER_THREADS=1
     -e HAPROXY_IP_BLACKLIST=/usr/local/etc/haproxy/ip-blacklist.lst
     -e HAPROXY_ORIGIN_WHITELIST=/usr/local/etc/haproxy/origin-whitelist.map
-    -e ACME_ENABLED= -e MYADDR_DOMAIN=fixture -e MYADDR_TOKEN=
+    -e TLS_ENABLED=true -e ACME_ENABLED= -e MYADDR_DOMAIN=fixture -e MYADDR_TOKEN=
     -v "$work/config:/usr/local/etc/haproxy:ro"
     -v "$work/ssl:/var/lib/haproxy/ssl"
     -v "$work/www:/usr/local/etc/www:ro"
@@ -57,13 +57,19 @@ docker rm -f "$name" >/dev/null
 
 # Fresh automatic mode must parse without a dummy PEM. Network stays disabled.
 mv "$work/ssl/server.pem" "$work/ssl/manual.pem"
+if docker run --rm "${args[@]}" dandelion-ssl-test:local > "$work/missing-pem.log" 2>&1; then
+    echo 'Manual TLS unexpectedly started without secrets/ssl/server.pem.' >&2
+    exit 1
+fi
+grep -q 'TLS_ENABLED=true with ACME disabled requires secrets/ssl/server.pem' "$work/missing-pem.log"
 docker run --rm "${args[@]}" -e ACME_ENABLED=true -e MYADDR_TOKEN=fixture-token \
     dandelion-ssl-test:local haproxy -c -f /usr/local/etc/haproxy/haproxy.cfg
 # Plaintext must start without any PEM even when automatic mode is requested.
-sed -i 's/^\.if 1$/.if 0/' "$work/config/haproxy.cfg"
 docker run --rm "${args[@]}" -e ACME_ENABLED=true -e MYADDR_TOKEN=fixture-token \
+    -e TLS_ENABLED=false \
     dandelion-ssl-test:local haproxy -c -f /usr/local/etc/haproxy/haproxy.cfg
 docker run -d --name "$name" "${args[@]}" -e ACME_ENABLED=true -e MYADDR_TOKEN=fixture-token \
+    -e TLS_ENABLED=false \
     dandelion-ssl-test:local >/dev/null
 for attempt in {1..20}; do
     if docker exec "$name" curl -sf http://127.0.0.1:8053/manifest > "$work/plain-response"; then break; fi

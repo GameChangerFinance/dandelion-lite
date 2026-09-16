@@ -21,9 +21,8 @@ changed. See [permission details and migration](../docs/ssl.md) and
 
 ## Automatic MyAddr TLS
 
-Set `ACME_ENABLED=true`, `MYADDR_DOMAIN` (registration label, no suffix),
-and its matching `MYADDR_TOKEN` in `.env`. Keep TLS mode enabled in
-`configs/haproxy/haproxy.cfg`.
+Set `TLS_ENABLED=true`, `ACME_ENABLED=true`, `MYADDR_DOMAIN` (registration label,
+no suffix), and its matching `MYADDR_TOKEN` in `.env`.
 
 HAProxy obtains, renews and applies the certificate automatically, saving it
 directly here. No candidate, host cron or routine manual rotation is involved.

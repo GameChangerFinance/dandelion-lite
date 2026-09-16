@@ -63,8 +63,14 @@ gum() { return "${TEST_CONFIRM:-0}"; }
 export DOMAIN=myaddr.io MYADDR_TOKEN=fixture MYADDR_DOMAIN=fixture
 for TEST_CONFIRM in 0 1; do
     cd "$work/repo"
-    source <(sed -n '/^ACME_ENABLED=false$/,/^update_env_var ".env" "ACME_ENABLED"/p' "$root/scripts/wizard.sh") > "$work/out"
-    if [ "$TEST_CONFIRM" = 0 ]; then grep -qx ACME_ENABLED=true .env; else grep -qx ACME_ENABLED=false .env; fi
+    source <(sed -n '/^TLS_ENABLED=false$/,/^update_env_var ".env" "ACME_ENABLED"/p' "$root/scripts/wizard.sh") > "$work/out"
+    if [ "$TEST_CONFIRM" = 0 ]; then
+        grep -qx TLS_ENABLED=true .env
+        grep -qx ACME_ENABLED=true .env
+    else
+        grep -qx TLS_ENABLED=false .env
+        grep -qx ACME_ENABLED=false .env
+    fi
 done
 cd "$root"
 
@@ -103,5 +109,5 @@ fi
 diff -u <(git show 8452d05:configs/haproxy/haproxy.cfg | sed -n '/  # Manual IP blacklisting/,$p') \
     <(sed -n '/  # Manual IP blacklisting/,$p' configs/haproxy/haproxy.cfg)
 diff -u <(git show 8452d05:configs/haproxy/haproxy.cfg | sed -n '/^defaults$/,/^frontend app$/p' | sed '$d') \
-    <(sed -n '/^defaults$/,/^# TLS mode:/p' configs/haproxy/haproxy.cfg | sed '$d')
+    <(sed -n '/^defaults$/,/^# TLS mode/p' configs/haproxy/haproxy.cfg | sed '$d')
 echo 'PASS: manual rotation, CLI failure propagation, wizard SSL choice, DDNS, generated cron and route invariance.'

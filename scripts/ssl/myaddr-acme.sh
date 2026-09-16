@@ -2,7 +2,8 @@
 # Data Plane API exec DNS-01 provider. https://myaddr.tools/
 set -eu
 
-fail() { printf 'MyAddr ACME: %s\n' "$1" >&2; exit 1; }
+log() { printf '%s %s %s\n' "$(date -u '+%Y-%m-%dT%H:%M:%SZ')" "$1" "$2" >&2; }
+fail() { log '❌' "MyAddr ACME: $1"; exit 1; }
 usage() {
     printf '%s\n' 'Usage: invoked by HAProxy Data Plane API with ACTION, ZONE, REC_NAME, REC_TYPE, REC_DATA.' \
         'Requires ACME_ENABLED=true, MYADDR_DOMAIN (registration label), MYADDR_TOKEN.'
@@ -24,9 +25,11 @@ record=$(printf '%s' "${REC_NAME:-}" | tr '[:upper:]' '[:lower:]')
 [ "${zone%.}" = myaddr.io ] || fail 'Unexpected DNS zone.'
 [ "${record%.}" = "_acme-challenge.${domain}.myaddr.io" ] || fail 'Unexpected challenge name.'
 
-case "${ACTION:-}" in
+action=${ACTION:-}
+case "$action" in
     delete)
         # MyAddr expires TXT challenges automatically. DELETE would remove IPs.
+        log 'ℹ️' "MyAddr ACME delete ignored for ${record%.}; MyAddr expires TXT challenges automatically."
         exit 0 ;;
     set|append) ;;
     *) fail 'Unsupported action; expected set, append or delete.' ;;
@@ -37,6 +40,7 @@ esac
 [ "${#REC_DATA}" -eq 43 ] || fail 'Expected a 43-character DNS-01 SHA-256 value.'
 
 # Read the credential from stdin, never from a URL or process argument.
+log 'ℹ️' "MyAddr ACME ${action} request for ${record%.}."
 response=$(printf '%s' "$MYADDR_TOKEN" | curl --silent --show-error \
     --proto '=https' --connect-timeout 10 --max-time 30 --max-filesize 4096 \
     --data-urlencode key@- --data-urlencode "acme_challenge=$REC_DATA" \
@@ -48,3 +52,4 @@ body=${response%'
 [ "$code" = 200 ] || fail "Provider returned HTTP $code; check the token and registration."
 # Do not echo an untrusted provider response (it could contain credentials).
 [ "$body" = OK ] || fail 'Provider did not return OK.'
+log '✅' "MyAddr ACME ${action} accepted for ${record%.}."

@@ -16,7 +16,7 @@ automation is disabled.
 
 Automatic mode is selected by all of these conditions:
 
-- TLS mode is enabled in `configs/haproxy/haproxy.cfg`.
+- `TLS_ENABLED=true`.
 - `ACME_ENABLED=true`.
 - `MYADDR_DOMAIN` contains the MyAddr registration label.
 - `MYADDR_TOKEN` contains the matching MyAddr token.
@@ -44,10 +44,10 @@ not a migration detector:
 After that, routine renewal is automatic. Do not schedule `--ssl-renew`; repeated
 manual requests can waste CA rate limits.
 
-If automatic settings are disabled or incomplete while TLS mode is enabled,
-HAProxy falls back to manual TLS and expects `secrets/ssl/server.pem` to already
-exist. Plaintext is selected only by changing the outer `TLS mode` `.if` block in
-`configs/haproxy/haproxy.cfg`.
+If `TLS_ENABLED=true` and automatic mode is disabled, HAProxy uses manual TLS and
+expects `secrets/ssl/server.pem` to already exist. If `ACME_ENABLED=true` but
+MyAddr credentials are incomplete, startup fails with an operator-facing error.
+Plaintext is selected with `TLS_ENABLED` empty or false.
 
 ## MyAddr Exec Glue
 
@@ -156,7 +156,8 @@ recovery, but they are no longer mounted or used by the automatic SSL feature.
 ## Manual TLS Remains Separate
 
 Manual/imported/self-signed certificates are still supported with
-`ACME_ENABLED` disabled. Stage a combined private key and full chain at:
+`TLS_ENABLED=true` and `ACME_ENABLED` disabled. Stage a combined private key and
+full chain at:
 
 ```text
 configs/ssl/server.pem

@@ -43,17 +43,17 @@ certificates only. It is not mounted into cron. Use
 `secrets/ssl/server.pem`, retain three backups and restart HAProxy.
 
 Automatic MyAddr SSL instead uses HAProxy's native ACME scheduler and its
-official Data Plane API companion. With `ACME_ENABLED=true` and matching
-MyAddr credentials, issuance, renewal, activation and persistence run within
-ingress. No candidate rotation is needed.
+official Data Plane API companion. With `TLS_ENABLED=true`, `ACME_ENABLED=true`
+and matching MyAddr credentials, issuance, renewal, activation and persistence
+run within ingress. No candidate rotation is needed.
 
-`haproxy/dataplaneapi.yml` configures a local Unix-socket-only companion.
+`haproxy/dataplaneapi.yml` configures the local Unix-socket-only Data Plane API
+companion. It is not a Compose fragment and contains no secrets.
 The host config mount stays read-only; startup copies its two configuration files
 to private, disposable container storage because the companion writes configuration
 and last-known-good files. Host configuration is authoritative on restart.
 
-The outer `.if 1` in the HAProxy `TLS mode` block selects TLS; change it to
-`.if 0` for plaintext. This does not change any route or published port.
+`TLS_ENABLED` selects TLS or plaintext without changing any route or published port.
 Active private state lives in owner-only `secrets/ssl/` (`0700`), not here.
 
 Read [SSL operation and migration](../docs/ssl.md) and

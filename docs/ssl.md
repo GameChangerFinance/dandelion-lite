@@ -12,19 +12,19 @@ boundary and reasons the old Certbot lifecycle was removed, read
 
 ## Choose A Mode
 
-The `TLS mode` block in `configs/haproxy/haproxy.cfg` is the single protocol
-selection point. Its outer `.if 1` selects TLS; change that line to `.if 0` for
-plaintext. Do not change the nested credential conditions or route definitions.
+`TLS_ENABLED` in `.env` is the protocol selection point. It controls only the
+existing HAProxy port mapping; it does not add or change ports.
 
 | Mode | Configuration | Certificate lifecycle |
 | --- | --- | --- |
-| Automatic MyAddr TLS | TLS mode, `ACME_ENABLED=true`, matching `MYADDR_DOMAIN` and `MYADDR_TOKEN` | Native HAProxy ACME, no recurring manual rotation |
-| Manual/imported/self-signed TLS | TLS mode, `ACME_ENABLED` empty or false | Operator supplies and rotates the PEM |
-| Plaintext | `.if 0` in the TLS mode block; leave `ACME_ENABLED` disabled | No certificate required or ACME order started |
+| Automatic MyAddr TLS | `TLS_ENABLED=true`, `ACME_ENABLED=true`, matching `MYADDR_DOMAIN` and `MYADDR_TOKEN` | Native HAProxy ACME, no recurring manual rotation |
+| Manual/imported/self-signed TLS | `TLS_ENABLED=true`, `ACME_ENABLED` empty or false | Operator supplies and rotates the PEM |
+| Plaintext | `TLS_ENABLED` empty or false | No certificate required or ACME order started |
 
 Automatic settings in `.env`:
 
 ```env
+TLS_ENABLED=true
 ACME_ENABLED=true
 MYADDR_DOMAIN=your-registration-label
 MYADDR_TOKEN=your-registration-token
@@ -35,9 +35,10 @@ The certificate covers `your-registration-label.myaddr.io`, not the equivalent
 No Certbot executable is used. The manual CLI flag is
 `--ssl-renew`. Old Certbot-prefixed names are not compatibility aliases.
 
-Missing credentials in TLS mode warn and use the existing manual PEM; if no PEM
-exists, startup fails rather than silently changing protocol. Fresh automatic
-mode needs no pre-generated PEM, but usable TLS depends on successful issuance.
+Missing automatic credentials with `ACME_ENABLED=true` stop startup with an
+operator-facing error. Manual TLS with no `secrets/ssl/server.pem` also stops
+startup. Fresh automatic mode needs no pre-generated PEM, but usable TLS depends
+on successful issuance.
 
 ## Network Requirements
 
@@ -110,7 +111,7 @@ This is an intentional interface change: the old names are no longer read.
    native HAProxy does not import or mount old Certbot account state.
 2. Merge the new TLS block and companion config into any customized HAProxy config.
    Public routes and the Compose ingress port mapping are unchanged. Plaintext
-   now uses the documented outer `.if 0`, rather than commenting old bind lines.
+   now uses `TLS_ENABLED` empty/false, rather than editing bind lines.
 3. Select a mode and set `.env`. Native propagation checks replace the fixed
    delay. In automatic mode the
    DDNS updater ignores legacy `MYADDR_ACME_CHALLENGE` to avoid conflicting TXT updates.
@@ -164,7 +165,7 @@ request renewal again; do not assume an in-memory certificate survived recreatio
 
 ## Manual Certificates
 
-Leave `ACME_ENABLED` disabled and recreate ingress before switching from
+Set `TLS_ENABLED=true`, leave `ACME_ENABLED` disabled and recreate ingress before switching from
 automatic ownership to manual ownership. Self-signing remains explicit:
 
 ```sh
