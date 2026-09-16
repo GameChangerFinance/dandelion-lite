@@ -25,7 +25,7 @@ chmod 600 "$work/ssl/"*.pem
 hosts=()
 while read -r host; do hosts+=(--add-host "$host:127.0.0.1"); done < <(
     awk '$1 == "server" {split($3,a,":"); print a[1]}' configs/haproxy/haproxy.cfg | sort -u)
-args=(--network none "${hosts[@]}"
+base_args=(--network none
     -e HAPROXY_MAX_CONNECTIONS=100 -e HAPROXY_WORKER_THREADS=1
     -e HAPROXY_IP_BLACKLIST=/usr/local/etc/haproxy/ip-blacklist.lst
     -e HAPROXY_ORIGIN_WHITELIST=/usr/local/etc/haproxy/origin-whitelist.map
@@ -34,6 +34,9 @@ args=(--network none "${hosts[@]}"
     -v "$work/ssl:/var/lib/haproxy/ssl"
     -v "$work/www:/usr/local/etc/www:ro"
     -v "$root/scripts/ssl:/scripts/ssl:ro")
+docker run --rm "${base_args[@]}" -e TLS_ENABLED=false \
+    dandelion-ssl-test:local haproxy -c -f /usr/local/etc/haproxy/haproxy.cfg
+args=("${base_args[@]}" "${hosts[@]}")
 docker run --rm "${args[@]}" dandelion-ssl-test:local haproxy -c -f /usr/local/etc/haproxy/haproxy.cfg
 docker run -d --name "$name" "${args[@]}" dandelion-ssl-test:local >/dev/null
 for attempt in {1..20}; do

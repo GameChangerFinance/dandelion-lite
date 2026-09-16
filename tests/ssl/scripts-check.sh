@@ -109,5 +109,6 @@ fi
 diff -u <(git show 8452d05:configs/haproxy/haproxy.cfg | sed -n '/  # Manual IP blacklisting/,$p') \
     <(sed -n '/  # Manual IP blacklisting/,$p' configs/haproxy/haproxy.cfg)
 diff -u <(git show 8452d05:configs/haproxy/haproxy.cfg | sed -n '/^defaults$/,/^frontend app$/p' | sed '$d') \
-    <(sed -n '/^defaults$/,/^# TLS mode/p' configs/haproxy/haproxy.cfg | sed '$d')
+    <(sed -n '/^defaults$/,/^# TLS mode/p' configs/haproxy/haproxy.cfg | sed '$d' \
+        | sed '/default-server init-addr/d;/^resolvers docker$/,/^$/d')
 echo 'PASS: manual rotation, CLI failure propagation, wizard SSL choice, DDNS, generated cron and route invariance.'

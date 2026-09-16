@@ -46,3 +46,11 @@ check, shell syntax, actual `.env` Compose validation and all three example
 Compose validations successfully. Docker/Podman tests covered plaintext with no
 PEM, manual TLS with a PEM, explicit failure for manual TLS without a PEM, and
 ACME parsing/issuance without a pre-existing PEM.
+
+After adding HAProxy startup DNS tolerance and `chroot auto`, reran script
+fixtures, Docker and rootless Podman smoke checks, the full local ACME check,
+unit checks, shell syntax, actual `.env` Compose validation and all three example
+Compose validations successfully. Docker/Podman smoke checks include config
+parsing with backend names unavailable, proving unresolved backends no longer
+fail startup. The local ACME check confirmed issuance, renewal, persistence and
+recreation still work with `chroot auto`.
