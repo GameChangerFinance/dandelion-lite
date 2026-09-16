@@ -37,40 +37,29 @@ Mainnet uses `--mainnet`; preprod uses testnet magic `1`; preview uses testnet m
 
 ## SSL
 
-`ssl/` is a temporary input location for certificate renewal workflows. It is mounted read/write only into the cron container at `/data/ssl/`.
+`configs/ssl/server.pem` is a candidate location for **manual/imported/self-signed**
+certificates only. It is not mounted into cron. Use
+`scripts/ssl/rotate-ssl-and-restart-haproxy.sh` to move a candidate into
+`secrets/ssl/server.pem`, retain three backups and restart HAProxy.
 
-Active HAProxy certificates are not read from `configs/ssl/`. HAProxy reads the active PEM from:
+Automatic MyAddr SSL instead uses HAProxy's native ACME scheduler and its
+official Data Plane API companion. With `ACME_ENABLED=true` and matching
+MyAddr credentials, issuance, renewal, activation and persistence run within
+ingress. No candidate rotation is needed.
 
-```text
-secrets/ssl/server.pem
-```
+`haproxy/dataplaneapi.yml` configures a local Unix-socket-only companion.
+The host config mount stays read-only; startup copies its two configuration files
+to private, disposable container storage because the companion writes configuration
+and last-known-good files. Host configuration is authoritative on restart.
 
-The certbot/MyAddr cron workflow and manual renewal workflows write the candidate PEM to:
+The outer `.if 1` in the HAProxy `TLS mode` block selects TLS; change it to
+`.if 0` for plaintext. This does not change any route or published port.
+Active private state lives in owner-only `secrets/ssl/` (`0700`), not here.
 
-```text
-configs/ssl/server.pem
-```
-
-To activate a candidate certificate, run from the repository root:
-
-```sh
-./scripts/ssl/rotate-ssl-and-restart-haproxy.sh
-```
-
-The same action is available in `scripts/dandoman.sh` under `Setup` > `Rotate SSL and Restart HAProxy`.
-
-Rotation behavior:
-
-- moves `configs/ssl/server.pem` to `secrets/ssl/server.pem`
-- backs up the previous active cert as `secrets/ssl/server.pem.old.1`
-- shifts older backups up to `.old.3`
-- restarts only the `haproxy` service with Docker Compose
-
-If there is no `configs/ssl/server.pem`, the rotation script exits without changing HAProxy.
-
-Cron certbot logs are written to `logs/cron/myaddrdns_certbot.log`. Operators should check that log for renewal activity and then rotate the candidate PEM when ready.
-
-Certbot account and renewal state is stored under `secrets/letsencrypt/` and mounted only into the cron container at `/etc/letsencrypt/`. Do not move that state into `configs/ssl/`; `configs/ssl/` is only the temporary PEM handoff directory.
+Read [SSL operation and migration](../docs/ssl.md) and
+[Native ACME With MyAddr](../docs/ACME.md) for required recreation steps,
+native PEM permissions, network requirements, status commands, manual mode and
+the MyAddr exec adapter behavior.
 
 ## Cardano
 

@@ -50,23 +50,14 @@ The mounted config uses `TraceOptions`, which matches `trace-dispatcher` 2.12.x 
 
 Reference proofs: [`iohk-nix` generates submit-api configs with `TraceOptions.""`](https://github.com/input-output-hk/iohk-nix/blob/master/cardano-lib/default.nix#L133-L143), and [`cardonnay` ships the same submit-api `TraceOptions` shape](https://github.com/IntersectMBO/cardonnay/blob/master/src/cardonnay_scripts/scripts/conway_fast/submit-api-config.json#L111-L120) while invoking submit-api with `--config`.
 
-## SSL And Certbot
+## SSL And Native ACME
 
-HAProxy now reads only the active PEM from:
-
-```text
-secrets/ssl/server.pem
-```
-
-Cron/Certbot writes the candidate PEM to:
-
-```text
-configs/ssl/server.pem
-```
-
-Added `scripts/ssl/rotate-ssl-and-restart-haproxy.sh` to promote the candidate PEM into `secrets/ssl/server.pem`, keep `.old.1` to `.old.3` backups, and restart only HAProxy. `dandoman.sh` now exposes setup actions for Certbot renewal and SSL rotation.
-
-`src/cron/Dockerfile` now installs `certbot`. Certbot renewal state is persisted under `secrets/letsencrypt/` and mounted only into the cron container. dandoman can also create a self-signed PEM candidate at `configs/ssl/server.pem` using `scripts/ssl/keygen.sh`; operators must rotate it before HAProxy uses it.
+Historical note: the old Certbot candidate workflow was superseded on
+2026-09-16 by native HAProxy/MyAddr renewal. Use [the current SSL guide](ssl.md)
+for setup and migration, and [the ACME guide](ACME.md) for the removal rationale,
+MyAddr exec adapter behavior and current security boundary. Manual/self-signed
+certificates still use `configs/ssl/server.pem` as a candidate and
+`scripts/ssl/rotate-ssl-and-restart-haproxy.sh` for explicit rotation.
 
 ## Backup Sync
 
@@ -74,8 +65,8 @@ Added `scripts/ssl/rotate-ssl-and-restart-haproxy.sh` to promote the candidate P
 
 ## Docs
 
-Updated `README.md`, `configs/README.md`, `secrets/README.md`, dandoman help, and generated education docs for the split services, peer snapshots, SSL staging/rotation, Certbot state, self-signed candidates, and current HAProxy certificate path.
+Updated `README.md`, `configs/README.md`, `secrets/README.md`, dandoman help, and generated education docs for the split services, peer snapshots, SSL staging/rotation, self-signed candidates, native ACME, and current HAProxy certificate path.
 
 ## Static Verification
 
-Shell syntax checks passed for the edited shell scripts. Repo-wide static searches were run for stale bundled node/Ogmios identifiers and stale HAProxy SSL mount paths; remaining SSL path references describe the intended active secret path or temporary Certbot candidate path. This is a first commit, WIP.
+Shell syntax checks passed for the edited shell scripts. Repo-wide static searches were run for stale bundled node/Ogmios identifiers and stale HAProxy SSL mount paths; remaining SSL path references describe the intended active secret path or manual certificate candidate path. This is a first commit, WIP.

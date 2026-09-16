@@ -135,18 +135,6 @@ fi
 
 show_splash_screen
 
-echo 'Please input your e-mail for Certbot notifications (empty = disabled)'
-CERTBOT_EMAIL_INPUT=$(gum input --prompt "E-mail: " --placeholder "${CERTBOT_EMAIL}" --prompt.foreground 99 --cursor.foreground 99 --width 50)
-if [[ -n "$CERTBOT_EMAIL_INPUT" ]]; then
-  update_env_var ".env" "CERTBOT_EMAIL" ${CERTBOT_EMAIL_INPUT}
-  # echo "var ${CERTBOT_EMAIL} "
-  # exit
-  CERTBOT_EMAIL=${CERTBOT_EMAIL_INPUT}
-  CERTBOT_ENABLED=true
-fi
-
-show_splash_screen
-
 if gum confirm "Generate new postgres db password?" --default=true --affirmative "Generate" --negative "Skip"; then
     POSTGRES_PASSWORD_GEN=`tr -dc 'A-Za-z0-9' </dev/urandom | fold -w 16 | head -n1`
     update_env_var ".env" "POSTGRES_PASSWORD" ${POSTGRES_PASSWORD_GEN}
@@ -166,6 +154,8 @@ if [[ $DOMAIN_INPUT ]]; then
     DOMAIN=${DOMAIN_INPUT}
 else
     DOMAIN='myaddr.io'
+    MYADDR_DOMAIN="${NODE_TICKER}-${PROJ_NAME}"
+    update_env_var ".env" "MYADDR_DOMAIN" "$MYADDR_DOMAIN"
 
     show_splash_screen
     echo "Go to the link below and claim this domain: ${NODE_TICKER}-${PROJ_NAME}.myaddr.io"
@@ -185,10 +175,18 @@ echo ${MYADDR_DOMAIN}
 
 show_splash_screen
 
-if gum confirm "Generate ssh key?" --default=true --affirmative "Create" --negative "Skip"; then
-    docker compose up -d 
-    docker compose exec -it cron /scripts/cron/myaddrdns/certbot.sh
+ACME_ENABLED=false
+if [[ "$DOMAIN" = myaddr.io ]] && gum confirm "Enable automatic SSL using MyAddr DNS-01?" --default=true --affirmative "Enable" --negative "Skip"; then
+    if [[ -n "$MYADDR_TOKEN" && -n "$MYADDR_DOMAIN" ]]; then
+        ACME_ENABLED=true
+        echo 'HAProxy will issue, renew and apply SSL automatically after deployment. No SSL rotation or challenge port is needed.'
+        echo 'Keep TLS enabled in configs/haproxy/haproxy.cfg. Public APIs still need your selected ingress port to be reachable.'
+    else
+        echo 'Missing MYADDR_TOKEN or MYADDR_DOMAIN; automatic SSL remains disabled.' >&2
+    fi
 fi
+update_env_var ".env" "ACME_ENABLED" "$ACME_ENABLED"
+echo 'Manual/self-signed TLS uses secrets/ssl/server.pem. For plaintext, select .if 0 in the TLS mode block of configs/haproxy/haproxy.cfg.'
 
 show_splash_screen
 

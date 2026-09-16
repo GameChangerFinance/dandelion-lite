@@ -1,99 +1,56 @@
 # Dandelion Lite Secrets
 
-This directory is for operator-managed secrets and private runtime state. Do not commit real keys, certificates, tokens, or Certbot account material.
+Private runtime state belongs here, never in Git. Do not commit keys, tokens,
+account material or backups containing them.
 
 ## SSL
 
-HAProxy reads the active TLS certificate from:
+Ingress alone mounts `secrets/ssl/` at `/var/lib/haproxy/ssl/`.
 
-```text
-secrets/ssl/server.pem
+- `server.pem`: active combined private key and certificate chain.
+- `myaddr.account.key`: persistent native ACME account key.
+- `server.pem.old.1` through `.old.3`: manual rotation backups.
+
+**Keep this directory owner-only (`0700`).** Ingress enforces that mode at
+startup and rejects symlinked storage/certificate/account paths. Data Plane API
+3.4.3 writes PEMs as `0644` despite umask; the private directory is therefore
+the access boundary. Do not relax its permissions while ingress is running.
+Protect exported copies separately with `0600`. Ownership is not automatically
+changed. See [permission details and migration](../docs/ssl.md) and
+[Native ACME With MyAddr](../docs/ACME.md).
+
+## Automatic MyAddr TLS
+
+Set `ACME_ENABLED=true`, `MYADDR_DOMAIN` (registration label, no suffix),
+and its matching `MYADDR_TOKEN` in `.env`. Keep TLS mode enabled in
+`configs/haproxy/haproxy.cfg`.
+
+HAProxy obtains, renews and applies the certificate automatically, saving it
+directly here. No candidate, host cron or routine manual rotation is involved.
+Changing environment or migrating the mount/image requires container recreation;
+a restart alone does not apply those changes.
+
+From the host:
+
+```sh
+docker compose exec -T haproxy /scripts/ssl/haproxy-acme.sh status
+./scripts/dandoman.sh --ssl-renew
+docker compose logs --tail 100 haproxy
 ```
 
-`configs/ssl/server.pem` is only a temporary candidate location. Certbot and manual workflows write there first. The candidate is not active until it is rotated into `secrets/ssl/server.pem`.
+The renewal command requests asynchronous work. Read the [SSL guide](../docs/ssl.md)
+and [ACME guide](../docs/ACME.md) for first-start behavior and migration from an
+existing self-signed certificate.
 
-### Enable Certbot Cron
+## Manual TLS
 
-1. Set these values in `.env`:
-
-```env
-CERTBOT_ENABLED=true
-MYADDR_DOMAIN=<your-myaddr-subdomain-without-.myaddr.io>
-MYADDR_TOKEN=<your-myaddr-token>
-CERTBOT_EMAIL=<optional-email>
-CERTBOT_DNS_PROPAGATION_SECONDS=60
-```
-
-2. Recreate or restart the cron container on the deployment host so it receives the updated env.
-3. Certbot cron output is written to `logs/cron/myaddrdns_certbot.log`.
-4. When a new `configs/ssl/server.pem` candidate exists, rotate it with:
+Keep automation disabled. Create a candidate with
+`./scripts/dandoman.sh --ssl-self-signed <domain-or-common-name>`, or stage an
+imported combined PEM at `configs/ssl/server.pem`. Apply it with:
 
 ```sh
 ./scripts/ssl/rotate-ssl-and-restart-haproxy.sh
 ```
 
-The same rotation is available from `scripts/dandoman.sh` under `Setup` > `Rotate SSL and Restart HAProxy`.
-
-### Manually Try Certbot
-
-From the deployment host, with `.env` loaded by dandoman or the shell:
-
-```sh
-./scripts/dandoman.sh --ssl-certbot-renew
-```
-
-Or from the dandoman menu:
-
-```text
-Setup > Check/Renew SSL Candidate
-```
-
-That command writes the candidate PEM to `configs/ssl/server.pem`. It does not restart HAProxy and does not change `secrets/ssl/server.pem` until rotation is run.
-
-### Create A Self-Signed Candidate
-
-From dandoman:
-
-```text
-Setup > Create Self-Signed SSL Candidate
-```
-
-Or from the CLI:
-
-```sh
-./scripts/dandoman.sh --ssl-self-signed <domain-or-common-name>
-```
-
-This creates `configs/ssl/server.pem` using `scripts/ssl/keygen.sh`. To apply it, run:
-
-```sh
-./scripts/ssl/rotate-ssl-and-restart-haproxy.sh
-```
-
-### Rotate And Apply
-
-Rotation moves the candidate into the active secret path:
-
-```text
-configs/ssl/server.pem -> secrets/ssl/server.pem
-```
-
-The previous active PEM is backed up under `secrets/ssl/` as:
-
-```text
-server.pem.old.1
-server.pem.old.2
-server.pem.old.3
-```
-
-After moving the PEM, the rotation script restarts only the `haproxy` service using Docker Compose.
-
-## Certbot State
-
-Certbot account, renewal, and live certificate state is stored under:
-
-```text
-secrets/letsencrypt/
-```
-
-This path is mounted only into the cron container at `/etc/letsencrypt/`. It is intentionally separate from `configs/ssl/`, which is just the temporary PEM handoff directory.
+This retains three previous active PEMs and restarts only HAProxy. No candidate
+means no rotation. Manual rotation is not the automatic renewal path.

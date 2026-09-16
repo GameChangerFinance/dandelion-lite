@@ -575,7 +575,7 @@ menu() {
 
             "Setup")
               # Submenu for Setup with plain text options
-              setup_choice=$(gum choose --height 15 --cursor.foreground 229 --item.foreground 39 "Initialise Postgres" "Reset Postgres" "Full Backup" "Full Restore" "Download Backup" "Create Self-Signed SSL Candidate" "Check/Renew SSL Candidate" "Rotate SSL and Restart HAProxy" "Run on system start"  "$(gum style --foreground 208 "Back")")
+              setup_choice=$(gum choose --height 15 --cursor.foreground 229 --item.foreground 39 "Initialise Postgres" "Reset Postgres" "Full Backup" "Full Restore" "Download Backup" "Create Self-Signed SSL Candidate" "Renew Automatic SSL" "Rotate SSL and Restart HAProxy" "Run on system start"  "$(gum style --foreground 208 "Back")")
 
               case "$setup_choice" in
                 #"Initialise Cardano Node")
@@ -663,8 +663,8 @@ menu() {
                   read -r -p "Press enter to continue"
                   show_splash_screen
                   ;;
-                "Check/Renew SSL Candidate")
-                  docker compose -f "${KLITE_HOME}"/docker-compose.yml exec -it cron /scripts/cron/myaddrdns/certbot.sh check-renew
+                "Renew Automatic SSL")
+                  docker compose -f "${KLITE_HOME}"/docker-compose.yml exec -T haproxy /scripts/ssl/haproxy-acme.sh renew
                   read -r -p "Press enter to continue"
                   show_splash_screen
                   ;;
@@ -1007,7 +1007,7 @@ display_help_usage() {
   echo -e "--logs-dbsync: \t\t\t Displays logs for the DBSync container."
   echo -e "--enter-haproxy: \t\t Accesses the HAProxy container."
   echo -e "--ssl-self-signed: \t Creates a self-signed SSL candidate at configs/ssl/server.pem."
-  echo -e "--ssl-certbot-renew: \t Runs Certbot in the cron container and writes configs/ssl/server.pem."
+  echo -e "--ssl-renew: \t Requests native MyAddr SSL renewal in HAProxy; applies automatically on success."
   echo -e "--ssl-rotate: \t\t Promotes configs/ssl/server.pem to secrets/ssl/server.pem and restarts HAProxy."
 }
 
@@ -1098,8 +1098,9 @@ process_args() {
       echo "Self-signed SSL candidate created at configs/ssl/server.pem."
       echo "Run ./scripts/dandoman.sh --ssl-rotate or the Setup rotation menu to apply it."
       ;;
-    --ssl-certbot-renew)
-      docker compose -f "${KLITE_HOME}"/docker-compose.yml exec -it cron /scripts/cron/myaddrdns/certbot.sh check-renew
+    --ssl-renew)
+      docker compose -f "${KLITE_HOME}"/docker-compose.yml exec -T haproxy /scripts/ssl/haproxy-acme.sh renew
+      return $?
       ;;
     --ssl-rotate)
       "${KLITE_HOME}"/scripts/ssl/rotate-ssl-and-restart-haproxy.sh --compose-file "${KLITE_HOME}"/docker-compose.yml --project-name "${PROJ_NAME}"
@@ -1157,7 +1158,7 @@ main() {
   append_path_to_shell_configs
   cd "$KLITE_HOME" || exit
   source .env
-  process_args "$@"  # Process any provided command line arguments
+  process_args "$@" || return $?  # Preserve failures from noninteractive commands.
   # install_dependencies || { echo "Failed to install dependencies."; exit 0; }
   if [ "$show_ui" = true ]; then
     display_ui

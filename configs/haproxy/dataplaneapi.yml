@@ -1,0 +1,27 @@
+config_version: 2
+name: dandelion-ingress
+dataplaneapi:
+  scheme: [unix]
+  socket_path: /var/run/dataplaneapi.sock
+  disable_inotify: true
+  user:
+    # No API login is enabled. ACME uses the master socket, not HTTP endpoints.
+    - name: disabled
+      password: "!"
+      insecure: false
+  resources:
+    ssl_certs_dir: /var/lib/haproxy/ssl
+    dataplane_storage_dir: /var/lib/dataplaneapi
+    maps_dir: /var/lib/dataplaneapi/maps
+    spoe_dir: /var/lib/dataplaneapi/spoe
+    general_storage_dir: /var/lib/dataplaneapi/general
+haproxy:
+  config_file: /var/lib/dataplaneapi/haproxy.cfg
+  master_runtime: /var/run/haproxy-master.sock
+  master_worker_mode: true
+  reload:
+    reload_strategy: s6
+log_targets:
+  - log_to: stdout
+    log_level: info
+    log_types: [app]

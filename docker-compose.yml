@@ -337,9 +337,8 @@ services:
       MYADDR_TOKEN: ${MYADDR_TOKEN:-}
       MYADDR_IP: ${MYADDR_IP:-}
       MYADDR_ACME_CHALLENGE: ${MYADDR_ACME_CHALLENGE:-}
-      CERTBOT_ENABLED: ${CERTBOT_ENABLED:-}
-      CERTBOT_EMAIL: ${CERTBOT_EMAIL:-}
-      CERTBOT_DNS_PROPAGATION_SECONDS: ${CERTBOT_DNS_PROPAGATION_SECONDS:-60}
+      # Prevent the DDNS job from replacing HAProxy's active TXT challenge.
+      ACME_ENABLED: ${ACME_ENABLED:-}
       CARDANO_TOKEN_REGISTRY_GITHUB_ORGANIZATION: ${CARDANO_TOKEN_REGISTRY_GITHUB_ORGANIZATION}
       CARDANO_TOKEN_REGISTRY_GITHUB_PROJECT_NAME: ${CARDANO_TOKEN_REGISTRY_GITHUB_PROJECT_NAME}
       CARDANO_TOKEN_REGISTRY_GITHUB_MAPPINGS_FOLDER: ${CARDANO_TOKEN_REGISTRY_GITHUB_MAPPINGS_FOLDER}
@@ -351,8 +350,6 @@ services:
       - ./configs/cardano/config/network/${NETWORK}:/config:ro
       - node-ipc:/node-ipc
       - ./logs/cron:/var/log/
-      - ./configs/ssl/:/data/ssl/
-      - ./secrets/letsencrypt/:/etc/letsencrypt/
     restart: always
     depends_on:
       postgress:
@@ -466,7 +463,9 @@ services:
 #################################
 
   haproxy:
-    image: haproxy:2.9.0-bookworm
+    build:
+      context: .
+      dockerfile: ./src/haproxy/Dockerfile
     hostname: ${HAPROXY_HOST}
     environment:
       # variables accesible in config/haproxy/haproxy.conf
@@ -474,10 +473,14 @@ services:
       HAPROXY_WORKER_THREADS: "${HAPROXY_WORKER_THREADS:-8}"
       HAPROXY_IP_BLACKLIST: /usr/local/etc/haproxy/ip-blacklist.lst
       HAPROXY_ORIGIN_WHITELIST: /usr/local/etc/haproxy/origin-whitelist.map
+      ACME_ENABLED: ${ACME_ENABLED:-}
+      MYADDR_DOMAIN: ${MYADDR_DOMAIN:-}
+      MYADDR_TOKEN: ${MYADDR_TOKEN:-}
     volumes:
       - ./configs/haproxy/:/usr/local/etc/haproxy/:ro
       - ./scripts/:/scripts/:ro
-      - ./secrets/ssl/server.pem:/etc/ssl/server.pem:ro
+      # Directory mount allows native certificate replacement; never share with cron.
+      - ./secrets/ssl/:/var/lib/haproxy/ssl/
     configs:
       - source: manifest_json
         target: /usr/local/etc/www/manifest.json
@@ -486,7 +489,7 @@ services:
     ports:
       - ${HAPROXY_BINDED_HOST}${HAPROXY_PORT:-8053}:8053
     healthcheck:
-      test: ["CMD-SHELL", "haproxy -c -- /usr/local/etc/haproxy/haproxy.cfg"]
+      test: ["CMD-SHELL", "haproxy -c -f /usr/local/etc/haproxy/haproxy.cfg && curl --silent --max-time 3 --unix-socket /var/run/dataplaneapi.sock --output /dev/null http://localhost/v3/info"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -740,4 +743,3 @@ configs:
               charset utf-8;
           }
       }
-

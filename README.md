@@ -249,19 +249,16 @@ This will **WIPE ALL YOUR DEPLOYMENT DATA** and will restore a previous backup:
 
 ### SSL
 
-You can terminate your connections with SSL encryption by setting up SSL certificate on Haproxy
+SSL is optional. In TLS mode, `ACME_ENABLED=true` with matching `MYADDR_DOMAIN`
+and `MYADDR_TOKEN` enables native HAProxy DNS-01 issuance, renewal and activation.
+No additional public port or routine manual rotation is needed. Manual/self-signed
+TLS remains available with automation disabled; plaintext is selected by `.if 0`
+in the `TLS mode` block of `configs/haproxy/haproxy.cfg`.
 
-1. Place the active HAProxy PEM at `secrets/ssl/server.pem`. Certbot and manual renewal workflows write a temporary candidate to `configs/ssl/server.pem` first. You can create a self signed certificate like this `$ ./scripts/ssl/keygen.sh <domain> <file-prefix>"`
-2. Uncomment SSL line and comment the default one on `config/haproxy/haproxy.cfg`, like this:
-
-```
-frontend app
-  # for non SSL encription termination
-  # bind 0.0.0.0:8053
-  ## If using SSL, comment line above and uncomment line below
-  bind 0.0.0.0:8053 ssl crt /etc/ssl/server.pem no-sslv3
-
-```
+Active private state stays in `secrets/ssl/`, which ingress enforces as owner-only
+(`0700`). Read [SSL operation and migration](docs/ssl.md) and
+[Native ACME With MyAddr](docs/ACME.md) before upgrading, including the one-time
+recreation steps and certificate permission requirements.
 
 
 ### Dynamic DNS
