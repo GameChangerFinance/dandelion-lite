@@ -44,6 +44,19 @@ not a migration detector:
 After that, routine renewal is automatic. Do not schedule `--ssl-renew`; repeated
 manual requests can waste CA rate limits.
 
+HAProxy does not use a fixed Dandelion cron schedule for ACME. Each certificate
+has a native ACME task whose next run is based on the certificate expiration
+date. Operators should inspect the exact next renewal with:
+
+```sh
+docker compose exec -T haproxy /scripts/ssl/haproxy-acme.sh status
+```
+
+The `scheduled date (UTC)` and `scheduled in` columns are the source of truth.
+For ordinary Let's Encrypt 90-day certificates this is expected to be near the
+end of the lifetime, but the repo intentionally does not encode a renewal day
+threshold.
+
 If `TLS_ENABLED=true` and automatic mode is disabled, HAProxy uses manual TLS and
 expects `secrets/ssl/server.pem` to already exist. If `ACME_ENABLED=true` but
 MyAddr credentials are incomplete, startup fails with an operator-facing error.

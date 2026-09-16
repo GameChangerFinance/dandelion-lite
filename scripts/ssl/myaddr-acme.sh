@@ -4,6 +4,16 @@ set -eu
 
 log() { printf '%s %s %s\n' "$(date -u '+%Y-%m-%dT%H:%M:%SZ')" "$1" "$2" >&2; }
 fail() { log '❌' "MyAddr ACME: $1"; exit 1; }
+trim_crlf() {
+    # MyAddr returns text/plain bodies; tolerate trailing line endings only.
+    awk 'BEGIN { ORS="" } { text = text $0 "\n" } END { sub(/\n$/, "", text); gsub(/\r$/, "", text); print text }'
+}
+sanitize_body() {
+    body=$(printf '%s' "$1" | tr '\r\n' '  ')
+    [ -z "${MYADDR_TOKEN:-}" ] || body=$(printf '%s' "$body" | sed "s/$(printf '%s' "$MYADDR_TOKEN" | sed 's/[.[\*^$()+?{}|\\/]/\\&/g')/<redacted-token>/g")
+    [ -z "${REC_DATA:-}" ] || body=$(printf '%s' "$body" | sed "s/$(printf '%s' "$REC_DATA" | sed 's/[.[\*^$()+?{}|\\/]/\\&/g')/<redacted-challenge>/g")
+    printf '%.200s' "$body"
+}
 usage() {
     printf '%s\n' 'Usage: invoked by HAProxy Data Plane API with ACTION, ZONE, REC_NAME, REC_TYPE, REC_DATA.' \
         'Requires ACME_ENABLED=true, MYADDR_DOMAIN (registration label), MYADDR_TOKEN.'
@@ -44,12 +54,13 @@ log 'ℹ️' "MyAddr ACME ${action} request for ${record%.}."
 response=$(printf '%s' "$MYADDR_TOKEN" | curl --silent --show-error \
     --proto '=https' --connect-timeout 10 --max-time 30 --max-filesize 4096 \
     --data-urlencode key@- --data-urlencode "acme_challenge=$REC_DATA" \
-    --write-out '\n%{http_code}' https://myaddr.io/update) || fail 'Request failed; check outbound HTTPS and MyAddr availability.'
+    --write-out '\n%{http_code}' https://myaddr.tools/update) || fail 'Request failed; check outbound HTTPS and MyAddr availability.'
 code=${response##*'
 '}
 body=${response%'
 '*}
-[ "$code" = 200 ] || fail "Provider returned HTTP $code; check the token and registration."
+body_cmp=$(printf '%s' "$body" | trim_crlf)
+[ "$code" = 200 ] || fail "Provider returned HTTP $code: $(sanitize_body "$body")"
 # Do not echo an untrusted provider response (it could contain credentials).
-[ "$body" = OK ] || fail 'Provider did not return OK.'
+[ "$body_cmp" = OK ] || fail "Provider did not return OK: $(sanitize_body "$body")"
 log '✅' "MyAddr ACME ${action} accepted for ${record%.}."

@@ -141,6 +141,12 @@ long-lived self-signed PEM can postpone issuance. Fresh empty storage issues
 automatically. Subsequent renewals are unattended; do not schedule the manual
 renew command or run it repeatedly against production CA rate limits.
 
+There is no Dandelion cron interval for ACME renewal. HAProxy owns the renewal
+task and schedules each certificate from its expiration date. The authoritative
+next-run time is the `scheduled date (UTC)` / `scheduled in` fields from
+`haproxy-acme.sh status`; do not rely on a hardcoded number of days in scripts
+or docs.
+
 ## Status And Recovery
 
 From the deployment host:
@@ -157,6 +163,12 @@ an asynchronous request, not completed issuance. `status` reports the native
 schedule/state. Check logs for provider, DNS, CA and certificate-storage errors;
 also check the certificate actually served to clients. Runtime status alone does
 not prove persistence succeeded.
+
+`status` states are HAProxy task states: `Running` means an issuance/renewal task
+is active, `Scheduled` means the certificate is usable and has a future renewal
+time, and `Stopped` means no task is currently scheduled. If `expires in` is not
+`0d`, the loaded certificate is still valid; use the scheduled fields to know
+when HAProxy will try again.
 
 A failed ACME attempt does not replace the last usable certificate. An expired
 certificate still causes client failures: monitor expiry and logs. If storage
