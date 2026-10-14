@@ -37,40 +37,9 @@ Mainnet uses `--mainnet`; preprod uses testnet magic `1`; preview uses testnet m
 
 ## SSL
 
-`ssl/` is a temporary input location for certificate renewal workflows. It is mounted read/write only into the cron container at `/data/ssl/`.
-
-Active HAProxy certificates are not read from `configs/ssl/`. HAProxy reads the active PEM from:
-
-```text
-secrets/ssl/server.pem
-```
-
-The certbot/MyAddr cron workflow and manual renewal workflows write the candidate PEM to:
-
-```text
-configs/ssl/server.pem
-```
-
-To activate a candidate certificate, run from the repository root:
-
-```sh
-./scripts/ssl/rotate-ssl-and-restart-haproxy.sh
-```
-
-The same action is available in `scripts/dandoman.sh` under `Setup` > `Rotate SSL and Restart HAProxy`.
-
-Rotation behavior:
-
-- moves `configs/ssl/server.pem` to `secrets/ssl/server.pem`
-- backs up the previous active cert as `secrets/ssl/server.pem.old.1`
-- shifts older backups up to `.old.3`
-- restarts only the `haproxy` service with Docker Compose
-
-If there is no `configs/ssl/server.pem`, the rotation script exits without changing HAProxy.
-
-Cron certbot logs are written to `logs/cron/myaddrdns_certbot.log`. Operators should check that log for renewal activity and then rotate the candidate PEM when ready.
-
-Certbot account and renewal state is stored under `secrets/letsencrypt/` and mounted only into the cron container at `/etc/letsencrypt/`. Do not move that state into `configs/ssl/`; `configs/ssl/` is only the temporary PEM handoff directory.
+TLS configuration and operational guidance are centralized in
+[docs/ssl.md](../docs/ssl.md). This directory contains only HAProxy configuration;
+private certificate state belongs in `secrets/ssl/`, never `configs/`.
 
 ## Cardano
 

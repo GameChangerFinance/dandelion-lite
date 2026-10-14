@@ -8,16 +8,6 @@ NAME="dandoman"
 script_dir=$(dirname "$(realpath "${BASH_SOURCE[@]}")")
 # Remove the last folder from the path and rename it to KLITE_HOME
 KLITE_HOME=$(dirname "$script_dir")
-path_line="export PATH=\"$script_dir:\$PATH\""
-
-# Append path_line to shell configuration files
-append_path_to_shell_configs() {
-  for file in "$HOME/.bashrc" "$HOME/.zshrc"; do
-    if [ -f "$file" ] && ! grep -Fxq "$path_line" "$file"; then
-      echo "$path_line" >> "$file"
-    fi
-  done
-}
 
 # Function definitions
 install_dependencies() {
@@ -442,8 +432,8 @@ handle_env_file() {
     action=$(gum choose --height 15 --item.foreground 39 --cursor.foreground 121 "Add Entry" "Edit Entry" "Remove Entry" "View File" "Reset Config" "$(gum style --foreground 208 "Back")")
     case "$action" in
       "Add Entry")
-        key=$(gum input --placeholder "Enter key")
-        value=$(gum input --placeholder "Enter value")
+        key=$(gum input --placeholder "Enter key (example: HAPROXY_PORT)")
+        value=$(gum input --placeholder "Enter value (example: 8053)")
         # Check if key or value is empty
         if [[ -z "$key" || -z "$value" ]]; then
           echo "Key or value cannot be empty. Entry not added."
@@ -461,7 +451,7 @@ handle_env_file() {
         if [[ -z "$key" ]]; then
           echo "No key selected for editing."
         else
-          new_value=$(gum input --placeholder "Enter new value for $key")
+          new_value=$(gum input --placeholder "Enter new value for $key (example: 8053)")
           # Check if new value is empty or the same as the existing value
           if [[ -z "$new_value" ]]; then
             echo "New value cannot be empty. Entry not edited."
@@ -575,7 +565,7 @@ menu() {
 
             "Setup")
               # Submenu for Setup with plain text options
-              setup_choice=$(gum choose --height 15 --cursor.foreground 229 --item.foreground 39 "Initialise Postgres" "Reset Postgres" "Full Backup" "Full Restore" "Download Backup" "Create Self-Signed SSL Candidate" "Check/Renew SSL Candidate" "Rotate SSL and Restart HAProxy" "Run on system start"  "$(gum style --foreground 208 "Back")")
+              setup_choice=$(gum choose --height 15 --cursor.foreground 229 --item.foreground 39 "Initialise Postgres" "Reset Postgres" "Full Backup" "Full Restore" "Download Backup" "Create Self-Signed SSL and Apply" "Renew Automatic SSL and Apply" "Check SSL Status" "Run on system start"  "$(gum style --foreground 208 "Back")")
 
               case "$setup_choice" in
                 #"Initialise Cardano Node")
@@ -635,10 +625,10 @@ menu() {
                   ;;
                 "Download Backup")
                   backupDir="${BACKUP_DIR:-$(pwd)}"
-                  read -p "Enter the URL for remote backup download (with trailing slash): " url
-                  read -p "Enter remote username (optional): " username
+                  read -p "Enter the URL for remote backup download with trailing slash (example: https://node.example/backups/): " url
+                  read -p "Enter remote username, optional (example: backup): " username
                   # Prompt for password silently
-                  read -s -p "Enter remote password (optional): " password
+                  read -s -p "Enter remote password, optional (example: leave empty for no password): " password
                   echo
                   echo "About to download backups from '${url}' into '${backupDir}'"
                   read -p "Press key to continue.. (Ctrl + C to abort)" -n1 -s
@@ -646,30 +636,23 @@ menu() {
                   read -r -p "Press enter to continue"
                   show_splash_screen
                   ;;
-                "Create Self-Signed SSL Candidate")
-                  read -r -p "Domain/Common Name for self-signed certificate: " ssl_domain
+                "Create Self-Signed SSL and Apply")
+                  read -r -p "Domain/Common Name for self-signed certificate (example: node.example.com): " ssl_domain
                   if [ -z "$ssl_domain" ]; then
-                    echo "Missing domain/common name. Nothing was generated."
+                    echo "⚠️ Missing domain/common name. Nothing was changed."
                   else
-                    mkdir -p "${KLITE_HOME}/configs/ssl"
-                    ssl_tmp_dir=$(mktemp -d)
-                    ssl_prefix="${ssl_tmp_dir}/self-signed-"
-                    "${KLITE_HOME}"/scripts/ssl/keygen.sh "$ssl_domain" "$ssl_prefix"
-                    mv "${ssl_prefix}server.pem" "${KLITE_HOME}/configs/ssl/server.pem"
-                    rm -rf "$ssl_tmp_dir"
-                    echo "Self-signed SSL candidate created at configs/ssl/server.pem."
-                    echo "Run Setup -> Rotate SSL and Restart HAProxy to apply it as secrets/ssl/server.pem."
+                    run_ssl_self_signed "$ssl_domain"
                   fi
                   read -r -p "Press enter to continue"
                   show_splash_screen
                   ;;
-                "Check/Renew SSL Candidate")
-                  docker compose -f "${KLITE_HOME}"/docker-compose.yml exec -it cron /scripts/cron/myaddrdns/certbot.sh check-renew
+                "Renew Automatic SSL and Apply")
+                  run_ssl_renew
                   read -r -p "Press enter to continue"
                   show_splash_screen
                   ;;
-                "Rotate SSL and Restart HAProxy")
-                  "${KLITE_HOME}"/scripts/ssl/rotate-ssl-and-restart-haproxy.sh --compose-file "${KLITE_HOME}"/docker-compose.yml --project-name "${PROJ_NAME}"
+                "Check SSL Status")
+                  run_ssl_status
                   read -r -p "Press enter to continue"
                   show_splash_screen
                   ;;
@@ -1006,9 +989,31 @@ display_help_usage() {
   echo -e "--enter-dbsync: \t\t Accesses the DBSync container."
   echo -e "--logs-dbsync: \t\t\t Displays logs for the DBSync container."
   echo -e "--enter-haproxy: \t\t Accesses the HAProxy container."
-  echo -e "--ssl-self-signed: \t Creates a self-signed SSL candidate at configs/ssl/server.pem."
-  echo -e "--ssl-certbot-renew: \t Runs Certbot in the cron container and writes configs/ssl/server.pem."
-  echo -e "--ssl-rotate: \t\t Promotes configs/ssl/server.pem to secrets/ssl/server.pem and restarts HAProxy."
+  echo -e "--ssl-self-signed <name>: \t Creates and applies a self-signed SSL certificate, then restarts HAProxy."
+  echo -e "--ssl-renew: \t Requests native MyAddr SSL renewal; HAProxy applies it automatically on success."
+  echo -e "--ssl-status: \t\t Shows safe TLS, certificate and native ACME status."
+}
+
+confirm_ssl_action() {
+  echo "⚠️ $1"
+  read -r -p "Press Enter to continue, or Ctrl-C to abort: "
+}
+
+run_ssl_self_signed() {
+  local ssl_domain=$1
+  confirm_ssl_action "About to create a self-signed certificate for ${ssl_domain} at secrets/ssl/server.pem. HAProxy will restart to apply it; no further action is needed for it to take effect."
+  "${KLITE_HOME}"/scripts/ssl/create-self-signed-ssl-and-apply.sh "$ssl_domain" --compose-file "${KLITE_HOME}/docker-compose.yml" --project-name "${PROJ_NAME}" || return $?
+  echo '✅ Self-signed SSL is active at secrets/ssl/server.pem. HAProxy restarted; no further action is needed.'
+}
+
+run_ssl_renew() {
+  confirm_ssl_action 'About to request automatic SSL renewal. On success, HAProxy will store it at secrets/ssl/server.pem and apply it automatically; no further action is needed.'
+  docker compose -f "${KLITE_HOME}"/docker-compose.yml exec -T haproxy /scripts/ssl/haproxy-acme.sh renew || return $?
+  echo '✅ Automatic SSL renewal was requested. On success, HAProxy stores and applies the certificate automatically; no further action is needed.'
+}
+
+run_ssl_status() {
+  "${KLITE_HOME}"/scripts/ssl/check-ssl-status.sh --compose-file "${KLITE_HOME}/docker-compose.yml" --project-name "${PROJ_NAME}"
 }
 
 # Function to process command line arguments
@@ -1085,24 +1090,19 @@ process_args() {
       ;;
     --ssl-self-signed)
       ssl_domain="${2:-}"
-      if [ -z "$ssl_domain" ]; then
+      if [ -z "$ssl_domain" ] || [ $# -ne 2 ]; then
         echo "Usage: ./scripts/dandoman.sh --ssl-self-signed <domain-or-common-name>"
         exit 1
       fi
-      mkdir -p "${KLITE_HOME}/configs/ssl"
-      ssl_tmp_dir=$(mktemp -d)
-      ssl_prefix="${ssl_tmp_dir}/self-signed-"
-      "${KLITE_HOME}"/scripts/ssl/keygen.sh "$ssl_domain" "$ssl_prefix"
-      mv "${ssl_prefix}server.pem" "${KLITE_HOME}/configs/ssl/server.pem"
-      rm -rf "$ssl_tmp_dir"
-      echo "Self-signed SSL candidate created at configs/ssl/server.pem."
-      echo "Run ./scripts/dandoman.sh --ssl-rotate or the Setup rotation menu to apply it."
+      run_ssl_self_signed "$ssl_domain"
       ;;
-    --ssl-certbot-renew)
-      docker compose -f "${KLITE_HOME}"/docker-compose.yml exec -it cron /scripts/cron/myaddrdns/certbot.sh check-renew
+    --ssl-renew)
+      [ $# -eq 1 ] || { echo 'Usage: ./scripts/dandoman.sh --ssl-renew'; exit 1; }
+      run_ssl_renew
       ;;
-    --ssl-rotate)
-      "${KLITE_HOME}"/scripts/ssl/rotate-ssl-and-restart-haproxy.sh --compose-file "${KLITE_HOME}"/docker-compose.yml --project-name "${PROJ_NAME}"
+    --ssl-status)
+      [ $# -eq 1 ] || { echo 'Usage: ./scripts/dandoman.sh --ssl-status'; exit 1; }
+      run_ssl_status
       ;;
     --help|-h)
       display_help_usage
@@ -1154,10 +1154,9 @@ show_colors(){
 
 # Main function to orchestrate script execution
 main() {
-  append_path_to_shell_configs
   cd "$KLITE_HOME" || exit
   source .env
-  process_args "$@"  # Process any provided command line arguments
+  process_args "$@" || return $?  # Preserve failures from noninteractive commands.
   # install_dependencies || { echo "Failed to install dependencies."; exit 0; }
   if [ "$show_ui" = true ]; then
     display_ui

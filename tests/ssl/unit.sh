@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+set -euo pipefail
+root=$(cd "$(dirname "$0")/../.." && pwd)
+cd "$root"
+mkdir -p tests/ssl/.work
+export FIXTURE
+FIXTURE=$(mktemp -d "$root/tests/ssl/.work/unit.XXXXXX")
+mkdir "$FIXTURE/bin"
+cp tests/ssl/fixtures/curl.sh "$FIXTURE/bin/curl"
+chmod +x "$FIXTURE/bin/curl"
+export PATH="$FIXTURE/bin:$PATH"
+export ACME_ENABLED=true MYADDR_TOKEN='fixture&secret=with spaces' MYADDR_DOMAIN=fixture
+export ACTION=set ZONE=myaddr.io. REC_TYPE=TXT REC_NAME=_acme-challenge.fixture.myaddr.io
+export REC_DATA=0123456789012345678901234567890123456789012
+adapter=scripts/ssl/myaddr-acme.sh
+expect_failure() {
+    if "$@" > "$FIXTURE/out" 2> "$FIXTURE/err"; then
+        echo 'Expected failure' >&2; exit 1
+    fi
+    ! grep -Fq "$MYADDR_TOKEN" "$FIXTURE/out" "$FIXTURE/err"
+}
+"$adapter" > "$FIXTURE/out" 2> "$FIXTURE/err"
+test ! -s "$FIXTURE/out"
+grep -Eq '^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z .* MyAddr ACME set' "$FIXTURE/err"
+! grep -Fq "$MYADDR_TOKEN" "$FIXTURE/err"
+! grep -Fq "$REC_DATA" "$FIXTURE/err"
+grep -Fxq 'key@-' "$FIXTURE/args"
+grep -Fxq "acme_challenge=$REC_DATA" "$FIXTURE/args"
+grep -Fxq https://myaddr.tools/update "$FIXTURE/args"
+MOCK_BODY=$(printf 'OK\r') "$adapter" > "$FIXTURE/out" 2> "$FIXTURE/err"
+test ! -s "$FIXTURE/out"
+MOCK_BODY=$(printf 'OK\r\n') "$adapter" > "$FIXTURE/out" 2> "$FIXTURE/err"
+test ! -s "$FIXTURE/out"
+ACTION=append "$adapter"
+MYADDR_DOMAIN=FIXTURE "$adapter"
+expect_failure env ACME_ENABLED=false "$adapter"
+expect_failure env -u ACME_ENABLED "$adapter"
+expect_failure env -u MYADDR_TOKEN "$adapter"
+expect_failure env -u MYADDR_DOMAIN "$adapter"
+expect_failure env MYADDR_DOMAIN='../other' "$adapter"
+expect_failure env REC_NAME=_acme-challenge.other.myaddr.io "$adapter"
+expect_failure env ZONE=example.org "$adapter"
+expect_failure env -u ZONE "$adapter"
+expect_failure env REC_TYPE=A "$adapter"
+expect_failure env ACTION=get "$adapter"
+expect_failure env REC_DATA='x; echo injected' "$adapter"
+expect_failure env MOCK_CODE=403 "$adapter"
+grep -q 'Provider returned HTTP 403: OK' "$FIXTURE/err"
+expect_failure env MOCK_BODY=' OK ' "$adapter"
+expect_failure env MOCK_BODY='OK extra' "$adapter"
+expect_failure env MOCK_BODY="$MYADDR_TOKEN" "$adapter"
+grep -q '<redacted-token>' "$FIXTURE/err"
+expect_failure env MOCK_BODY="$REC_DATA" "$adapter"
+grep -q '<redacted-challenge>' "$FIXTURE/err"
+expect_failure env MOCK_FAILURE=28 "$adapter"
+# Cleanup never calls curl, even when the network is unavailable.
+ACTION=delete MOCK_FAILURE=99 "$adapter"
+expect_failure "$adapter" unexpected
+"$adapter" --help >/dev/null
+expect_failure scripts/ssl/haproxy-acme.sh
+expect_failure scripts/ssl/haproxy-acme.sh renew extra
+expect_failure env ACME_ENABLED=false scripts/ssl/haproxy-acme.sh renew
+expect_failure env -u ACME_ENABLED scripts/ssl/haproxy-acme.sh renew
+echo 'PASS: adapter contract, validation, failure/timeout handling, cleanup and credential non-disclosure.'

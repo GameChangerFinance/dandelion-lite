@@ -1,4 +1,5 @@
 .env
+.ssl-test/
 .*status
 .dependency_installation_status
 *.swp

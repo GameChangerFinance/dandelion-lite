@@ -25,16 +25,16 @@ else
   echo "Setting your '<DOMAIN>.myaddr.<tools|dev|io>' domain IP address to be '$CURRENT_IP' ..."
 fi
 
-# Build request payload
-POST_DATA="key=${MYADDR_TOKEN}&ip=${IP_TO_USE}"
+# Keep the token out of process arguments and encode operator-supplied values.
+POST_ARGS=(--data-urlencode key@- --data-urlencode "ip=${IP_TO_USE}")
 
-# Include ACME challenge if set
-if [[ -n ${MYADDR_ACME_CHALLENGE} ]]; then
-  POST_DATA="${POST_DATA}&acme_challenge=${MYADDR_ACME_CHALLENGE}"
+# Native ACME owns TXT updates in automatic mode; stale static values must not race it.
+if [[ -n ${MYADDR_ACME_CHALLENGE} && ${ACME_ENABLED:-} != true ]]; then
+  POST_ARGS+=(--data-urlencode "acme_challenge=${MYADDR_ACME_CHALLENGE}")
 fi
 
 # Perform the update
-RESPONSE=$(curl -s -X POST -d "${POST_DATA}" "${UPDATE_URL}")
+RESPONSE=$(printf '%s' "$MYADDR_TOKEN" | curl -s -X POST "${POST_ARGS[@]}" "${UPDATE_URL}")
 echo "Update Response: ${RESPONSE}"
 
 echo

@@ -22,6 +22,10 @@ ___  ____ __ _ ___  ____ _    _ ____ __ _
 
 For the project goal and broader Dandelion concept, read [docs/concept.md](docs/concept.md).
 
+## Documentation
+
+Operator and architecture guides are centralized in [docs/README.md](docs/README.md).
+
 ## Components
 
 This setup includes several key components:
@@ -60,12 +64,13 @@ Each service is containerized and managed via Podman (as an alias of Docker) and
 
 ## Hardware Requirements:
 
-**Last updated: 18/06/2026**
+**Last updated: 14/10/2026**
 
 Suggested setup for concurrent **Cardano Mainnet** and **Preproduction Testnet** with volume backups consists on
 
 - 128GB RAM (DDR4 ECC RAM)
-- 2TB M2 NVME for full storage (OS + docker images + volumes + backups)
+- 2TB M2 NVME for container storage (OS + docker images + volumes)
+- 1TB M2 NVME (internal or external) for volume backups
 - Dual Intel Xeon E5 2680 v4 (LGA 2011-3 motherboard)
 
 ### Storage Requirements
@@ -84,47 +89,52 @@ Suggested setup for concurrent **Cardano Mainnet** and **Preproduction Testnet**
   </thead>
   <tbody>
     <tr>
-      <td rowspan="5">mainnet</td>
+      <td rowspan="6">mainnet</td>
       <td>db-sync-data</td>
-      <td>25G</td>
-      <td rowspan="5">724.23G</td>
-      <td>1.4G</td>
-      <td rowspan="5">357.385G</td>
-      <td rowspan="5">~1.08T</td>
+      <td>7.4G</td>
+      <td rowspan="6">1.2T</td>
+      <td>5.0G</td>
+      <td rowspan="6">373G</td>
+      <td rowspan="6">~1.57T</td>
     </tr>
     <tr>
       <td>node-db</td>
-      <td>187G</td>
-      <td>120G</td>
+      <td>230G</td>
+      <td>122G</td>
     </tr>
     <tr>
       <td>node-ipc</td>
       <td>8.0K</td>
-      <td>92</td>
+      <td>90</td>
+    </tr>
+    <tr>
+      <td>pgadmin-data</td>
+      <td>200K</td>
+      <td>12K</td>
     </tr>
     <tr>
       <td>postgresdb</td>
-      <td>512G</td>
-      <td>236G</td>
+      <td>958G</td>
+      <td>246G</td>
     </tr>
     <tr>
       <td>unimatrix-data</td>
       <td>8.0K</td>
-      <td>92</td>
+      <td>91</td>
     </tr>
     <tr>
-      <td rowspan="5">preprod</td>
+      <td rowspan="6">preprod</td>
       <td>db-sync-data</td>
-      <td>3.9G</td>
-      <td rowspan="5">27.94G</td>
-      <td>1.4G</td>
-      <td rowspan="5">24.585G</td>
-      <td rowspan="5">~52.5G</td>
+      <td>2.9G</td>
+      <td rowspan="6">84.9G</td>
+      <td>1.7G</td>
+      <td rowspan="6">28.3G</td>
+      <td rowspan="6">~113.2G</td>
     </tr>
     <tr>
       <td>node-db</td>
-      <td>8.8G</td>
-      <td>8.2G</td>
+      <td>22G</td>
+      <td>9.6G</td>
     </tr>
     <tr>
       <td>node-ipc</td>
@@ -132,9 +142,14 @@ Suggested setup for concurrent **Cardano Mainnet** and **Preproduction Testnet**
       <td>92</td>
     </tr>
     <tr>
+      <td>pgadmin-data</td>
+      <td>800K</td>
+      <td>15K</td>
+    </tr>
+    <tr>
       <td>postgresdb</td>
-      <td>16G</td>
-      <td>15G</td>
+      <td>60G</td>
+      <td>17G</td>
     </tr>
     <tr>
       <td>unimatrix-data</td>
@@ -249,19 +264,8 @@ This will **WIPE ALL YOUR DEPLOYMENT DATA** and will restore a previous backup:
 
 ### SSL
 
-You can terminate your connections with SSL encryption by setting up SSL certificate on Haproxy
-
-1. Place the active HAProxy PEM at `secrets/ssl/server.pem`. Certbot and manual renewal workflows write a temporary candidate to `configs/ssl/server.pem` first. You can create a self signed certificate like this `$ ./scripts/ssl/keygen.sh <domain> <file-prefix>"`
-2. Uncomment SSL line and comment the default one on `config/haproxy/haproxy.cfg`, like this:
-
-```
-frontend app
-  # for non SSL encription termination
-  # bind 0.0.0.0:8053
-  ## If using SSL, comment line above and uncomment line below
-  bind 0.0.0.0:8053 ssl crt /etc/ssl/server.pem no-sslv3
-
-```
+SSL is optional. All TLS, automatic MyAddr ACME, self-signed, custom-certificate,
+status and migration instructions are centralized in [SSL](docs/ssl.md).
 
 
 ### Dynamic DNS
