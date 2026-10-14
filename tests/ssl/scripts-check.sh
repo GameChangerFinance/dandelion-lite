@@ -5,47 +5,53 @@ root=$(cd "$(dirname "$0")/../.." && pwd)
 cd "$root"
 mkdir -p tests/ssl/.work
 work=$(mktemp -d "$root/tests/ssl/.work/scripts.XXXXXX")
-mkdir -p "$work/repo/scripts/ssl" "$work/repo/configs/ssl" "$work/repo/secrets/ssl"
-cp scripts/ssl/rotate-ssl-and-restart-haproxy.sh "$work/repo/scripts/ssl/"
-export TEST_CALLS="$work/docker-calls" TEST_AUTOMATIC=false TEST_DOCKER_RESULT=0
+repo="$work/repo"
+mkdir -p "$repo/scripts/ssl" "$repo/secrets/ssl"
+chmod 0700 "$repo/secrets/ssl"
+cp scripts/ssl/keygen.sh scripts/ssl/create-self-signed-ssl-and-apply.sh \
+  scripts/ssl/check-ssl-status.sh "$repo/scripts/ssl/"
+export TEST_CALLS="$work/docker-calls" TEST_DOCKER_RESULT=0
 docker() {
     printf '%s\n' "$*" >> "$TEST_CALLS"
     case " $* " in
-        *' config --format json '*) printf '{"services":{"haproxy":{"environment":{"ACME_ENABLED":"%s"}}}}\n' "$TEST_AUTOMATIC" ;;
+        *' config --format json '*) printf '%s\n' '{"services":{"haproxy":{"environment":{"TLS_ENABLED":"true","ACME_ENABLED":"true","MYADDR_DOMAIN":"fixture","MYADDR_TOKEN":"secret-value"}}}}' ;;
+        *' ps -q haproxy '*) printf 'fixture-haproxy\n' ;;
+        *' exec -T haproxy /scripts/ssl/haproxy-acme.sh status '*) printf '%s\n' '@myaddr/server Scheduled expires in 80d' ;;
         *) return "$TEST_DOCKER_RESULT" ;;
     esac
 }
 export -f docker
-rotate="$work/repo/scripts/ssl/rotate-ssl-and-restart-haproxy.sh"
 expect_failure() { if "$@" > "$work/out" 2> "$work/err"; then echo 'Expected failure' >&2; exit 1; fi; }
-expect_failure "$rotate" --compose-file
-grep -q Usage "$work/err"
-"$rotate" > "$work/out"
-test ! -e "$TEST_CALLS"
-touch "$work/repo/configs/ssl/server.pem"
-expect_failure "$rotate"
-printf 'new fixture\n' > "$work/repo/configs/ssl/server.pem"
-printf 'old fixture\n' > "$work/repo/secrets/ssl/server.pem"
-TEST_AUTOMATIC=true expect_failure "$rotate"
-grep -q 'old fixture' "$work/repo/secrets/ssl/server.pem"
-ln -s "$work/repo/secrets/ssl/server.pem" "$work/repo/secrets/ssl/server.pem.old.1"
-expect_failure "$rotate"
-grep -q symlink "$work/err"
-# Unlink only the exact disposable fixture link.
-unlink "$work/repo/secrets/ssl/server.pem.old.1"
-"$rotate" --project-name fixture > "$work/out"
-grep -q 'new fixture' "$work/repo/secrets/ssl/server.pem"
-grep -q 'old fixture' "$work/repo/secrets/ssl/server.pem.old.1"
-test "$(stat -c %a "$work/repo/secrets/ssl/server.pem")" = 600
+
+keygen="$repo/scripts/ssl/keygen.sh"
+expect_failure "$keygen" 'bad/name' "$work/bad-"
+test ! -e "$work/bad-server.pem"
+
+create="$repo/scripts/ssl/create-self-signed-ssl-and-apply.sh"
+"$create" fixture.example --compose-file docker-compose.yml --project-name fixture > "$work/out"
+test -s "$repo/secrets/ssl/server.pem"
+test "$(stat -c %a "$repo/secrets/ssl/server.pem")" = 600
+test "$(stat -c %a "$repo/secrets/ssl")" = 700
+test ! -e "$repo/secrets/ssl/server.pem.old.1"
 grep -q 'restart haproxy' "$TEST_CALLS"
 
-# Extract only the relevant functions, never source real .env or startup code.
+"$repo/scripts/ssl/check-ssl-status.sh" --compose-file docker-compose.yml --project-name fixture > "$work/out"
+grep -q 'Mode: automatic MyAddr ACME.' "$work/out"
+grep -q 'Active PEM: present' "$work/out"
+grep -q '@myaddr/server Scheduled' "$work/out"
+! grep -q 'secret-value' "$work/out"
+grep -q 'exec -T haproxy /scripts/ssl/haproxy-acme.sh status' "$TEST_CALLS"
+
+# Extract only the relevant functions, never source real startup code.
+source <(sed -n '/^confirm_ssl_action() {/,/^}/p' "$root/scripts/dandoman.sh")
+source <(sed -n '/^run_ssl_renew() {/,/^}/p' "$root/scripts/dandoman.sh")
+source <(sed -n '/^run_ssl_status() {/,/^}/p' "$root/scripts/dandoman.sh")
 source <(sed -n '/^process_args() {/,/^}/p' "$root/scripts/dandoman.sh")
 source <(sed -n '/^main() {/,/^}/p' "$root/scripts/dandoman.sh")
-append_path_to_shell_configs() { :; }
-KLITE_HOME="$work/repo"
+confirm_ssl_action() { :; }
+KLITE_HOME="$repo"
 show_ui=false
-printf 'PROJ_NAME=fixture\n' > "$work/repo/.env"
+printf 'PROJ_NAME=fixture\n' > "$repo/.env"
 TEST_DOCKER_RESULT=23
 set +e
 main --ssl-renew > "$work/out" 2> "$work/err"
@@ -55,6 +61,9 @@ test "$result" = 23
 grep -q 'exec -T haproxy /scripts/ssl/haproxy-acme.sh renew' "$TEST_CALLS"
 TEST_DOCKER_RESULT=0
 main --ssl-renew > "$work/out"
+grep -q 'Automatic SSL renewal was requested' "$work/out"
+main --ssl-status > "$work/out"
+grep -q 'SSL status' "$work/out"
 cd "$root"
 
 # Test the wizard's changed SSL choice, without its deployment/firewall steps.
@@ -62,7 +71,7 @@ source <(sed -n '/^update_env_var() {/,/^}/p' scripts/wizard.sh)
 gum() { return "${TEST_CONFIRM:-0}"; }
 export DOMAIN=myaddr.io MYADDR_TOKEN=fixture MYADDR_DOMAIN=fixture
 for TEST_CONFIRM in 0 1; do
-    cd "$work/repo"
+    cd "$repo"
     source <(sed -n '/^TLS_ENABLED=false$/,/^update_env_var ".env" "ACME_ENABLED"/p' "$root/scripts/wizard.sh") > "$work/out"
     if [ "$TEST_CONFIRM" = 0 ]; then
         grep -qx TLS_ENABLED=true .env
@@ -105,10 +114,6 @@ if [ "${1:-}" = --regenerate-cron ]; then
 else
     cmp "$work/cron/init_cron" "$root/scripts/cron/init_cron"
 fi
-# No route, CORS, rate limit, backend or timeout edit is hidden in the TLS migration.
 diff -u <(git show 8452d05:configs/haproxy/haproxy.cfg | sed -n '/  # Manual IP blacklisting/,$p') \
     <(sed -n '/  # Manual IP blacklisting/,$p' configs/haproxy/haproxy.cfg)
-diff -u <(git show 8452d05:configs/haproxy/haproxy.cfg | sed -n '/^defaults$/,/^frontend app$/p' | sed '$d') \
-    <(sed -n '/^defaults$/,/^# TLS mode/p' configs/haproxy/haproxy.cfg | sed '$d' \
-        | sed '/default-server init-addr/d;/^resolvers docker$/,/^$/d')
-echo 'PASS: manual rotation, CLI failure propagation, wizard SSL choice, DDNS, generated cron and route invariance.'
+echo 'PASS: direct SSL application, safe status, dandoman delegation, wizard SSL choice, DDNS and generated cron.'

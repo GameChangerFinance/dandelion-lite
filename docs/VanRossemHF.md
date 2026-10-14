@@ -53,11 +53,8 @@ Reference proofs: [`iohk-nix` generates submit-api configs with `TraceOptions.""
 ## SSL And Native ACME
 
 Historical note: the old Certbot candidate workflow was superseded on
-2026-09-16 by native HAProxy/MyAddr renewal. Use [the current SSL guide](ssl.md)
-for setup and migration, and [the ACME guide](ACME.md) for the removal rationale,
-MyAddr exec adapter behavior and current security boundary. Manual/self-signed
-certificates still use `configs/ssl/server.pem` as a candidate and
-`scripts/ssl/rotate-ssl-and-restart-haproxy.sh` for explicit rotation.
+2026-09-16 by native HAProxy/MyAddr renewal. SSL behavior, migration, adapter
+details and the security boundary are centralized in [the SSL guide](ssl.md).
 
 ## Backup Sync
 
@@ -65,8 +62,8 @@ certificates still use `configs/ssl/server.pem` as a candidate and
 
 ## Docs
 
-Updated `README.md`, `configs/README.md`, `secrets/README.md`, dandoman help, and generated education docs for the split services, peer snapshots, SSL staging/rotation, self-signed candidates, native ACME, and current HAProxy certificate path.
+Updated `README.md`, `configs/README.md`, `secrets/README.md`, dandoman help, and generated education docs for the split services, peer snapshots, self-signed certificates, native ACME, and current HAProxy certificate path.
 
 ## Static Verification
 
-Shell syntax checks passed for the edited shell scripts. Repo-wide static searches were run for stale bundled node/Ogmios identifiers and stale HAProxy SSL mount paths; remaining SSL path references describe the intended active secret path or manual certificate candidate path. This is a first commit, WIP.
+Shell syntax checks passed for the edited shell scripts. Repo-wide static searches were run for stale bundled node/Ogmios identifiers and stale HAProxy SSL mount paths. This is a first commit, WIP.

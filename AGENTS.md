@@ -64,6 +64,10 @@ Rules:
 - Do not hide destructive actions.
 - Do not silently change files, volumes, or deployment state without clear logs.
 - Keep backup and restore operations especially conservative.
+- Every `dandoman.sh` action that changes deployment state, especially critical
+  actions, must state what it will do and give the operator a clear chance to
+  cancel before it starts. On completion, show a brief outcome summary and any
+  useful next step.
 
 Emoji convention for shell script messages:
 
@@ -73,6 +77,9 @@ Emoji convention for shell script messages:
 - `✅` final success/completion
 
 Use `✅` sparingly. Prefer one final success status per script or operation instead of marking every intermediate step successful.
+
+Keep semantic emojis minimal and consistent: use `❌` for errors, `⚠️` for risks
+or cancellation points, `ℹ️` for status, and one `✅` for completed work.
 
 ## Wrapper vs Low-Level Helpers
 
@@ -84,6 +91,10 @@ Keep a strict boundary:
 - low-level scripts do one direct task with minimal assumptions
 - low-level scripts should be usable manually during emergencies
 - wrapper logic must not leak complex deployment policy into low-level helpers
+- Keep `dandoman.sh` a thin wrapper around focused helper scripts. When a menu or
+  CLI action needs more than roughly ten lines and has a coherent standalone
+  purpose, move that behavior into `scripts/` and let dandoman handle prompts,
+  summaries and delegation.
 
 Examples:
 
@@ -106,69 +117,18 @@ Rules:
 - Keep script usage examples synchronized with actual call signatures.
 - Avoid stale names after renames.
 - Keep docs explicit about destructive behavior, backup/restore risk, and required operator intent.
+- Keep full operator contracts in focused `docs/` files. Root and directory
+  READMEs should be short pointers, and AGENTS.md should retain only maintainer
+  coding and architectural rules.
+- `docs/ssl.md` is authoritative for TLS behavior and operations;
+  `docs/backups.md` is authoritative for backup operations. Do not duplicate or
+  fork those contracts in READMEs, scripts or AGENTS.md.
 
-## Volume Backup System
+## Backup Implementation
 
-Goal: reduce deployment time and disk risk while keeping backup sync safe, resumable, verifiable, and usable by many operators.
-
-Context:
-
-- Cardano node and database volumes can be very large.
-- Operators may not have enough disk for duplicate temporary files.
-- Downloads can take hours and failures must resume where possible.
-- Backup scripts affect production deploys and must be treated as high risk.
-
-Design rules:
-
-- Do not create duplicate backup artifacts such as `.1`, `.2`, `.3`.
-- Do not use temporary staging copies for large backup payloads.
-- Use the final target filename for in-progress downloads.
-- Let `aria2c` resume before replacing a local file.
-- If a completed transfer still fails checksum verification, wrappers may remove only that single target file and retry once.
-- Hashes are the source of truth; HTTP headers are only an optimization.
-- Remote backup sync must be gated by remote `READY`, `MD5SUMS`, and `SHA256SUMS`.
-- `MD5SUMS` may be used as a fast-change hint to avoid expensive SHA256 hashing before downloads.
-- `SHA256SUMS` remains the final integrity authority and must be regenerated locally after sync before reporting success.
-- If final SHA256 verification fails, move `READY` to `old/READY` instead of deleting it, so the set is clearly marked not-ready.
-- Missing remote `READY` means the remote backup repository is not ready or invalid.
-- `DLT` and `NETWORK` mismatches are hard failures.
-- `CARDANO_NODE_VERSION` and `CARDANO_DB_SYNC_VERSION` mismatches must warn with incoming and local values and require explicit operator intent.
-- `READY` must be plain `KEY=value` metadata, position-agnostic, easy to parse in Bash, and copied verbatim from the remote after a successful full sync.
-- `SHA256SUMS` must use the standard `sha256sum` format:
-
-```text
-<sha256-hex>  <filename>
-```
-
-Required `READY` keys:
-
-```env
-DLT=cardano
-NETWORK=preprod
-CARDANO_NODE_VERSION=11.0.1
-CARDANO_DB_SYNC_VERSION=13.7.1.0
-UPDATED_AT=2026-06-17T00:00:00Z
-```
-
-Do not publish unrelated service versions in `READY`. Avoid exposing versions such as nginx, Blockfrost, Unimatrix, or other unrelated services unless a future task explicitly defines a need and risk model.
-
-## Backup Script Roles
-
-Goal: keep each backup script understandable and replaceable during incidents.
-
-- `backup-volume.sh`: low-level volume export helper.
-- `restore-volume.sh`: low-level volume import helper.
-- `backup-sync.sh`: low-level one-file remote download helper.
-- `full-backup-sync.sh`: wrapper that validates remote backup metadata, discovers expected volumes, and delegates payload downloads.
-- `full-backup.sh`: wrapper for creating a local backup set.
-- `full-restore.sh`: wrapper for restoring local backup sets.
-- `create-backup-checksum.sh`: canonical generator for local `READY`, `MD5SUMS`, and `SHA256SUMS`.
-
-Do not reintroduce `sha256sum-backups.sh`. The canonical checksum script is:
-
-```text
-scripts/docker/create-backup-checksum.sh
-```
+`docs/backups.md` owns the backup protocol, public script roles and operator
+workflow. Preserve those contracts when changing backup code; keep wrappers as
+policy/orchestration layers and low-level helpers narrow and directly usable.
 
 ## Testing Expectations
 
@@ -185,17 +145,8 @@ For shell script changes:
 - avoid touching real Docker volumes unless the user explicitly approves it
 - use fake or isolated Docker command shims/functions only when needed to avoid mutating local deployment state
 
-For backup sync changes, verify at least:
-
-- missing remote `READY`
-- missing or invalid `SHA256SUMS`
-- `DLT` mismatch
-- `NETWORK` mismatch
-- node/db-sync version mismatch warning
-- already-valid local file skip
-- stale local file retry behavior
-- no `.1`, `.2`, `.3` duplicate files
-- `sha256sum -c SHA256SUMS`
+For backup sync changes, run the scenario coverage defined in `docs/backups.md`
+using disposable fixtures; never test against real Docker volumes.
 
 ## Dependency Policy
 

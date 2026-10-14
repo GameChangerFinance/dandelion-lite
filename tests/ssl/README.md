@@ -15,7 +15,7 @@ Requirements: Bash, Git history containing baseline `8452d05`, standard shell to
 | Check | Coverage |
 | --- | --- |
 | unit | Callback validation, encoded requests, missing credentials, provider errors/timeouts, no token in arguments/output, safe cleanup, helper usage |
-| scripts-check | Fixture rotation, automatic-mode refusal, symlinks, dandoman failure propagation, isolated wizard choices, DDNS challenge isolation, generated cron, unchanged HAProxy route/default sections |
+| scripts-check | Direct PEM application without backups, self-signed validation, safe status output, dandoman failure propagation, isolated wizard choices, DDNS challenge isolation and generated cron |
 | container-check | Full configuration parsing, manual HTTPS/plaintext manifest, plaintext renewal refusal, API 401, socket/directory permissions, unprivileged PEM access denial, empty-store automatic parsing |
 | acme-check | Local DNS-01 issuance, requested renewal, automatic renewal of an expired PEM at startup, native persistence and served fingerprint, recreation, CA-outage retention |
 | podman-check | Same container smoke checks under rootless Podman with workspace-local storage/runtime |

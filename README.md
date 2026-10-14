@@ -22,6 +22,10 @@ ___  ____ __ _ ___  ____ _    _ ____ __ _
 
 For the project goal and broader Dandelion concept, read [docs/concept.md](docs/concept.md).
 
+## Documentation
+
+Operator and architecture guides are centralized in [docs/README.md](docs/README.md).
+
 ## Components
 
 This setup includes several key components:
@@ -249,16 +253,8 @@ This will **WIPE ALL YOUR DEPLOYMENT DATA** and will restore a previous backup:
 
 ### SSL
 
-SSL is optional. `TLS_ENABLED=true` enables TLS on the existing HAProxy port.
-With `ACME_ENABLED=true` and matching `MYADDR_DOMAIN` and `MYADDR_TOKEN`,
-HAProxy uses native DNS-01 issuance, renewal and activation. Manual/self-signed
-TLS remains available with automation disabled; plaintext is selected with
-`TLS_ENABLED` empty or false.
-
-Active private state stays in `secrets/ssl/`, which ingress enforces as owner-only
-(`0700`). Read [SSL operation and migration](docs/ssl.md) and
-[Native ACME With MyAddr](docs/ACME.md) before upgrading, including the one-time
-recreation steps and certificate permission requirements.
+SSL is optional. All TLS, automatic MyAddr ACME, self-signed, custom-certificate,
+status and migration instructions are centralized in [SSL](docs/ssl.md).
 
 
 ### Dynamic DNS

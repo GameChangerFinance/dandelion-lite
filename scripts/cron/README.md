@@ -23,9 +23,8 @@ it cannot compete with HAProxy's temporary DNS challenge.
 Certificate issuance/renewal now belongs to ingress, not cron. The Certbot
 package, hooks, renewal job and private certificate mounts have been removed.
 Cron has no HAProxy control socket or Docker socket. See
-[SSL operation and migration](../../docs/ssl.md) and
-[Native ACME With MyAddr](../../docs/ACME.md); do not recreate a host-side
-renewal cron or manually edit the generated `init_cron`.
+[SSL and native ACME](../../docs/ssl.md); do not recreate a host-side renewal
+cron or manually edit the generated `init_cron`.
 
 ### Koios Artifacts
 
