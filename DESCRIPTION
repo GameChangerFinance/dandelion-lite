@@ -1,0 +1,15 @@
+Project: Dandelion Lite
+Repository: https://github.com/GameChangerFinance/dandelion-lite
+Website: https://github.com/GameChangerFinance/dandelion-lite
+Status: Production
+Version: See Git tags and GitHub Releases for published versions
+License: MIT (see LICENSE)
+Creators: Adriano Fiorenza (GameChanger Finance); Maarten Menhere (M2Tec)
+Core Maintainer: Adriano Fiorenza (GitHub: zxpectre)
+Platform: Linux; Podman or Docker with Docker Compose
+Purpose: Self-hostable, modular Cardano node and reusable API infrastructure for independent Dandelion Node Operators.
+Services: Cardano node, Ogmios, cardano-db-sync, PostgreSQL, HAProxy, Cardano Submit API, Blockfrost, Cardano GraphQL MKII, Unimatrix, PostgREST and supporting services. Availability and support vary by configuration; see README.md.
+Documentation: README.md; docs/README.md; docs/concept.md
+Dependencies: Container images and system tools defined by docker-compose.yml, network-specific .env examples and deployment scripts; consult these files for authoritative versions and configuration.
+Governance: GOVERNANCE.md
+Security: SECURITY.md
