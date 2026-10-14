@@ -68,6 +68,10 @@ Rules:
   actions, must state what it will do and give the operator a clear chance to
   cancel before it starts. On completion, show a brief outcome summary and any
   useful next step.
+- Every interactive prompt that collects input must state the expected value and
+  include a parenthesized representative example. Never use a real credential in
+  an example. Before a state-changing confirmation, name the target path and the
+  expected effect, such as restart or automatic application.
 
 Emoji convention for shell script messages:
 

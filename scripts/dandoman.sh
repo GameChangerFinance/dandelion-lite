@@ -432,8 +432,8 @@ handle_env_file() {
     action=$(gum choose --height 15 --item.foreground 39 --cursor.foreground 121 "Add Entry" "Edit Entry" "Remove Entry" "View File" "Reset Config" "$(gum style --foreground 208 "Back")")
     case "$action" in
       "Add Entry")
-        key=$(gum input --placeholder "Enter key")
-        value=$(gum input --placeholder "Enter value")
+        key=$(gum input --placeholder "Enter key (example: HAPROXY_PORT)")
+        value=$(gum input --placeholder "Enter value (example: 8053)")
         # Check if key or value is empty
         if [[ -z "$key" || -z "$value" ]]; then
           echo "Key or value cannot be empty. Entry not added."
@@ -451,7 +451,7 @@ handle_env_file() {
         if [[ -z "$key" ]]; then
           echo "No key selected for editing."
         else
-          new_value=$(gum input --placeholder "Enter new value for $key")
+          new_value=$(gum input --placeholder "Enter new value for $key (example: 8053)")
           # Check if new value is empty or the same as the existing value
           if [[ -z "$new_value" ]]; then
             echo "New value cannot be empty. Entry not edited."
@@ -625,10 +625,10 @@ menu() {
                   ;;
                 "Download Backup")
                   backupDir="${BACKUP_DIR:-$(pwd)}"
-                  read -p "Enter the URL for remote backup download (with trailing slash): " url
-                  read -p "Enter remote username (optional): " username
+                  read -p "Enter the URL for remote backup download with trailing slash (example: https://node.example/backups/): " url
+                  read -p "Enter remote username, optional (example: backup): " username
                   # Prompt for password silently
-                  read -s -p "Enter remote password (optional): " password
+                  read -s -p "Enter remote password, optional (example: leave empty for no password): " password
                   echo
                   echo "About to download backups from '${url}' into '${backupDir}'"
                   read -p "Press key to continue.. (Ctrl + C to abort)" -n1 -s
@@ -637,7 +637,7 @@ menu() {
                   show_splash_screen
                   ;;
                 "Create Self-Signed SSL and Apply")
-                  read -r -p "Domain/Common Name for self-signed certificate: " ssl_domain
+                  read -r -p "Domain/Common Name for self-signed certificate (example: node.example.com): " ssl_domain
                   if [ -z "$ssl_domain" ]; then
                     echo "⚠️ Missing domain/common name. Nothing was changed."
                   else
@@ -1001,15 +1001,15 @@ confirm_ssl_action() {
 
 run_ssl_self_signed() {
   local ssl_domain=$1
-  confirm_ssl_action "About to replace secrets/ssl/server.pem with a self-signed certificate for ${ssl_domain} and restart HAProxy."
+  confirm_ssl_action "About to create a self-signed certificate for ${ssl_domain} at secrets/ssl/server.pem. HAProxy will restart to apply it; no further action is needed for it to take effect."
   "${KLITE_HOME}"/scripts/ssl/create-self-signed-ssl-and-apply.sh "$ssl_domain" --compose-file "${KLITE_HOME}/docker-compose.yml" --project-name "${PROJ_NAME}" || return $?
-  echo '✅ Self-signed SSL was created and applied. Next: use Check SSL Status; if automatic ACME is enabled, request renewal to replace the temporary certificate.'
+  echo '✅ Self-signed SSL is active at secrets/ssl/server.pem. HAProxy restarted; no further action is needed.'
 }
 
 run_ssl_renew() {
-  confirm_ssl_action 'About to request automatic SSL renewal. HAProxy will apply the certificate when issuance succeeds.'
+  confirm_ssl_action 'About to request automatic SSL renewal. On success, HAProxy will store it at secrets/ssl/server.pem and apply it automatically; no further action is needed.'
   docker compose -f "${KLITE_HOME}"/docker-compose.yml exec -T haproxy /scripts/ssl/haproxy-acme.sh renew || return $?
-  echo '✅ Automatic SSL renewal was requested. Next: use Check SSL Status and HAProxy logs until it completes.'
+  echo '✅ Automatic SSL renewal was requested. On success, HAProxy stores and applies the certificate automatically; no further action is needed.'
 }
 
 run_ssl_status() {

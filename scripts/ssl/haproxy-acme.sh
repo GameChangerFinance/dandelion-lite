@@ -33,4 +33,4 @@ if [ -n "$response" ]; then
     exit 1
 fi
 printf '%s\n' 'Renewal requested. HAProxy will apply and persist it automatically on success.' \
-    'Check /scripts/ssl/haproxy-acme.sh status and docker compose logs haproxy; no manual certificate action is needed.'
+    'No further action is required; status and HAProxy logs are available for troubleshooting.'
