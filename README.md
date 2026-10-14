@@ -69,7 +69,8 @@ Each service is containerized and managed via Podman (as an alias of Docker) and
 Suggested setup for concurrent **Cardano Mainnet** and **Preproduction Testnet** with volume backups consists on
 
 - 128GB RAM (DDR4 ECC RAM)
-- 2TB M2 NVME for full storage (OS + docker images + volumes + backups)
+- 2TB M2 NVME for container storage (OS + docker images + volumes)
+- 1TB M2 NVME (internal or external) for volume backups
 - Dual Intel Xeon E5 2680 v4 (LGA 2011-3 motherboard)
 
 ### Storage Requirements
