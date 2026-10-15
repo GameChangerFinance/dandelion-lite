@@ -4,6 +4,10 @@ Notable operator-facing changes to Dandelion Lite will be recorded here, followi
 
 ## [Unreleased]
 
+### Changed
+
+- Added a visitor-count badge to the README.
+
 ## [1.0.0] - 2026-10-14
 
 ### Added

@@ -1,5 +1,7 @@
 <!-- ![Example Image](images/Koios.png) -->
 
+[![Hits](https://hits.sh/github.com/GameChangerFinance/dandelion-lite.svg?extraCount=956)](https://hits.sh/github.com/GameChangerFinance/dandelion-lite/)
+
 ```
 ___  ____ __ _ ___  ____ _    _ ____ __ _
 |__> |--| | \| |__> |=== |___ | [__] | \|
