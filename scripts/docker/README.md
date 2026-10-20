@@ -102,7 +102,7 @@ Low-level volume restore helper.
 ./scripts/docker/restore-volume.sh <volumeName> <fileNameWithoutExtension> <backupDir>
 ```
 
-It restores one archive into one target volume. This is destructive for the target volume contents.
+It restores one archive into one target volume. This is destructive for the target volume contents. If the archive is missing or unreadable, it exits with an error before touching the volume.
 
 ### `backup-sync.sh`
 

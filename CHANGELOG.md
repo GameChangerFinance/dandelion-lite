@@ -8,6 +8,12 @@ Notable operator-facing changes to Dandelion Lite will be recorded here, followi
 
 - Added a visitor-count badge to the README.
 
+### Fixed
+
+- `scripts/docker/restore-volume.sh` now exits before emptying the volume when the
+  backup archive is missing or unreadable. Previously a wrong file name, or a volume
+  without a matching archive during `full-restore.sh`, left the volume empty.
+
 ## [1.0.0] - 2026-10-14
 
 ### Added
