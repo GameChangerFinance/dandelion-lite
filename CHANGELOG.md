@@ -8,6 +8,12 @@ Notable operator-facing changes to Dandelion Lite will be recorded here, followi
 
 - Added a visitor-count badge to the README.
 
+### Fixed
+
+- `dandoman.sh` *Config → Edit Entry* and *Remove Entry* now change `.env` on Linux.
+  They used the BSD-only `sed -i ''`, which GNU sed rejects: sed printed an error and `.env` was not
+  changed on Ubuntu.
+
 ## [1.0.0] - 2026-10-14
 
 ### Added
