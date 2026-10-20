@@ -8,6 +8,13 @@ Notable operator-facing changes to Dandelion Lite will be recorded here, followi
 
 - Added a visitor-count badge to the README.
 
+### Fixed
+
+- `scripts/docker/backup-volume.sh` now runs its export container with `docker` instead
+  of `podman`, like the image pull just before it and `restore-volume.sh`. Full backups
+  failed on hosts installed with `dandoman.sh --docker-install` (no `podman` binary);
+  Podman hosts are unchanged, as the Podman install provides `docker` via `podman-docker`.
+
 ## [1.0.0] - 2026-10-14
 
 ### Added
