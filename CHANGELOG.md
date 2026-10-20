@@ -8,6 +8,14 @@ Notable operator-facing changes to Dandelion Lite will be recorded here, followi
 
 - Added a visitor-count badge to the README.
 
+### Fixed
+
+- Restored the missing `!` in the shebang of `scripts/docker/restore-volume.sh`,
+  `full-backup.sh`, `fix_db_pass.sh`, `systemdAdd.sh` and `scripts/deploy/ngrok.sh`.
+  When started by a non-Bash program (`sudo`, `env`, cron), they ran under `/bin/sh`:
+  `restore-volume.sh` and `full-backup.sh` skipped their argument checks, and
+  `fix_db_pass.sh` could not load `.env`.
+
 ## [1.0.0] - 2026-10-14
 
 ### Added

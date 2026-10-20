@@ -1,4 +1,4 @@
-#/bin/sh
+#!/bin/bash
 
 volumeName=$1
 fileName=$2
