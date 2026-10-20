@@ -8,6 +8,15 @@ Notable operator-facing changes to Dandelion Lite will be recorded here, followi
 
 - Added a visitor-count badge to the README.
 
+### Security
+
+- Refreshed `src/dbless-cardano-token-registry/package-lock.json` with
+  `npm audit fix --package-lock-only` (no `--force`, within the existing `^` ranges):
+  production advisories go from 25 (1 critical, 12 high) to 5 high as of 2026-10-20, all
+  through `nodemon` 2.x, whose fix needs a major upgrade. The lockfile format moves from
+  v1 to v3 (fine with the `node:16` image's npm 8; npm 6 / Node 14 ignores it). This
+  optional service is not started by `docker-compose.yml`.
+
 ## [1.0.0] - 2026-10-14
 
 ### Added
