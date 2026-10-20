@@ -7,6 +7,9 @@ Notable operator-facing changes to Dandelion Lite will be recorded here, followi
 ### Changed
 
 - Added a visitor-count badge to the README.
+- `.env.example.*` now default `BACKUP_DIR` to `${HOME}/backups/${NETWORK}/` instead of
+  `/home/${USER}/...`. Same path for standard Linux users; on macOS the old default made Docker Desktop
+  refuse the backup bind mounts. Existing `.env` files are not changed.
 
 ## [1.0.0] - 2026-10-14
 
