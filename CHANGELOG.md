@@ -8,6 +8,13 @@ Notable operator-facing changes to Dandelion Lite will be recorded here, followi
 
 - Added a visitor-count badge to the README.
 
+### Fixed
+
+- `dandoman.sh` asks for the network on the very first run again (#8). The question used
+  `gum` before the dependencies (including `gum`) were installed, so no `.env` was created
+  and the first session ran with empty variables. Dependencies are now installed first,
+  and the new `.env` is loaded for the current session.
+
 ## [1.0.0] - 2026-10-14
 
 ### Added
