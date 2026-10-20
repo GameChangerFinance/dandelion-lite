@@ -7,6 +7,7 @@ Notable operator-facing changes to Dandelion Lite will be recorded here, followi
 ### Changed
 
 - Added a visitor-count badge to the README.
+- README base system install now lists `git` as a prerequisite (#5).
 
 ## [1.0.0] - 2026-10-14
 
