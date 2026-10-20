@@ -185,6 +185,8 @@ Reported to be working in production on:
 
 - Ubuntu Server version 24.04 (normal, not minimal install)
 
+On macOS (Docker Desktop), keep `BACKUP_DIR` inside your home folder, which Docker Desktop shares by default: the example default `${HOME}/backups/${NETWORK}/` resolves to `/Users/<you>/...`, while a `/home/...` path fails with `mounts denied`.
+
 ## Deployment
 
 ### Base system install
@@ -228,7 +230,7 @@ Syncing Cardano node and databases can take even more than a week, it is adviced
 
 #### Instructions
 
-1. Set the `BACKUP_DIR` environment variable on `.env` file with the location on where you want to store the files, like `BACKUP_DIR="/home/${USER}/backups/${NETWORK}/"`. Check [Volume Backup Sizes](#volume-backup-sizes) for estimating the required size.
+1. Set the `BACKUP_DIR` environment variable on `.env` file with the location on where you want to store the files, like `BACKUP_DIR="${HOME}/backups/${NETWORK}/"`. Check [Volume Backup Sizes](#volume-backup-sizes) for estimating the required size.
 2. Execute `scripts/dandoman.sh` > `Setup->Download Backup` and follow steps.
 
 ```
@@ -253,14 +255,14 @@ If the final SHA verification fails, `READY` is moved into `old/READY` so the se
 ### Run a Full Deploy Backup
 
 Syncing Cardano node and databases can take even more than a week, it is adviced for you to take compressed snapshots or backups of your databases after 2 or 3 of months at least.
-1. Set the `BACKUP_DIR` environment variable on `.env` file with the location on where you want to store the files, like `BACKUP_DIR="/home/${USER}/backups/${NETWORK}/"`. Check [Volume Backup Sizes](###-storage-requirements) for estimating the required size.
+1. Set the `BACKUP_DIR` environment variable on `.env` file with the location on where you want to store the files, like `BACKUP_DIR="${HOME}/backups/${NETWORK}/"`. Check [Volume Backup Sizes](###-storage-requirements) for estimating the required size.
 2. Customize `NGINX_WWW_BACKUP_USER` and `NGINX_WWW_BACKUP_PASSWORD` to protect with a password the hosting of your backup files
 3. Execute `scripts/dandoman.sh` > `Setup->Full backup` and follow steps. The backup flow will also create the special `READY`, `MD5SUMS`, and `SHA256SUMS` files (you can do manually by calling `./scripts/docker/create-backup-checksum.sh`).
 
 ### Run a Full Deploy Restore
 
 This will **WIPE ALL YOUR DEPLOYMENT DATA** and will restore a previous backup:
-1. Set the `BACKUP_DIR` environment variable on `.env` file with the location from where you want to read the stored files, like `BACKUP_DIR="/home/${USER}/backups/${NETWORK}/"`. Check[Volume Backup Sizes](###-storage-requirements)  for estimating the required size.
+1. Set the `BACKUP_DIR` environment variable on `.env` file with the location from where you want to read the stored files, like `BACKUP_DIR="${HOME}/backups/${NETWORK}/"`. Check[Volume Backup Sizes](###-storage-requirements)  for estimating the required size.
 2. Execute `scripts/dandoman.sh` > `Setup->Full restore` and follow steps.
 
 
