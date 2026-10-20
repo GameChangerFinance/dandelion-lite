@@ -4,6 +4,12 @@ Notable operator-facing changes to Dandelion Lite will be recorded here, followi
 
 ## [Unreleased]
 
+### Added
+
+- GitHub Actions `checks` workflow on pushes to `main` and pull requests: `bash -n` on
+  every tracked script, `docker compose config` for each `.env.example.*`, and the SSL
+  fixture tests. Read-only; no secrets, images or deployments.
+
 ### Changed
 
 - Added a visitor-count badge to the README.
