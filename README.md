@@ -196,6 +196,7 @@ We use the normal install not the minimal one. Also install **OpenSSH** server t
 1. When install is completed do `ip -br a` to get the ip address of your newly installed server 
 2. From you local system. So not on your server do `ssh-copy-id USER_NAME@SERVER_IP` This will copy your ssh keys to the server to allow easy login
 3. Do `ssh USER_NAME@SERVER_IP`
+4. Make sure `git` is installed to clone the repository: `sudo apt update && sudo apt install -y git`
 
 To deploy or run Dandelion Lite:
 1. Clone the repository to your local machine.`$ git clone https://github.com/GameChangerFinance/dandelion-lite.git dandelion-lite-preprod`. Put every network you sync into it's own folder. 
