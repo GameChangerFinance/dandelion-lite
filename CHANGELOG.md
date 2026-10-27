@@ -10,6 +10,10 @@ Notable operator-facing changes to Dandelion Lite will be recorded here, followi
 
 ### Fixed
 
+- `scripts/docker/backup-volume.sh` now runs its export container with `docker` instead
+  of `podman`, like the image pull just before it and `restore-volume.sh`. Full backups
+  failed on hosts installed with `dandoman.sh --docker-install` (no `podman` binary);
+  Podman hosts are unchanged, as the Podman install provides `docker` via `podman-docker`.
 - `dandoman.sh` *Config → Edit Entry* and *Remove Entry* now change `.env` on Linux.
   They used the BSD-only `sed -i ''`, which GNU sed rejects: sed printed an error and `.env` was not
   changed on Ubuntu.
