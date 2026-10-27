@@ -10,6 +10,9 @@ Notable operator-facing changes to Dandelion Lite will be recorded here, followi
 
 ### Fixed
 
+- `scripts/docker/restore-volume.sh` now exits before emptying the volume when the
+  backup archive is missing or unreadable. Previously a wrong file name, or a volume
+  without a matching archive during `full-restore.sh`, left the volume empty.
 - `scripts/docker/backup-volume.sh` now runs its export container with `docker` instead
   of `podman`, like the image pull just before it and `restore-volume.sh`. Full backups
   failed on hosts installed with `dandoman.sh --docker-install` (no `podman` binary);

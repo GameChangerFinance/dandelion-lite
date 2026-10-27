@@ -11,6 +11,15 @@ backupDir=$3
 targetVolumeName="${volumeName}"
 backupFileName="${fileName}.tar.gz"
 
+# Check the archive before anything is deleted: a missing or unreadable file must
+# never reach the "rm -rfv /volume/*" step below. POSIX [ ] on purpose, so the
+# check also runs when the script is executed by /bin/sh. "%/" + "/" accepts a
+# backupDir with or without its trailing slash, like the /backup mount below.
+if [ ! -r "${backupDir%/}/${backupFileName}" ]; then
+  echo "❌ Backup file not found or not readable: '${backupDir%/}/${backupFileName}'. Volume '${targetVolumeName}' left unchanged." >&2
+  exit 1
+fi
+
 echo "ℹ️ Restoring volume '$targetVolumeName' from backup file '${backupDir}$backupFileName' ..."
 
 ls -alh "${backupDir}${backupFileName}" | awk '{print $5, $9}'
