@@ -403,6 +403,8 @@ check_env_file() {
 			read -p "Press key to continue.." -n1 -s
 		;;
 	esac
+	# main() sourced .env before it existed; load the new file for this session
+	[ -f ".env" ] && source .env
   fi
 }
 
@@ -458,7 +460,8 @@ handle_env_file() {
           elif [[ "$new_value" == "$existing_value" ]]; then
             echo "New value is the same as the existing value. Entry not edited."
           else
-            sed -i '' "s/^$key=.*/$key=$new_value/" .env
+            # -i<suffix> works with both GNU sed (Linux) and BSD sed (macOS); -i '' is BSD-only
+            sed -i.dandoman-tmp "s/^$key=.*/$key=$new_value/" .env && rm -f .env.dandoman-tmp
           fi
         fi
         ;;
@@ -469,7 +472,7 @@ handle_env_file() {
             echo "No key selected for removal."
           else
             # Remove the line from .env file
-            sed -i '' "/^$key_to_remove=/d" .env
+            sed -i.dandoman-tmp "/^$key_to_remove=/d" .env && rm -f .env.dandoman-tmp
             clear
             gum style --border rounded --border-foreground 121 --padding "1" --margin "1" --foreground green "Current .env content:" "$(cat "${KLITE_HOME}"/.env)"
           fi
@@ -1110,6 +1113,8 @@ process_args() {
     *)
       # Check if the number of arguments is zero
       if [ $# -eq 0 ]; then
+        # The network question in check_env_file uses gum, so install it first
+        install_dependencies || { echo "Failed to install dependencies."; exit 0; }
         check_env_file
         display_ui  # Call the display function
       else

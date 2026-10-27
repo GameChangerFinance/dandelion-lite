@@ -14,6 +14,13 @@ Notable operator-facing changes to Dandelion Lite will be recorded here, followi
   of `podman`, like the image pull just before it and `restore-volume.sh`. Full backups
   failed on hosts installed with `dandoman.sh --docker-install` (no `podman` binary);
   Podman hosts are unchanged, as the Podman install provides `docker` via `podman-docker`.
+- `dandoman.sh` *Config → Edit Entry* and *Remove Entry* now change `.env` on Linux.
+  They used the BSD-only `sed -i ''`, which GNU sed rejects: sed printed an error and `.env` was not
+  changed on Ubuntu.
+- `dandoman.sh` asks for the network on the very first run again (#8). The question used
+  `gum` before the dependencies (including `gum`) were installed, so no `.env` was created
+  and the first session ran with empty variables. Dependencies are now installed first,
+  and the new `.env` is loaded for the current session.
 
 ## [1.0.0] - 2026-10-14
 
