@@ -403,6 +403,8 @@ check_env_file() {
 			read -p "Press key to continue.." -n1 -s
 		;;
 	esac
+	# main() sourced .env before it existed; load the new file for this session
+	[ -f ".env" ] && source .env
   fi
 }
 
@@ -1110,6 +1112,8 @@ process_args() {
     *)
       # Check if the number of arguments is zero
       if [ $# -eq 0 ]; then
+        # The network question in check_env_file uses gum, so install it first
+        install_dependencies || { echo "Failed to install dependencies."; exit 0; }
         check_env_file
         display_ui  # Call the display function
       else
