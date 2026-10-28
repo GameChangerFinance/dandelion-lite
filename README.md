@@ -232,7 +232,8 @@ to install ngrok and connect your account.
 
 Start your Dandelion Lite deployment, then select `Tools->Expose with NGROK`.
 The tool exposes your HAProxy port and displays the public URL. Keep the terminal
-session open while using the tunnel, then press a key when prompted to close it.
+session open while using the tunnel. When you are finished, press `Ctrl+C` in
+the terminal running ngrok to stop it and close the tunnel.
 
 
 ### Download a Full Remote Backup
