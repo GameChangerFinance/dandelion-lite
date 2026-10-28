@@ -2,7 +2,8 @@
 
 source .env
 
-echo "IMPORTANT: you need to manually install and setup NGROK from https://ngrok.com/download"
+echo "IMPORTANT: install ngrok and connect your account before using this feature: https://ngrok.com/docs/share-localhost/quickstart"
+echo "ℹ️ Use this interactive tunnel for temporary access during development and testing."
 echo
 echo "Initiallizing tunneling ... "
 echo

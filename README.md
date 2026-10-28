@@ -222,6 +222,18 @@ Remember to secure your deployment according to best practices, including securi
 To auto run on system start:
 1. Execute `scripts/dandoman.sh` > `Setup->Run on system start` and follow steps.
 
+### Optional ngrok tunnel
+
+Use `Tools->Expose with NGROK` in `scripts/dandoman.sh` for temporary public
+access during development and testing.
+
+Before using this feature, follow the [official ngrok setup guide](https://ngrok.com/docs/share-localhost/quickstart)
+to install ngrok and connect your account.
+
+Start your Dandelion Lite deployment, then select `Tools->Expose with NGROK`.
+The tool exposes your HAProxy port and displays the public URL. Keep the terminal
+session open while using the tunnel, then press a key when prompted to close it.
+
 
 ### Download a Full Remote Backup
 
