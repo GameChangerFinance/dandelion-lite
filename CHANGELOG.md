@@ -8,6 +8,8 @@ Notable operator-facing changes to Dandelion Lite will be recorded here, followi
 
 - Added a visitor-count badge to the README.
 - README base system install now lists `git` as a prerequisite (#5).
+- Document ngrok installation and account setup through the official guide, and
+  clarify temporary, interactive usage for development and testing (#9).
 
 ### Fixed
 
