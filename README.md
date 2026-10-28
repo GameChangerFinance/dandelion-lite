@@ -222,6 +222,9 @@ Remember to secure your deployment according to best practices, including securi
 To auto run on system start:
 1. Execute `scripts/dandoman.sh` > `Setup->Run on system start` and follow steps.
 
+See [Autostart and deployment controls](docs/autostart.md) for starting, stopping,
+and checking the same deployment through systemd, the menu, or Compose.
+
 ### Optional ngrok tunnel
 
 Use `Tools->Expose with NGROK` in `scripts/dandoman.sh` for temporary public

@@ -120,17 +120,18 @@ loginctl enable-linger
 echo "ℹ️ Reloading systemd daemon..."
 sudo systemctl daemon-reload
 
-echo "ℹ️ Enabling and starting the service..."
+echo "ℹ️ Enabling the service for system startup..."
 systemctl enable ${serviceName}.service
 #systemctl start ${serviceName}.service
 
 echo "✅ Service '${serviceName}' has been installed. Useful commands:"
+echo "ℹ️ Autostart is enabled; to manage the service use:"
 echo
 echo "    start:  systemctl start  ${serviceName}"
 echo "    stop:   systemctl stop   ${serviceName}"
 echo "    status: systemctl status ${serviceName}"
 echo "    logs:   journalctl -u ${serviceName}"
 echo 
-echo "ℹ️ You should set 'KillUserProcesses=no' on '/etc/systemd/logind.conf'" 
+echo "ℹ️ IMPORTANT: You should set 'KillUserProcesses=no' on '/etc/systemd/logind.conf'"
 echo "ℹ️ and run 'systemctl restart systemd-logind'"
 echo
