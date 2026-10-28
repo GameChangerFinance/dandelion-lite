@@ -173,3 +173,6 @@ Utility for resetting the PostgreSQL password inside the running database servic
 ### `systemdAdd.sh`
 
 Creates systemd integration for running the deployment on boot.
+
+See [Autostart and deployment controls](../../docs/autostart.md) for setup,
+start/stop behavior, and container status checks.

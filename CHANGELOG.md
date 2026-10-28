@@ -6,6 +6,8 @@ Notable operator-facing changes to Dandelion Lite will be recorded here, followi
 
 ### Changed
 
+- Document shared systemd, menu and Compose deployment controls, and clarify that
+  installing autostart enables the service without starting it (#12, including #11).
 - Added a visitor-count badge to the README.
 - README base system install now lists `git` as a prerequisite (#5).
 - Document ngrok installation and account setup through the official guide, and
