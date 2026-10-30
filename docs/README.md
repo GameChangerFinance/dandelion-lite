@@ -10,5 +10,6 @@ Root and directory READMEs should link here rather than repeat operational detai
 | TLS, MyAddr ACME, custom certificates and migration | [ssl.md](ssl.md) |
 | Volume backup, restore and remote synchronization | [backups.md](backups.md) |
 | Van Rossem hard-fork change record | [VanRossemHF.md](VanRossemHF.md) |
+| Beginner course for new operators (open locally in a browser) | [education/index.html](../education/index.html) |
 
 `plan-example.md` is a historical planning example, not current operator guidance.

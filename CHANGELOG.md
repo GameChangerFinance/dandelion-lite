@@ -6,6 +6,7 @@ Notable operator-facing changes to Dandelion Lite will be recorded here, followi
 
 ### Changed
 
+- README and `docs/README.md` now link the beginner operator course in `education/` (#22).
 - Document shared systemd, menu and Compose deployment controls, and clarify that
   installing autostart enables the service without starting it (#12, including #11).
 - Added a visitor-count badge to the README.

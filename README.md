@@ -28,6 +28,17 @@ For the project goal and broader Dandelion concept, read [docs/concept.md](docs/
 
 Operator and architecture guides are centralized in [docs/README.md](docs/README.md).
 
+### Education
+
+New to running a node? The **Dandelion Lite guide** (Catalyst F13 course) is included in this repository under [`education/`](education/). It is written for non-developer operators and covers:
+
+- **101 Introduction:** why Dandelion Lite exists, what a server API is, hardware needs
+- **102 My first node:** installing Ubuntu, preparing the server, starting `dandoman.sh`, and installing on Windows (WSL)
+- **103 Module overview:** Ogmios, Cardano GraphQL, Koios, Token Registry, PostgREST, Unimatrix, the node manifest and statistics
+- **201 Docker tutorial** and **202 Podman tutorial**
+
+Open [`education/index.html`](education/index.html) in a web browser from your clone (for example `xdg-open education/index.html`). GitHub shows `.html` files as source code, so read the course from a local copy. Where the course and this README differ, follow this README.
+
 ## Components
 
 This setup includes several key components:
