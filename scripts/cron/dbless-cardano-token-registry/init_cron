@@ -1,2 +1,0 @@
-# dbless-cardano-token-registry
-*/15 * * * * /scripts/cron/dbless-cardano-token-registry/update_registry.sh >> /var/log/dbless-cardano-token-registry_update_registry.log 2>&1

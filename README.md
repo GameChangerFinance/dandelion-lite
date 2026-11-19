@@ -26,7 +26,7 @@ For the project goal and broader Dandelion concept, read [docs/concept.md](docs/
 
 ## Documentation
 
-Operator and architecture guides are centralized in [docs/README.md](docs/README.md).
+Operator, developer and architecture guides are centralized in [docs/README.md](docs/README.md).
 
 ## Components
 

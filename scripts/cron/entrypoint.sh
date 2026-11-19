@@ -15,7 +15,6 @@ cat /etc/cron.d/koios-artifacts-1.3.2/init_cron  >> "$cronFile" && echo >>"$cron
 cat /etc/cron.d/duckdns/init_cron  >> "$cronFile" && echo >>"$cronFile"
 cat /etc/cron.d/myaddrdns/init_cron  >> "$cronFile" && echo >>"$cronFile"
 # cat /etc/cron.d/koios-lite/init_cron  >> "$cronFile" && echo >>"$cronFile"
-# cat /etc/cron.d/dbless-cardano-token-registry/init_cron  >> "$cronFile" && echo >>"$cronFile"
 
 # Load the compiled crontab file
 crontab "$cronFile"

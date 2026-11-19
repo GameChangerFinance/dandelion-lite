@@ -51,7 +51,7 @@ docker run -d --name "$name-dns" --network "$name" --network-alias dns \
 dnsip=$(docker inspect --format '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' "$name-dns")
 docker exec "$name-dns" curl -fsS -d "{\"ip\":\"$dnsip\"}" http://127.0.0.1:8055/set-default-ipv4
 docker run -d --name "$name-ca" --network "$name" --network-alias pebble \
-    -e PEBBLE_VA_NOSLEEP=1 -e PEBBLE_AUTHZREUSE=0 \
+    -e PEBBLE_VA_NOSLEEP=1 -e PEBBLE_AUTHZREUSE=0 -e PEBBLE_WFE_NONCEREJECT=0 \
     -v "$work:/fixtures:ro" \
     -v "$root/tests/ssl/.upstream/pebble-linux-amd64/linux/amd64/pebble:/test-ca:ro" \
     dandelion-ssl-test:local /test-ca -config /fixtures/pebble.json -dnsserver "$dnsip:53" >/dev/null
@@ -94,7 +94,7 @@ wait_ssl_mode() {
 wait_log() {
     local pattern=$1
     for attempt in {1..20}; do
-        if docker logs "$name-ingress" 2>&1 | grep -q "$pattern"; then return; fi
+        if docker logs "$name-ingress" 2>&1 | grep -F "$pattern" >/dev/null; then return; fi
         sleep 1
     done
     echo "Expected log line was not emitted: $pattern" >&2
@@ -155,9 +155,12 @@ docker run --rm -v "$work/ssl:/ssl" dandelion-ssl-test:local sh -c '
     chmod 0600 /ssl/server.pem
     rm -f /ssl/expired-key.pem /ssl/expired-cert.pem
 '
+expired=$(sha256sum "$work/ssl/server.pem" | cut -d' ' -f1)
 start_ingress
-wait_cert "$second"
+# Wait for ACME to replace the expired fixture, not merely for the fixture write.
+wait_cert "$expired"
 wait_ssl_mode server.pem 600
+docker exec "$name-ingress" openssl x509 -in /var/lib/haproxy/ssl/server.pem -noout -checkend 0
 check_served_certificate
 echo 'PASS: initial DNS-01 issuance, requested/due renewal, persistence, recreation and CA-outage retention.'
 printf 'Fixture logs: tests/ssl/.work/%s\n' "${work##*/}"
