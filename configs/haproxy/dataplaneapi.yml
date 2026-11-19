@@ -20,7 +20,11 @@ haproxy:
   master_runtime: /var/run/haproxy-master.sock
   master_worker_mode: true
   reload:
-    reload_strategy: s6
+    reload_strategy: custom
+    reload_cmd: /usr/local/bin/gopherd signal haproxy USR2
+    restart_cmd: /usr/local/bin/gopherd restart haproxy
+    stop_cmd: /usr/local/bin/gopherd stop haproxy
+    status_cmd: /usr/local/bin/gopherd status haproxy
 log_targets:
   - log_to: stdout
     log_level: info

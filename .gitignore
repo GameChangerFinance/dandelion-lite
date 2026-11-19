@@ -10,3 +10,4 @@ scripts/sql/rpc/Skipped.txt
 configs/haproxy/manifest.json
 configs/haproxy/index.html
 logs/
+tmp/

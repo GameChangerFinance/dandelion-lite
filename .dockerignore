@@ -1,0 +1,10 @@
+# Root-context builds only need these Dockerfiles and the HAProxy entrypoint.
+**
+!src/
+!src/cron/
+!src/cron/Dockerfile
+!src/haproxy/
+!src/haproxy/Dockerfile
+!scripts/
+!scripts/ssl/
+!scripts/ssl/haproxy-entrypoint.sh

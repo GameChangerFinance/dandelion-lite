@@ -33,6 +33,12 @@ esac
 zone=${ZONE:-}
 record=$(printf '%s' "${REC_NAME:-}" | tr '[:upper:]' '[:lower:]')
 [ "${zone%.}" = myaddr.io ] || fail 'Unexpected DNS zone.'
+# Exec providers may pass a zone-relative name or an absolute DNS name.
+record=${record%.}
+case "$record" in
+    *."${zone%.}") ;;
+    *) record="$record.${zone%.}" ;;
+esac
 [ "${record%.}" = "_acme-challenge.${domain}.myaddr.io" ] || fail 'Unexpected challenge name.'
 
 action=${ACTION:-}

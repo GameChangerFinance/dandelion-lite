@@ -2,7 +2,7 @@
 
 ## What's this?
 
-A system that allows you to schedule recurrent tasks to maintain, shape and control various services like `koios-artifacts`, `koios-lite`,`duckdns`,`dbless-cardano-token-registry` and more.
+A system that allows you to schedule recurrent tasks to maintain, shape and control various services like `koios-artifacts`, `koios-lite`,`duckdns` and more.
 
 The script files in this directory are scheduled with `cron`.
 
