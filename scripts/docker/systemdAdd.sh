@@ -1,4 +1,4 @@
-#/bin/sh
+#!/bin/bash
 
 projectName=$1
 projectFile=$2

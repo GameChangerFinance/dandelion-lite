@@ -4,6 +4,15 @@ Notable operator-facing changes to Dandelion Lite will be recorded here, followi
 
 ## [Unreleased]
 
+### Fixed
+
+- Use explicit Bash shebangs for `scripts/docker/restore-volume.sh`,
+  `scripts/docker/full-backup.sh`, `scripts/docker/fix_db_pass.sh`,
+  `scripts/docker/systemdAdd.sh` and `scripts/deploy/ngrok.sh` so direct execution
+  uses the required interpreter instead of depending on the calling program's
+  fallback behavior (#37). Invoke these helpers directly or with `bash`; explicit
+  `sh` invocation does not use the shebang.
+
 ## [1.1.0] - 2026-11-19
 
 ### Added
