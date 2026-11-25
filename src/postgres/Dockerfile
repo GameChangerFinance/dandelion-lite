@@ -1,7 +1,7 @@
 # Custom Postgres image with Cardano-related extensions
 # Extensions: pg_cardano (enabled), pg_curl (disabled for now)
 
-FROM postgres:18.2-bookworm
+FROM postgres:18.7-bookworm
 
 ARG PG_CARDANO_VERSION=v1.2.0
 ARG PGRX_VERSION=0.17.0

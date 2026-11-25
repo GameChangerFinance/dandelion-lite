@@ -58,6 +58,13 @@ docker exec "$name" sh -c 'stat -c "%a" /var/run/dataplaneapi.sock /var/run/hapr
 test "$(stat -c %a "$work/ssl")" = 700
 test "$(stat -c %a "$work/ssl/server.pem")" = 600
 docker exec --user 65534 "$name" sh -c 'test ! -r /var/lib/haproxy/ssl/server.pem'
+# Exercise the supervisor command used by Data Plane API after configuration changes.
+docker exec "$name" /usr/local/bin/gopherd signal haproxy USR2
+for attempt in {1..20}; do
+    if docker exec "$name" curl -ksf https://127.0.0.1:8053/manifest > "$work/reload-response"; then break; fi
+    sleep 1
+done
+test "$(cat "$work/reload-response")" = '{}'
 docker logs "$name" > "$work/ingress.log" 2>&1
 docker rm -f "$name" >/dev/null
 
@@ -87,5 +94,5 @@ if docker exec "$name" /scripts/ssl/haproxy-acme.sh renew > "$work/plain-renew.l
     echo 'Plaintext unexpectedly accepted automatic renewal.' >&2
     exit 1
 fi
-printf 'PASS: manual TLS/plaintext runtime, local-only API authentication and automatic configuration.\n'
+printf 'PASS: manual TLS/plaintext runtime, supervisor reload, local-only API authentication and automatic configuration.\n'
 printf 'Fixture logs: tests/ssl/.work/%s\n' "${work##*/}"

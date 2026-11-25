@@ -191,7 +191,7 @@ services:
     restart: always
     environment:
       GRAPHILE_ENV: production
-      CORS: true 
+      CORS: "true"
 
       CARDANO_GRAPHQL_PORT: 4000
       CARDANO_GRAPHQL_GRAPHQL_PATH: ${CARDANO_GRAPHQL_GRAPHQL_PATH}
@@ -304,7 +304,7 @@ services:
       PGRST_SERVER_PORT: 8050
       PGRST_OPENAPI_SERVER_PROXY_URI: http://0.0.0.0:8050
       PGRST_DB_MAX_ROWS: 1000
-      PGRST_DB_AGGREGATES_ENABLED: true
+      PGRST_DB_AGGREGATES_ENABLED: "true"
       PGRST_DB_EXTRA_SEARCH_PATH: "${POSTGREST_DB_EXTRA_SEARCH_PATH}"
     restart: always
     logging:
@@ -378,7 +378,7 @@ services:
       PGRST_SERVER_PORT: 8060
       PGRST_OPENAPI_SERVER_PROXY_URI: http://0.0.0.0:8060
       PGRST_DB_MAX_ROWS: 1000
-      PGRST_DB_AGGREGATES_ENABLED: true
+      PGRST_DB_AGGREGATES_ENABLED: "true"
       PGRST_DB_EXTRA_SEARCH_PATH: "${DANDELION_POSTGREST_DB_EXTRA_SEARCH_PATH}"
     restart: always
     logging:
@@ -581,25 +581,30 @@ services:
   #   environment:
   #     API_URL: http://127.0.0.1:${POSTGREST_PORT}/
 
-  # pgadmin:
-  #   # image: dpage/pgadmin4
-  #   build:
-  #     context: ./src/pgadmin
-  #     args:
-  #       NETWORK: ${NETWORK}
-  #       POSTGRES_DB: ${POSTGRES_DB}
-  #       POSTGRES_USER: ${POSTGRES_USER}
-  #       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-  #   restart: always
-  #   environment:
-  #       PGADMIN_LISTEN_PORT: 80
-  #   ports:
-  #       - "${PGADMIN_PORT:-5050}:80"
-  #   volumes:
-  #       - pgadmin-data:/var/lib/pgadmin
-  #   depends_on:
-  #     postgress:
-  #       condition: service_healthy
+  pgadmin:
+    profiles: [admin]
+    build:
+      context: ./src/pgadmin
+    restart: always
+    environment:
+      NETWORK: ${NETWORK}
+      POSTGRES_HOST: ${POSTGRES_HOST}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+      PGADMIN_LISTEN_PORT: 80
+      PGADMIN_DISABLE_POSTFIX: "1"
+    secrets:
+      - postgres_password
+    ports:
+      - "127.0.0.1:${PGADMIN_PORT:-5050}:80"
+    tmpfs:
+      - /pgpass:mode=0700
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    depends_on:
+      postgress:
+        condition: service_healthy
 
 
 
