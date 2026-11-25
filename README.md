@@ -26,7 +26,7 @@ For the project goal and broader Dandelion concept, read [docs/concept.md](docs/
 
 ## Documentation
 
-Operator and architecture guides are centralized in [docs/README.md](docs/README.md).
+Operator, developer and architecture guides are centralized in [docs/README.md](docs/README.md).
 
 ## Components
 
@@ -196,6 +196,7 @@ We use the normal install not the minimal one. Also install **OpenSSH** server t
 1. When install is completed do `ip -br a` to get the ip address of your newly installed server 
 2. From you local system. So not on your server do `ssh-copy-id USER_NAME@SERVER_IP` This will copy your ssh keys to the server to allow easy login
 3. Do `ssh USER_NAME@SERVER_IP`
+4. Make sure `git` is installed to clone the repository: `sudo apt update && sudo apt install -y git`
 
 To deploy or run Dandelion Lite:
 1. Clone the repository to your local machine.`$ git clone https://github.com/GameChangerFinance/dandelion-lite.git dandelion-lite-preprod`. Put every network you sync into it's own folder. 
@@ -220,6 +221,22 @@ Remember to secure your deployment according to best practices, including securi
 
 To auto run on system start:
 1. Execute `scripts/dandoman.sh` > `Setup->Run on system start` and follow steps.
+
+See [Autostart and deployment controls](docs/autostart.md) for starting, stopping,
+and checking the same deployment through systemd, the menu, or Compose.
+
+### Optional ngrok tunnel
+
+Use `Tools->Expose with NGROK` in `scripts/dandoman.sh` for temporary public
+access during development and testing.
+
+Before using this feature, follow the [official ngrok setup guide](https://ngrok.com/docs/share-localhost/quickstart)
+to install ngrok and connect your account.
+
+Start your Dandelion Lite deployment, then select `Tools->Expose with NGROK`.
+The tool exposes your HAProxy port and displays the public URL. Keep the terminal
+session open while using the tunnel. When you are finished, press `Ctrl+C` in
+the terminal running ngrok to stop it and close the tunnel.
 
 
 ### Download a Full Remote Backup

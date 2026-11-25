@@ -35,8 +35,9 @@ if [ -f "${backupDir}${exportFileName}" ]; then
   rm "${backupDir}${exportFileName}" && echo "ℹ️ Old file deleted."
 fi
 
-# Run the container with Podman
-podman run --rm \
+# Run the container through the docker CLI (Docker Engine, or Podman via podman-docker),
+# the same CLI used for the image pull above and by restore-volume.sh
+docker run --rm \
         --mount type=volume,source=${sourceVolumeName},target=/volume \
         -v ${backupDir}:/backup \
         alpine:3.20.1 \

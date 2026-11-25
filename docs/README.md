@@ -1,11 +1,13 @@
 # Dandelion Lite Documentation
 
-Long-form operator and architecture guidance belongs in focused documents here.
+Long-form operator, developers, and architecture guidance belongs in focused documents here.
 Root and directory READMEs should link here rather than repeat operational detail.
 
 | Topic | Authoritative document |
 | --- | --- |
 | Project purpose and decentralized service model | [concept.md](concept.md) |
+| Autostart, systemd and manual Compose controls | [autostart.md](autostart.md) |
+| Development tools, admin profile and host ports | [development.md](development.md) |
 | TLS, MyAddr ACME, custom certificates and migration | [ssl.md](ssl.md) |
 | Volume backup, restore and remote synchronization | [backups.md](backups.md) |
 | Van Rossem hard-fork change record | [VanRossemHF.md](VanRossemHF.md) |

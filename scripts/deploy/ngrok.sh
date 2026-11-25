@@ -2,7 +2,8 @@
 
 source .env
 
-echo "IMPORTANT: you need to manually install and setup NGROK from https://ngrok.com/download"
+echo "IMPORTANT: install ngrok and connect your account before using this feature: https://ngrok.com/docs/share-localhost/quickstart"
+echo "ℹ️ Use this interactive tunnel for temporary access during development and testing."
 echo
 echo "Initiallizing tunneling ... "
 echo
@@ -20,7 +21,6 @@ echo "Now you can visit it on browser to monitor node status, or use these APIs:
 echo "   ogmios: 		${tunnelHost}/ogmios/"
 echo "   cardano-graphql:     ${tunnelHost}/cardano-graphql/"
 echo "   koios/koios-lite:    ${tunnelHost}/koios/"
-echo "   token-registry:      ${tunnelHost}/token-registry/"
 echo "   dandelion-postgrest: ${tunnelHost}/postgrest/"
 echo "   cardano-sql:         ${tunnelHost}/cardano-sql/"
 echo
