@@ -4,6 +4,14 @@ Notable operator-facing changes to Dandelion Lite will be recorded here, followi
 
 ## [Unreleased]
 
+### Added
+
+- GitHub Actions checks for pushes to `main` and pull requests: validate tracked
+  shell scripts with `bash -n`, check Compose configuration against each shipped
+  network example, and run the SSL unit and script fixtures (#33). Fixtures create
+  synthetic test files without starting service containers or using deployment
+  credentials.
+
 ### Fixed
 
 - Use explicit Bash shebangs for `scripts/docker/restore-volume.sh`,

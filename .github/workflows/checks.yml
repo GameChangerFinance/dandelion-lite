@@ -1,0 +1,44 @@
+# Fast, read-only checks that need no Cardano node, network peers or real .env.
+# They mirror the minimum asked for in CONTRIBUTING.md (bash -n on scripts),
+# plus Compose validation of the shipped .env examples and the isolated SSL
+# fixture tests documented in tests/ssl/README.md.
+name: checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # tests/ssl/scripts-check.sh needs history containing baseline 8452d05
+          fetch-depth: 0
+
+      - name: Shell syntax (bash -n)
+        run: |
+          status=0
+          while IFS= read -r -d '' script; do
+            bash -n "$script" || { echo "::error file=$script::bash -n failed"; status=1; }
+          done < <(git ls-files -z '*.sh')
+          exit "$status"
+
+      - name: Compose config for each .env example
+        run: |
+          for network in mainnet preprod preview; do
+            echo "ℹ️ docker compose config with .env.example.${network}"
+            docker compose --env-file ".env.example.${network}" config --quiet
+          done
+
+      - name: SSL unit checks
+        run: bash tests/ssl/unit.sh
+
+      - name: SSL script checks
+        run: bash tests/ssl/scripts-check.sh
